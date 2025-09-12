@@ -14,6 +14,8 @@
     gdb
     openocd
     usbutils
+    renode
+    probe-rs-tools
     # qemu_full
   ];
 
@@ -34,9 +36,9 @@
     ];
   };
 
-  git-hooks.hooks = {
-    rustfmt.enable = true;
-    clippy.enable = true;
-  };
+  # git-hooks.hooks = {
+  #   rustfmt.enable = true;
+  #   clippy.enable = true;
+  # };
 
 }
