@@ -14,3 +14,6 @@ runner = [
   "--log-format",
   "{t} {L} {s}",
 ]
+
+[env]
+DEFMT_LOG = "trace"

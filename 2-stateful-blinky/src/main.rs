@@ -1,41 +1,34 @@
 #![no_std]
 #![no_main]
 
+mod blinky;
+mod hardware;
+
 use defmt_rtt as _;
 use panic_probe as _;
 
-use defmt::info;
 use embassy_executor::Executor;
-use embassy_stm32::gpio::{Level, Output, Speed};
-use embassy_time::Timer;
 use static_cell::StaticCell;
+
+use crate::{
+    blinky::{STATE, State, blinky_task},
+    hardware::Hardware,
+};
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
-struct State<'a> {
-    led: Output<'a>,
-}
-
-static STATE: StaticCell<State> = StaticCell::new();
-
 #[cortex_m_rt::entry]
 fn main() -> ! {
-    info!("Initializing");
-    let peripherals = embassy_stm32::init(Default::default());
-
-    let led = Output::new(peripherals.PB0, Level::Low, Speed::Low);
+    let hardware = Hardware::get();
 
     let executor = EXECUTOR.init(embassy_executor::Executor::new());
     executor.run(|spawner| {
-        spawner.spawn(blinky(STATE.init(State { led }))).ok();
+        spawner
+            .spawn(blinky_task(STATE.init(State::new([
+                hardware.left_led,
+                hardware.middle_led,
+                hardware.right_led,
+            ]))))
+            .ok();
     })
-}
-
-#[embassy_executor::task]
-async fn blinky(state: &'static mut State<'static>) {
-    loop {
-        info!("Blinky!");
-        state.led.toggle();
-        Timer::after_millis(1000).await
-    }
 }
