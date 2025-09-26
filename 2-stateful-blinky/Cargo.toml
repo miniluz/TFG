@@ -9,7 +9,7 @@ cortex-m-rt = "0.7.5"
 defmt = "1.0.1"
 defmt-rtt = "1.0.0"
 embassy-executor = { version = "0.9.1", features = ["arch-cortex-m", "defmt", "executor-thread", "executor-interrupt"] }
-embassy-stm32 = { version = "0.4.0", features = ["stm32h723zg", "defmt", "memory-x", "time", "time-driver-any"] }
+embassy-stm32 = { version = "0.4.0", features = ["stm32h723zg", "defmt", "memory-x", "time", "time-driver-any", "exti"] }
 embassy-sync = { version = "0.7.2", features = ["defmt"] }
 embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime"] }
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
