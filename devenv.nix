@@ -14,9 +14,8 @@
     gdb
     openocd
     usbutils
-    renode
     probe-rs-tools
-    # qemu_full
+    qemu
   ];
 
   languages.rust = {
