@@ -10,11 +10,38 @@
   packages = with pkgs; [
     git
     cargo-binutils
+    cargo-expand
     cargo-generate
     gdb
     openocd
     usbutils
-    probe-rs-tools
+    (pkgs.rustPlatform.buildRustPackage rec {
+      pname = "probe-rs-tools";
+      version = "0.27.0";
+
+      src = fetchFromGitHub {
+        owner = "probe-rs";
+        repo = "probe-rs";
+        rev = "70f2e4060a81041f2dac7f388b5e11143696b3af";
+        hash = "sha256-qpHSfn8/dvFC5yjtbD35j5OH2XJQrDI988V7Oidsr8A=";
+      };
+
+      cargoHash = "sha256-C5ca6uaZ6RBtLoShkat9OoaeNM7iEgiUltcwBCcvvQw=";
+
+      buildAndTestSubdir = pname;
+
+      nativeBuildInputs = [
+        cmake
+        pkg-config
+      ];
+
+      buildInputs = [
+        libusb1
+        openssl
+      ];
+      doCheck = false;
+
+    })
     qemu
   ];
 
