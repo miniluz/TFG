@@ -42,7 +42,6 @@
       doCheck = false;
 
     })
-    qemu
   ];
 
   languages.rust = {
