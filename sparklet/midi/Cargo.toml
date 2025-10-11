@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-midly = "0.5.3"
+embassy-sync = "0.7.2"
+midly = { version = "0.5.3", default-features = false }
 

@@ -8,10 +8,10 @@
 
 {
   packages = with pkgs; [
-    git
     cargo-binutils
     cargo-expand
     cargo-generate
+    bacon
     gdb
     openocd
     usbutils
