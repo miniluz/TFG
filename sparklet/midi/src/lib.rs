@@ -13,12 +13,16 @@ pub enum MidiEvent {
 
 pub struct MidiListener<'ch, M: RawMutex, const N: usize> {
     sender: Sender<'ch, M, MidiEvent, N>,
-    midi_stream: MidiStream,
+    midi_stream: MidiStream<MidiListenerBuffer>,
+}
+
+midly::stack_buffer! {
+    struct MidiListenerBuffer([u8; 4]);
 }
 
 impl<'ch, M: RawMutex, const N: usize> MidiListener<'ch, M, N> {
     pub fn new(sender: Sender<'ch, M, MidiEvent, N>) -> Self {
-        let midi_stream = MidiStream::new();
+        let midi_stream = MidiStream::with_buffer(MidiListenerBuffer::new());
 
         MidiListener {
             sender,
@@ -52,7 +56,10 @@ impl<'ch, M: RawMutex, const N: usize> MidiListener<'ch, M, N> {
 #[cfg(test)]
 mod test {
     use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel};
-    use midly::{MidiMessage, live::LiveEvent};
+    use midly::{
+        MidiMessage,
+        live::{LiveEvent, SystemCommon},
+    };
     use pretty_assertions::assert_eq;
 
     use crate::{MidiEvent, MidiListener};
@@ -192,9 +199,13 @@ mod test {
     fn when_receiving_garbage_it_processes_the_midi() {
         setup!(receiver, midi_listener);
 
+        let sysex_contents = [8.into()].repeat(1000);
+        let sysex = LiveEvent::Common(SystemCommon::SysEx(sysex_contents.as_slice()));
+
         let sample_midi = [
             note_on!(0, 0, 0),
             note_off!(1, 1, 1),
+            sysex,
             note_on!(2, 2, 2),
             note_off!(3, 3, 3),
         ];
@@ -206,9 +217,8 @@ mod test {
             .for_each(|ev| ev.write(&mut input_buffer).unwrap());
 
         // add random data
-        input_buffer.append(&mut vec![
-            0x90, 0xf1, 0x56, 0x3e, 0xe3, 0x0d, 0x87, 0x78, 0xd1, 0xc4,
-        ]);
+        input_buffer
+            .append(&mut [0x90, 0xf1, 0x56, 0x3e, 0xe3, 0x0d, 0x87, 0x78, 0xd1, 0xc4].repeat(1000));
 
         sample_midi[2..]
             .iter()
