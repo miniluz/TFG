@@ -7,3 +7,6 @@ edition = "2024"
 embassy-sync = "0.7.2"
 midly = { version = "0.5.3", default-features = false }
 
+[dev-dependencies]
+midly = { version = "0.5.3" }
+pretty_assertions = "1.4.1"

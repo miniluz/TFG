@@ -11,6 +11,7 @@
     cargo-binutils
     cargo-expand
     cargo-generate
+    cargo-nextest
     bacon
     gdb
     openocd
