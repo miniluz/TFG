@@ -25,7 +25,7 @@ impl<'a> Hardware<'a> {
         let midi_uart = UartRx::new(
             peripherals.UART4,
             Irqs,
-            peripherals.PB8,
+            peripherals.PA1,
             peripherals.DMA1_CH0,
             config,
         );

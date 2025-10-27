@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 embassy-sync = "0.7.2"
 midly = { version = "0.5.3", default-features = false }
+defmt = "1.0.1"
 
 [dev-dependencies]
 midly = { version = "0.5.3" }

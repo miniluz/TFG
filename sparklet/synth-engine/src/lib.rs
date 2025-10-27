@@ -1,24 +1,27 @@
 #![cfg_attr(not(test), no_std)]
 
+use defmt::Format;
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
-use fixed::types::I1F15 as Q15;
-use midi::{MidiEvent, u7};
+use midi::MidiEvent;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub use fixed::types::I1F15 as Q15;
+
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoiceStage {
     Free,
     Held,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 struct Voice {
     start: u64,
-    note: u7,
-    velocity: u7,
+    note: u8,
+    velocity: u8,
     stage: VoiceStage,
 }
 
-struct VoiceBank<const N: usize> {
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct VoiceBank<const N: usize> {
     voices: [Voice; N],
 }
 
@@ -27,8 +30,8 @@ impl<const N: usize> VoiceBank<N> {
         Self {
             voices: [Voice {
                 start: 0,
-                note: 0.into(),
-                velocity: 0.into(),
+                note: 0,
+                velocity: 0,
                 stage: VoiceStage::Free,
             }; N],
         }
@@ -41,7 +44,7 @@ impl<const N: usize> VoiceBank<N> {
         }
     }
 
-    pub fn play_note(&mut self, note: u7, velocity: u7) {
+    pub fn play_note(&mut self, note: u8, velocity: u8) {
         let mut earliest_start_index: usize = 0;
         let mut earliest_start_value: u64 = 0;
 
@@ -70,7 +73,7 @@ impl<const N: usize> VoiceBank<N> {
         earliest_voice.stage = VoiceStage::Held;
     }
 
-    pub fn release_note(&mut self, note: u7) {
+    pub fn release_note(&mut self, note: u8) {
         for voice in self.voices.iter_mut() {
             if voice.note == note {
                 voice.stage = VoiceStage::Free;
@@ -105,6 +108,10 @@ impl<'ch, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: usize>
             voice_bank: VoiceBank::new(),
             receiver,
         }
+    }
+
+    pub fn get_voice_bank(&self) -> &VoiceBank<VOICE_BANK_SIZE> {
+        &self.voice_bank
     }
 
     pub fn render_samples(&mut self, sample_buffer: &mut [Q15]) {

@@ -10,6 +10,7 @@ const TEST_CHANNEL_SIZE: usize = 4;
 // Macro for easily setting up a VoiceBank instance
 macro_rules! setup_voice_bank {
     ($vb:ident) => {
+        #[allow(unused_mut)]
         let mut $vb = VoiceBank::<TEST_VOICE_BANK_SIZE>::new();
     };
 }
@@ -41,7 +42,7 @@ fn voice_bank_play_note_fills_free_voices() {
     setup_voice_bank!(vb);
 
     for i in 0..TEST_VOICE_BANK_SIZE {
-        vb.play_note((i as u8).into(), 100.into());
+        vb.play_note(i as u8, 100);
         assert_eq!(vb.count_active_voices(), i + 1);
         assert_eq!(vb.get_voice_state(i).note, u7::from(i as u8));
         assert_eq!(vb.get_voice_state(i).velocity, u7::from(100));
@@ -56,14 +57,14 @@ fn voice_bank_play_note_steals_earliest_voice_when_full() {
 
     // Fill all voices
     for i in 0..TEST_VOICE_BANK_SIZE {
-        vb.play_note((i as u8).into(), 100.into());
+        vb.play_note(i as u8, 100);
     }
     assert_eq!(vb.count_active_voices(), TEST_VOICE_BANK_SIZE);
 
     // Play one more note, it should steal the voice at index 0 (note 0)
     // because all start times are 0.
-    let stolen_note = (TEST_VOICE_BANK_SIZE as u8).into();
-    vb.play_note(stolen_note, 120.into());
+    let stolen_note = TEST_VOICE_BANK_SIZE as u8;
+    vb.play_note(stolen_note, 120);
 
     assert_eq!(vb.count_active_voices(), TEST_VOICE_BANK_SIZE); // Still full
     assert_eq!(vb.get_voice_state(0).note, stolen_note);
@@ -82,8 +83,8 @@ fn voice_bank_play_note_steals_earliest_voice_when_full() {
 fn voice_bank_release_note_frees_active_note() {
     setup_voice_bank!(vb);
 
-    let note_to_play = 60.into();
-    vb.play_note(note_to_play, 100.into());
+    let note_to_play = 60;
+    vb.play_note(note_to_play, 100);
     assert_eq!(vb.count_active_voices(), 1);
 
     vb.release_note(note_to_play);
@@ -95,9 +96,9 @@ fn voice_bank_release_note_frees_active_note() {
 fn voice_bank_release_note_frees_all_instances_of_a_note() {
     setup_voice_bank!(vb);
 
-    let note_to_play = 60.into();
-    vb.play_note(note_to_play, 100.into()); // Voice 0
-    vb.play_note(note_to_play, 90.into()); // Voice 1 (if TEST_VOICE_BANK_SIZE >= 2)
+    let note_to_play = 60;
+    vb.play_note(note_to_play, 100); // Voice 0
+    vb.play_note(note_to_play, 90); // Voice 1 (if TEST_VOICE_BANK_SIZE >= 2)
     assert_eq!(vb.count_active_voices(), 2);
 
     vb.release_note(note_to_play);
@@ -110,12 +111,12 @@ fn voice_bank_release_note_frees_all_instances_of_a_note() {
 fn voice_bank_release_note_non_existent_does_nothing() {
     setup_voice_bank!(vb);
 
-    vb.play_note(60.into(), 100.into());
-    vb.play_note(62.into(), 100.into());
+    vb.play_note(60, 100);
+    vb.play_note(62, 100);
     assert_eq!(vb.count_active_voices(), 2);
 
     // Try to release a note that was not played
-    vb.release_note(64.into());
+    vb.release_note(64);
     assert_eq!(vb.count_active_voices(), 2);
     assert_eq!(vb.get_voice_state(0).note, u7::from(60));
     assert_eq!(vb.get_voice_state(1).note, u7::from(62));
@@ -127,8 +128,8 @@ fn voice_bank_release_note_non_existent_does_nothing() {
 fn voice_bank_process_midi_event_handles_note_on_and_off() {
     setup_voice_bank!(vb);
 
-    let note = 60.into();
-    let vel = 100.into();
+    let note = 60;
+    let vel = 100;
 
     // NoteOn
     vb.process_midi_event(MidiEvent::NoteOn { key: note, vel });
@@ -138,10 +139,7 @@ fn voice_bank_process_midi_event_handles_note_on_and_off() {
     assert_eq!(vb.get_voice_state(0).stage, VoiceStage::Held);
 
     // NoteOff
-    vb.process_midi_event(MidiEvent::NoteOff {
-        key: note,
-        vel: 0.into(),
-    });
+    vb.process_midi_event(MidiEvent::NoteOff { key: note, vel: 0 });
     assert_eq!(vb.count_active_voices(), 0);
     assert_eq!(vb.get_voice_state(0).stage, VoiceStage::Free);
 }
@@ -150,8 +148,8 @@ fn voice_bank_process_midi_event_handles_note_on_and_off() {
 fn synth_engine_render_samples_processes_note_on_events() {
     setup_synth_engine!(sender, se);
 
-    let note = 60.into();
-    let vel = 100.into();
+    let note = 60;
+    let vel = 100;
 
     sender
         .try_send(MidiEvent::NoteOn { key: note, vel })
@@ -175,8 +173,8 @@ fn synth_engine_render_samples_processes_note_on_events() {
 fn synth_engine_render_samples_processes_note_off_events() {
     setup_synth_engine!(sender, se);
 
-    let note = 60.into();
-    let vel = 100.into();
+    let note = 60;
+    let vel = 100;
 
     // First NoteOn to get a voice active
     sender
@@ -189,10 +187,7 @@ fn synth_engine_render_samples_processes_note_off_events() {
 
     // Now send NoteOff
     sender
-        .try_send(MidiEvent::NoteOff {
-            key: note,
-            vel: 0.into(),
-        })
+        .try_send(MidiEvent::NoteOff { key: note, vel: 0 })
         .unwrap();
     se.render_samples(&mut buffer); // Process the NoteOff
 
@@ -211,31 +206,19 @@ fn synth_engine_render_samples_processes_multiple_events() {
 
     // NoteOn 60
     sender
-        .try_send(MidiEvent::NoteOn {
-            key: 60.into(),
-            vel: 100.into(),
-        })
+        .try_send(MidiEvent::NoteOn { key: 60, vel: 100 })
         .unwrap();
     // NoteOn 62
     sender
-        .try_send(MidiEvent::NoteOn {
-            key: 62.into(),
-            vel: 100.into(),
-        })
+        .try_send(MidiEvent::NoteOn { key: 62, vel: 100 })
         .unwrap();
     // NoteOff 60
     sender
-        .try_send(MidiEvent::NoteOff {
-            key: 60.into(),
-            vel: 0.into(),
-        })
+        .try_send(MidiEvent::NoteOff { key: 60, vel: 0 })
         .unwrap();
     // NoteOn 64
     sender
-        .try_send(MidiEvent::NoteOn {
-            key: 64.into(),
-            vel: 100.into(),
-        })
+        .try_send(MidiEvent::NoteOn { key: 64, vel: 100 })
         .unwrap();
 
     let mut buffer = [Q15::ZERO; 10];

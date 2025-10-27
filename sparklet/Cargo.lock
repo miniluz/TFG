@@ -641,6 +641,7 @@ checksum = "f5e54036fe321fd421e10d732f155734c4e4afd610dd556d9a82833ab3ee0bed"
 name = "midi"
 version = "0.1.0"
 dependencies = [
+ "defmt 1.0.1",
  "embassy-sync",
  "midly",
  "pretty_assertions",
@@ -804,6 +805,7 @@ dependencies = [
  "midi",
  "panic-probe",
  "static_cell",
+ "synth_engine",
 ]
 
 [[package]]
@@ -898,6 +900,7 @@ dependencies = [
 name = "synth_engine"
 version = "0.1.0"
 dependencies = [
+ "defmt 1.0.1",
  "embassy-sync",
  "fixed",
  "midi",

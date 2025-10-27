@@ -15,3 +15,4 @@ embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2.1.1"
 midi = { path = "../midi" }
+synth_engine = { path = "../synth-engine" }

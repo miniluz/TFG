@@ -1,5 +1,5 @@
 use defmt::trace;
-use embassy_executor::Executor;
+use embassy_executor::SpawnToken;
 use embassy_stm32::usart::RingBufferedUartRx;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel};
 use midi::{MidiEvent, MidiListener};
@@ -29,21 +29,12 @@ pub static MIDI_TASK_STATE: StaticCell<MidiTaskState> = StaticCell::new();
 pub static MIDI_TASK_CHANNEL: Channel<CriticalSectionRawMutex, MidiEvent, MIDI_CHANNEL_SIZE> =
     Channel::new();
 
-pub fn setup_task(
-    executor: &'static mut Executor,
-    midi_uart_buffered: RingBufferedUartRx<'static>,
-) {
+pub fn create_task(midi_uart_buffered: RingBufferedUartRx<'static>) -> SpawnToken<impl Sized> {
     let midi_sender = MIDI_TASK_CHANNEL.sender();
 
     let midi_listener = MidiListener::new(midi_sender);
 
-    executor.run(|spawner| {
-        spawner
-            .spawn(midi_task(
-                MIDI_TASK_STATE.init(MidiTaskState::new(midi_listener, midi_uart_buffered)),
-            ))
-            .ok();
-    });
+    midi_task(MIDI_TASK_STATE.init(MidiTaskState::new(midi_listener, midi_uart_buffered)))
 }
 
 #[embassy_executor::task]

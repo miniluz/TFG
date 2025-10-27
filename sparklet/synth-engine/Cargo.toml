@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 embassy-sync = "0.7.2"
 fixed = "1.29.0"
+defmt = "1.0.1"
 midi = { path = "../midi" }
 
 [dev-dependencies]

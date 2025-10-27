@@ -1,14 +1,15 @@
 #![cfg_attr(not(test), no_std)]
 
+use defmt::{Format, info};
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Sender};
 use midly::{MidiMessage, live::LiveEvent, stream::MidiStream};
 
 pub use midly::num::u7;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MidiEvent {
-    NoteOff { key: u7, vel: u7 },
-    NoteOn { key: u7, vel: u7 },
+    NoteOff { key: u8, vel: u8 },
+    NoteOn { key: u8, vel: u8 },
 }
 
 pub struct MidiListener<'ch, M: RawMutex, const N: usize> {
@@ -37,10 +38,18 @@ impl<'ch, M: RawMutex, const N: usize> MidiListener<'ch, M, N> {
         } = event
         {
             let event_to_add: MidiEvent = match message {
-                MidiMessage::NoteOff { key, vel } => MidiEvent::NoteOff { key, vel },
-                MidiMessage::NoteOn { key, vel } => MidiEvent::NoteOn { key, vel },
+                MidiMessage::NoteOff { key, vel } => MidiEvent::NoteOff {
+                    key: key.into(),
+                    vel: vel.into(),
+                },
+                MidiMessage::NoteOn { key, vel } => MidiEvent::NoteOn {
+                    key: key.into(),
+                    vel: vel.into(),
+                },
                 _ => return,
             };
+
+            info!("Adding event: {:#?}", event_to_add);
 
             // only fails if full. if full, the message should be discareded anyways
             sender.try_send(event_to_add).ok();
@@ -127,22 +136,10 @@ mod test {
         assert_eq!(
             output_buffer.as_slice(),
             &[
-                MidiEvent::NoteOn {
-                    key: 0.into(),
-                    vel: 0.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 1.into(),
-                    vel: 1.into()
-                },
-                MidiEvent::NoteOn {
-                    key: 2.into(),
-                    vel: 2.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 3.into(),
-                    vel: 3.into()
-                },
+                MidiEvent::NoteOn { key: 0, vel: 0 },
+                MidiEvent::NoteOff { key: 1, vel: 1 },
+                MidiEvent::NoteOn { key: 2, vel: 2 },
+                MidiEvent::NoteOff { key: 3, vel: 3 },
             ]
         );
     }
@@ -175,22 +172,10 @@ mod test {
         assert_eq!(
             output_buffer.as_slice(),
             &[
-                MidiEvent::NoteOn {
-                    key: 0.into(),
-                    vel: 0.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 1.into(),
-                    vel: 1.into()
-                },
-                MidiEvent::NoteOn {
-                    key: 2.into(),
-                    vel: 2.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 3.into(),
-                    vel: 3.into()
-                },
+                MidiEvent::NoteOn { key: 0, vel: 0 },
+                MidiEvent::NoteOff { key: 1, vel: 1 },
+                MidiEvent::NoteOn { key: 2, vel: 2 },
+                MidiEvent::NoteOff { key: 3, vel: 3 },
             ]
         );
     }
@@ -235,22 +220,10 @@ mod test {
         assert_eq!(
             output_buffer.as_slice(),
             &[
-                MidiEvent::NoteOn {
-                    key: 0.into(),
-                    vel: 0.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 1.into(),
-                    vel: 1.into()
-                },
-                MidiEvent::NoteOn {
-                    key: 2.into(),
-                    vel: 2.into()
-                },
-                MidiEvent::NoteOff {
-                    key: 3.into(),
-                    vel: 3.into()
-                },
+                MidiEvent::NoteOn { key: 0, vel: 0 },
+                MidiEvent::NoteOff { key: 1, vel: 1 },
+                MidiEvent::NoteOn { key: 2, vel: 2 },
+                MidiEvent::NoteOff { key: 3, vel: 3 },
             ]
         );
     }
