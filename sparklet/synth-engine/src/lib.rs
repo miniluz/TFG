@@ -4,7 +4,7 @@ use defmt::Format;
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
 use midi::MidiEvent;
 
-pub use fixed::types::I1F15 as Q15;
+pub use cmsis_interface::Q15;
 
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoiceStage {

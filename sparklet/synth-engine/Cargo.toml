@@ -8,6 +8,7 @@ embassy-sync = "0.7.2"
 fixed = "1.29.0"
 defmt = "1.0.1"
 midi = { path = "../midi" }
+cmsis-interface = { path = "../cmsis-interface" }
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"

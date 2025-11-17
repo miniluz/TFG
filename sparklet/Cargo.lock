@@ -1394,6 +1394,7 @@ dependencies = [
 name = "synth_engine"
 version = "0.1.0"
 dependencies = [
+ "cmsis-interface",
  "defmt 1.0.1",
  "embassy-sync",
  "fixed",
