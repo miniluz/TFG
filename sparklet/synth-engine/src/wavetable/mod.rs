@@ -1,5 +1,10 @@
+mod phase_increment_table;
+
 use cmsis_interface::{CmsisOperations, Q15};
 use fixed::types::U8F24;
+
+use crate::Note;
+use phase_increment_table::MIDI_TO_PHASE_INCREMENT;
 
 pub struct Wavetable([Q15; 256]);
 
@@ -10,10 +15,7 @@ pub struct WavetableOscillator<const SAMPLE_RATE: u32> {
 }
 
 impl<const SAMPLE_RATE: u32> WavetableOscillator<SAMPLE_RATE> {
-    pub fn get_samples<T: CmsisOperations, const LEN: usize>(
-        self: &mut Self,
-        buffer: &mut [Q15; LEN],
-    ) {
+    pub fn get_samples<T: CmsisOperations, const LEN: usize>(&mut self, buffer: &mut [Q15; LEN]) {
         /*
          * We're gonna use SIMD to calculate for efficienty
          * So we'll be collecting things into arrays first
@@ -27,7 +29,7 @@ impl<const SAMPLE_RATE: u32> WavetableOscillator<SAMPLE_RATE> {
         let mut weight_current = [Q15::ZERO; LEN];
         let mut weight_next = [Q15::ZERO; LEN];
 
-        for (s_current, (s_next, (w_next))) in sample_current
+        for (s_current, (s_next, w_next)) in sample_current
             .iter_mut()
             .zip(sample_next.iter_mut().zip(weight_next.iter_mut()))
         {
@@ -89,5 +91,10 @@ impl<const SAMPLE_RATE: u32> WavetableOscillator<SAMPLE_RATE> {
         T::multiply_q15(&sample_next.clone(), &weight_next, &mut sample_next);
 
         T::add_q15(&sample_current, &sample_next, buffer);
+    }
+
+    pub fn set_note(&mut self, note: &Note) {
+        self.phase = U8F24::ZERO;
+        self.phase_increment = MIDI_TO_PHASE_INCREMENT[note.as_u8() as usize]
     }
 }
