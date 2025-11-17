@@ -1,101 +1,13 @@
 #![cfg_attr(not(test), no_std)]
 
+mod voice_bank;
 mod wavetable;
 
-use defmt::Format;
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
 use midi::MidiEvent;
 
 pub use cmsis_interface::Q15;
-
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VoiceStage {
-    Free,
-    Held,
-}
-
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
-struct Voice {
-    start: u64,
-    note: u8,
-    velocity: u8,
-    stage: VoiceStage,
-}
-
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct VoiceBank<const N: usize> {
-    voices: [Voice; N],
-}
-
-impl<const N: usize> VoiceBank<N> {
-    pub fn new() -> Self {
-        Self {
-            voices: [Voice {
-                start: 0,
-                note: 0,
-                velocity: 0,
-                stage: VoiceStage::Free,
-            }; N],
-        }
-    }
-
-    pub fn process_midi_event(&mut self, event: MidiEvent) {
-        match event {
-            MidiEvent::NoteOn { key, vel } => self.play_note(key, vel),
-            MidiEvent::NoteOff { key, vel: _ } => self.release_note(key),
-        }
-    }
-
-    pub fn play_note(&mut self, note: u8, velocity: u8) {
-        let mut earliest_start_index: usize = 0;
-        let mut earliest_start_value: u64 = 0;
-
-        for (index, voice) in self.voices.iter_mut().enumerate() {
-            match voice.stage {
-                VoiceStage::Free => {
-                    voice.note = note;
-                    voice.velocity = velocity;
-                    voice.stage = VoiceStage::Held;
-                    return;
-                }
-                VoiceStage::Held => {
-                    if voice.start < earliest_start_value {
-                        earliest_start_index = index;
-                        earliest_start_value = voice.start;
-                    }
-                }
-            }
-        }
-
-        // No free note found
-        let earliest_voice = &mut self.voices[earliest_start_index];
-        earliest_voice.start = 0;
-        earliest_voice.note = note;
-        earliest_voice.velocity = velocity;
-        earliest_voice.stage = VoiceStage::Held;
-    }
-
-    pub fn release_note(&mut self, note: u8) {
-        for voice in self.voices.iter_mut() {
-            if voice.note == note {
-                voice.stage = VoiceStage::Free;
-            }
-        }
-    }
-
-    #[cfg(test)]
-    pub(crate) fn count_active_voices(&self) -> usize {
-        self.voices
-            .iter()
-            .filter(|v| v.stage == VoiceStage::Held)
-            .count()
-    }
-
-    #[cfg(test)]
-    pub(crate) fn get_voice_state(&self, index: usize) -> Voice {
-        self.voices[index]
-    }
-}
+pub use voice_bank::{Note, Velocity, VoiceBank, VoiceStage};
 
 pub struct SynthEngine<'ch, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: usize> {
     voice_bank: VoiceBank<VOICE_BANK_SIZE>,
