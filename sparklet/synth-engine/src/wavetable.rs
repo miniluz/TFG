@@ -3,14 +3,17 @@ use fixed::types::U8F24;
 
 pub struct Wavetable([Q15; 256]);
 
-pub struct WavetableOscillator<T: CmsisOperations, const SAMPLE_RATE: u32> {
+pub struct WavetableOscillator<const SAMPLE_RATE: u32> {
     phase: U8F24,
     phase_increment: U8F24,
     wavetable: Wavetable,
 }
 
-impl<T: CmsisOperations, const SAMPLE_RATE: u32> WavetableOscillator<T, SAMPLE_RATE> {
-    pub fn get_samples<const LEN: usize>(self: &mut Self, buffer: &mut [Q15; LEN]) {
+impl<const SAMPLE_RATE: u32> WavetableOscillator<SAMPLE_RATE> {
+    pub fn get_samples<T: CmsisOperations, const LEN: usize>(
+        self: &mut Self,
+        buffer: &mut [Q15; LEN],
+    ) {
         /*
          * We're gonna use SIMD to calculate for efficienty
          * So we'll be collecting things into arrays first
