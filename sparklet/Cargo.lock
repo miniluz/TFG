@@ -132,6 +132,9 @@ dependencies = [
 [[package]]
 name = "cmsis-interface"
 version = "0.1.0"
+dependencies = [
+ "fixed",
+]
 
 [[package]]
 name = "cmsis-rust"

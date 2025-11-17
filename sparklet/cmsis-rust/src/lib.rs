@@ -5,19 +5,49 @@ use cmsis_interface::CmsisOperations;
 pub struct CmsisRustOperations;
 
 impl CmsisOperations for CmsisRustOperations {
-    fn add(left: u64, right: u64) -> u64 {
-        left + right
+    fn abs_in_place_q15(values: &mut [cmsis_interface::Q15]) {
+        for value in values.iter_mut() {
+            *value = value.abs();
+        }
     }
 
-    fn multiply_f32(src1: &[f32], src2: &[f32], dst: &mut [f32]) {
-        {
-            if (src1.len() != src2.len()) || (src1.len() != dst.len()) {
-                panic!("src1.len() != src2.len() || src1.len() != dst.len()");
-            }
+    fn abs_q15(src: &[cmsis_interface::Q15], dst: &mut [cmsis_interface::Q15]) {
+        if src.len() != dst.len() {
+            panic!("src.len() != dst.len()");
+        }
 
-            for (dst, (src1, src2)) in dst.iter_mut().zip(src1.iter().zip(src2.iter())) {
-                *dst = *src1 * *src2;
-            }
+        for (dst, src) in dst.iter_mut().zip(src.iter()) {
+            *dst = src.abs();
+        }
+    }
+
+    fn add_q15(
+        src1: &[cmsis_interface::Q15],
+        src2: &[cmsis_interface::Q15],
+        dst: &mut [cmsis_interface::Q15],
+    ) {
+        if (src1.len() != src2.len()) || (src1.len() != dst.len()) {
+            panic!("src1.len() != src2.len() || src1.len() != dst.len()");
+        }
+
+        for (dst, (src1, src2)) in dst.iter_mut().zip(src1.iter().zip(src2.iter())) {
+            // TODO: Check if they saturate
+            *dst = src1.saturating_add(*src2);
+        }
+    }
+
+    fn multiply_q15(
+        src1: &[cmsis_interface::Q15],
+        src2: &[cmsis_interface::Q15],
+        dst: &mut [cmsis_interface::Q15],
+    ) {
+        if (src1.len() != src2.len()) || (src1.len() != dst.len()) {
+            panic!("src1.len() != src2.len() || src1.len() != dst.len()");
+        }
+
+        for (dst, (src1, src2)) in dst.iter_mut().zip(src1.iter().zip(src2.iter())) {
+            // Multiplication should never saturate...
+            *dst = src1 * src2;
         }
     }
 }

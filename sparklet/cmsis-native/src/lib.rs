@@ -1,19 +1,25 @@
 #![no_std]
 #![no_main]
 
-use cmsis_interface::CmsisOperations;
+use cmsis_interface::{CmsisOperations, Q15};
 
 pub struct CmsisNativeOperations;
 
 impl CmsisOperations for CmsisNativeOperations {
-    fn add(left: u64, right: u64) -> u64 {
-        left + right
+    fn abs_in_place_q15(values: &mut [Q15]) {
+        cmsis_dsp::basic::abs_in_place_q15(values);
     }
 
-    fn multiply_f32(src1: &[f32], src2: &[f32], dst: &mut [f32]) {
-        use cmsis_dsp::basic::multiply_f32;
+    fn abs_q15(src: &[Q15], dst: &mut [Q15]) {
+        cmsis_dsp::basic::abs_q15(src, dst);
+    }
 
-        multiply_f32(src1, src2, dst);
+    fn add_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]) {
+        cmsis_dsp::basic::add_q15(src1, src2, dst);
+    }
+
+    fn multiply_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]) {
+        cmsis_dsp::basic::multiply_q15(src1, src2, dst);
     }
 }
 
