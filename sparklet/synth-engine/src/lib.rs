@@ -1,5 +1,7 @@
 #![cfg_attr(not(test), no_std)]
 
+mod wavetable;
+
 use defmt::Format;
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
 use midi::MidiEvent;

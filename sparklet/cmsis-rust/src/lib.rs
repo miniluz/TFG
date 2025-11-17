@@ -50,6 +50,22 @@ impl CmsisOperations for CmsisRustOperations {
             *dst = src1 * src2;
         }
     }
+
+    fn negate_in_place_q15(values: &mut [cmsis_interface::Q15]) {
+        for value in values.iter_mut() {
+            *value = value.saturating_neg();
+        }
+    }
+
+    fn negate_q15(src: &[cmsis_interface::Q15], dst: &mut [cmsis_interface::Q15]) {
+        if src.len() != dst.len() {
+            panic!("src.len() != dst.len()");
+        }
+
+        for (dst, src) in dst.iter_mut().zip(src.iter()) {
+            *dst = src.saturating_neg();
+        }
+    }
 }
 
 cmsis_interface::declare_tests!(crate::CmsisRustOperations,,);

@@ -21,6 +21,14 @@ impl CmsisOperations for CmsisNativeOperations {
     fn multiply_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]) {
         cmsis_dsp::basic::multiply_q15(src1, src2, dst);
     }
+
+    fn negate_in_place_q15(values: &mut [Q15]) {
+        cmsis_dsp::basic::negate_in_place_q15(values);
+    }
+
+    fn negate_q15(src: &[Q15], dst: &mut [Q15]) {
+        cmsis_dsp::basic::negate_q15(src, dst);
+    }
 }
 
 #[cfg(test)]
@@ -30,7 +38,7 @@ fn setup() {
 }
 
 #[cfg(test)]
-adder_interface::declare_tests! {
+cmsis_interface::declare_tests! {
     crate::CmsisNativeOperations,
     #[embedded_test::tests],
     use embassy_stm32 as _;

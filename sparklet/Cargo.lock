@@ -115,7 +115,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2fd1289c04a9ea8cb22300a459a72a385d7c73d3259e2ed7dcb2af674838cfa9"
 
 [[package]]
-name = "cmsis-cmsis"
+name = "cmsis-interface"
+version = "0.1.0"
+dependencies = [
+ "fixed",
+]
+
+[[package]]
+name = "cmsis-native"
 version = "0.1.0"
 dependencies = [
  "cmsis-interface",
@@ -130,13 +137,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cmsis-interface"
-version = "0.1.0"
-dependencies = [
- "fixed",
-]
-
-[[package]]
 name = "cmsis-rust"
 version = "0.1.0"
 dependencies = [
@@ -146,8 +146,7 @@ dependencies = [
 [[package]]
 name = "cmsis_dsp"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "074f989fa8d48b1e434c2bad1ac127e916675de48bb56b9db01462a248029d24"
+source = "git+https://github.com/miniluz/cmsis_dsp.rs?branch=negate-bindings#d442accc22b313eb2bd0883f48cd5561ce26088d"
 dependencies = [
  "cmsis_dsp_sys_pregenerated",
  "fixed",
@@ -158,8 +157,7 @@ dependencies = [
 [[package]]
 name = "cmsis_dsp_sys_pregenerated"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c48e0714acb16e5425249cfae1629a759f8d6123b10e68c6bb5917315d0ad20a"
+source = "git+https://github.com/miniluz/cmsis_dsp.rs?branch=negate-bindings#d442accc22b313eb2bd0883f48cd5561ce26088d"
 dependencies = [
  "ureq",
  "zip",
@@ -955,9 +953,9 @@ checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
 name = "micromath"
-version = "1.1.1"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc4010833aea396656c2f91ee704d51a6f1329ec2ab56ffd00bfd56f7481ea94"
+checksum = "c3c8dda44ff03a2f238717214da50f65d5a53b45cd213a7370424ffdb6fae815"
 
 [[package]]
 name = "midi"

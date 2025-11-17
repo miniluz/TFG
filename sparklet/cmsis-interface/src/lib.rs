@@ -7,6 +7,8 @@ pub trait CmsisOperations {
     fn abs_q15(src: &[Q15], dst: &mut [Q15]);
     fn add_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]);
     fn multiply_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]);
+    fn negate_in_place_q15(values: &mut [Q15]);
+    fn negate_q15(src: &[Q15], dst: &mut [Q15]);
 }
 
 #[macro_export]
@@ -55,6 +57,21 @@ macro_rules! declare_tests {
                 let mut values = [Q15::from_num(-0.5), Q15::from_num(0.25), Q15::from_num(-0.75)];
                 <$T>::abs_in_place_q15(&mut values);
                 assert_eq!(values, [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(0.75)]);
+            }
+
+            #[test]
+            pub fn test_negate_q15() {
+                let src = [Q15::from_num(0.5), Q15::from_num(-0.25), Q15::from_num(0.75)];
+                let mut dst = [Q15::from_num(0.0); 3];
+                <$T>::negate_q15(&src, &mut dst);
+                assert_eq!(dst, [Q15::from_num(-0.5), Q15::from_num(0.25), Q15::from_num(-0.75)]);
+            }
+
+            #[test]
+            pub fn test_negate_in_place_q15() {
+                let mut values = [Q15::from_num(0.5), Q15::from_num(-0.25), Q15::from_num(0.75)];
+                <$T>::negate_in_place_q15(&mut values);
+                assert_eq!(values, [Q15::from_num(-0.5), Q15::from_num(0.25), Q15::from_num(-0.75)]);
             }
         }
     };
