@@ -1,3 +1,3 @@
 [workspace]
 resolver = "3"
-members = ["midi", "runner", "synth-engine"]
+members = ["midi", "runner", "synth-engine", "cmsis-interface", "cmsis-native", "cmsis-rust"]
