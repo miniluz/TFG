@@ -37,10 +37,7 @@ fn synth_engine_render_samples_processes_note_on_events() {
     assert_eq!(se.get_voice_bank_mut().count_active_voices(), 1);
     assert_eq!(se.get_voice_bank_mut().get_voice_note(0), note.into());
     assert_eq!(se.get_voice_bank_mut().get_voice_velocity(0), vel.into());
-    assert_eq!(
-        se.get_voice_bank_mut().get_voice_stage(0),
-        VoiceStage::Held
-    );
+    assert_eq!(se.get_voice_bank_mut().get_voice_stage(0), VoiceStage::Held);
     assert_eq!(buffer, [Q15::ZERO; 10]); // Still zeroes buffer
 }
 
@@ -68,10 +65,7 @@ fn synth_engine_render_samples_processes_note_off_events() {
 
     // Verify MidiEvent was processed by VoiceBank
     assert_eq!(se.get_voice_bank_mut().count_active_voices(), 0);
-    assert_eq!(
-        se.get_voice_bank_mut().get_voice_stage(0),
-        VoiceStage::Free
-    );
+    assert_eq!(se.get_voice_bank_mut().get_voice_stage(0), VoiceStage::Free);
     assert_eq!(buffer, [Q15::ZERO; 10]);
 }
 

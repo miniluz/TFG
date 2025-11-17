@@ -1,4 +1,8 @@
 mod phase_increment_table;
+mod saw_wavetable;
+mod sine_wavetable;
+mod square_wavetable;
+mod triangle_wavetable;
 
 use cmsis_interface::{CmsisOperations, Q15};
 use fixed::types::U8F24;
@@ -6,15 +10,15 @@ use fixed::types::U8F24;
 use crate::Note;
 use phase_increment_table::MIDI_TO_PHASE_INCREMENT;
 
-pub struct Wavetable([Q15; 256]);
+pub struct Wavetable<'a>(&'a [Q15; 256]);
 
-pub struct WavetableOscillator<const SAMPLE_RATE: u32> {
+pub struct WavetableOscillator<'a, const SAMPLE_RATE: u32> {
     phase: U8F24,
     phase_increment: U8F24,
-    wavetable: Wavetable,
+    wavetable: Wavetable<'a>,
 }
 
-impl<const SAMPLE_RATE: u32> WavetableOscillator<SAMPLE_RATE> {
+impl<'a, const SAMPLE_RATE: u32> WavetableOscillator<'a, SAMPLE_RATE> {
     pub fn get_samples<T: CmsisOperations, const LEN: usize>(&mut self, buffer: &mut [Q15; LEN]) {
         /*
          * We're gonna use SIMD to calculate for efficienty
