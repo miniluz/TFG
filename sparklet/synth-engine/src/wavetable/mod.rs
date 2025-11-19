@@ -4,6 +4,9 @@ mod sine_wavetable;
 mod square_wavetable;
 mod triangle_wavetable;
 
+#[cfg(test)]
+mod tests;
+
 use cmsis_interface::{CmsisOperations, Q15};
 use fixed::types::U8F24;
 
