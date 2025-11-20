@@ -1,6 +1,16 @@
 use cmsis_interface::Q15;
 use fixed::types::I1F31;
 
+#[cfg(not(target_os = "none"))]
+pub mod native_utils;
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BaseAndCoefficient {
+    pub base: I1F31,
+    pub coefficient: I1F31,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ADSRStage {
     IDLE,
     ATTACK,
@@ -61,6 +71,7 @@ impl ADSRStage {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct ADSRConfig {
     sustain_level: I1F31,
     attack_base: I1F31,
@@ -69,6 +80,7 @@ struct ADSRConfig {
     decay_release_coefficient: I1F31,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct ADSR {
     stage: ADSRStage,
     config: ADSRConfig,

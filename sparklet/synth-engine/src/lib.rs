@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 
-mod adsr;
+pub mod adsr;
 mod voice_bank;
 mod wavetable;
 
