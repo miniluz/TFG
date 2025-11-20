@@ -1,0 +1,196 @@
+use std::env;
+
+use fixed::{
+    traits::ToFixed,
+    types::I1F31
+};
+
+const SAMPLE_RATE: u32 = 48000;
+
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
+struct DecayConfig {
+    rate: f64,
+    target_ratio: f64,
+    initial: f64,
+    target: f64,
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+struct BaseAndCoefficient {
+    base: I1F31,
+    coefficient: I1F31,
+}
+
+fn get_base_and_coefficient(
+    DecayConfig {
+        rate,
+        target_ratio,
+        initial,
+        target,
+    }: DecayConfig,
+) -> BaseAndCoefficient {
+    // to be consumed with the recursive
+    // output = base + output * coefficient
+    // if output starts at initial, after rate times,
+    // it should be (around) target.
+    
+    // coefficient = \exp(log(\frac{target\_ratio}{1+target\_ratio}) ) \div rate)
+    let coefficient = f64::exp(f64::ln(target_ratio / (1. + target_ratio)) / rate);
+
+    // final = initial + (target - initial) \times (1 + target\_ratio)
+    // base = final \times (1 - coefficient)
+    let r#final = initial + (target - initial) * (1. + target_ratio);
+    let base = r#final * (1. - coefficient);
+
+    let base = base.to_fixed();
+    let coefficient = coefficient.to_fixed();
+
+    return BaseAndCoefficient { base, coefficient };
+
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
+struct TimeConfig {
+    rate: f64,
+    ratio: f64,
+    initial: f64,
+    target: f64,
+}
+
+fn get_time_for_index(
+    index: usize,
+    TimeConfig {
+        rate,
+        ratio,
+        initial,
+        target,
+    }: TimeConfig,
+) -> f64 {
+    // time = initial + (target - initial) \times (e^{ratio+(ln(e^{ratio}+1)
+    // - ratio)\frac{x}{rate}}-e^{ratio})
+    initial
+        + (target - initial)
+            * (f64::exp(ratio + (f64::ln(f64::exp(ratio) + 1.) - ratio) * (index as f64) / rate)
+                - f64::exp(ratio))
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
+struct ParamConfig {
+    target_ratio: f64,
+    initial: f64,
+    target: f64,
+    time_config: TimeConfig,
+}
+
+fn get_base_and_coefficient_for_index(
+    index: usize,
+    ParamConfig {
+        target_ratio,
+        initial,
+        target,
+        time_config,
+    }: ParamConfig,
+) -> BaseAndCoefficient {
+    let time = get_time_for_index(index, time_config);
+    let rate = time * SAMPLE_RATE as f64;
+
+    get_base_and_coefficient(DecayConfig {
+        rate,
+        target_ratio,
+        initial,
+        target,
+    })
+}
+
+fn base_coefficient_table_to_string(table: &[BaseAndCoefficient]) -> String {
+    table.iter().map(|BaseAndCoefficient{base, coefficient}| 
+        format!("BaseAndCoefficient{{ base: I1F32::from_bits({:#010x}), coefficient: I1F32::from_bits({:#010x}) }}", base.to_bits() as u32, coefficient.to_bits() as u32)
+    ).reduce(|acc, s| acc + &s).expect("base_coefficient_table_to_string cannot be called with an empty table")
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let target_ratio = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(1.5);
+    assert!(target_ratio > 0.);
+    // Controls how linear/exponential the time adjustment is
+    let time_control_target_ratio = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(-4.8);
+
+    eprintln!("Generating attack base and coefficient table for:");
+    eprintln!("  TARGET_RATIO: {}", target_ratio);
+    eprintln!("  TIME_CONTROL_TARGET_RATIO: {}", time_control_target_ratio);
+
+    print!("[");
+
+    const SIZE: usize = 256;
+
+    let mut attack_table: [BaseAndCoefficient; SIZE] = [Default::default(); SIZE];
+
+    let attack_config = ParamConfig {
+        target_ratio,
+        initial: 0.,
+        target: 1.,
+        time_config: TimeConfig {
+            rate: SIZE as f64 - 1.,
+            ratio: -4.8,
+            initial: 0.01,
+            target: 5.,
+        },
+    };
+
+    let mut decay_release_table: [BaseAndCoefficient; SIZE] = [Default::default(); SIZE];
+
+    let decay_release_config = ParamConfig {
+        target_ratio,
+        initial: 1.,
+        target: 0.,
+        time_config: TimeConfig {
+            rate: SIZE as f64 - 1.,
+            ratio: -5.9,
+            initial: 0.01,
+            target: 10.,
+        },
+    };
+
+    let mut sanity_attack_times = vec![];
+    let mut sanity_decay_release_times = vec![];
+
+    for (index, (attack_base_coefficient, decay_release_base_coefficient)) in attack_table.iter_mut().zip(decay_release_table.iter_mut()).enumerate() {
+        if index <= 2 || 126 <= index && index <= 128 || 253 <= index {
+            sanity_attack_times.push(get_time_for_index(index, attack_config.time_config));
+            sanity_decay_release_times.push(get_time_for_index(index, decay_release_config.time_config));
+        }
+
+        *attack_base_coefficient = get_base_and_coefficient_for_index(index, attack_config);
+        *decay_release_base_coefficient =
+            get_base_and_coefficient_for_index(index, decay_release_config);
+    }
+
+    let contents = format!("
+    // Autogenerated by generate_adsr_tables 
+    
+    use fixed::types::I1F31;
+
+    #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
+    struct BaseAndCoefficient {{
+        base: I1F31,
+        coefficient: I1F31,
+    }}
+
+    static ATTACK_BASE_COEFFICIENT_TABLE: [I1F31; {}] = [
+        {}
+    ];
+
+    static DECAY_RELEASE_BASE_COEFFICIENT_TABLE: [I1F31; {}] = [
+        {}
+    ];
+
+    ", SIZE, base_coefficient_table_to_string(&attack_table), SIZE, base_coefficient_table_to_string(&decay_release_table));
+
+    println!("{}", contents);
+
+    eprintln!("");
+    eprintln!("Sanity check:");
+    eprintln!("  Attack timings: {:?}", sanity_attack_times);
+    eprintln!("  Decay and release timings: {:?}", sanity_decay_release_times);
+}
