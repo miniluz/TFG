@@ -1,6 +1,7 @@
 use cmsis_interface::Q15;
 use fixed::types::I1F31;
 
+mod config_table;
 #[cfg(not(target_os = "none"))]
 pub mod native_utils;
 
