@@ -1,9 +1,18 @@
 use cmsis_interface::Q15;
 use fixed::types::I1F31;
 
+use crate::adsr::{
+    config_table::{
+        ATTACK_BASE_COEFFICIENT_TABLE, DECAY_RELEASE_BASE_COEFFICIENT_TABLE,
+        QUICK_RELEASE_BASE_COEFFICIENT,
+    },
+    sustain_amplitude_table::SUSTAIN_AMPLITUDE_TABLE,
+};
+
 mod config_table;
 #[cfg(not(target_os = "none"))]
 pub mod native_utils;
+mod sustain_amplitude_table;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BaseAndCoefficient {
@@ -12,58 +21,73 @@ pub struct BaseAndCoefficient {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ADSRStage {
-    IDLE,
-    ATTACK,
-    DECAY,
-    SUSTAIN,
-    RELEASE,
+pub(crate) enum ADSRStage {
+    Idle,
+    Attack,
+    Decay,
+    Sustain,
+    Release,
+    QuickRelease,
 }
 
 impl ADSRStage {
-    fn play(&mut self) {
-        *self = Self::ATTACK;
+    pub(crate) fn play(&mut self) {
+        *self = Self::Attack;
     }
 
-    fn stop_playing(&mut self) {
+    pub(crate) fn stop_playing(&mut self) {
         match *self {
-            Self::IDLE => (),
+            Self::Idle => (),
             _ => {
-                *self = ADSRStage::RELEASE;
+                *self = ADSRStage::Release;
             }
         }
     }
 
-    fn progress(&mut self, output: I1F31, adsr_config: &ADSRConfig) -> I1F31 {
+    pub(crate) fn quick_release(&mut self) {
         match *self {
-            Self::IDLE => I1F31::ZERO,
-            Self::ATTACK => {
-                let output = output
-                    .saturating_mul_add(adsr_config.attack_coefficient, adsr_config.attack_base);
+            Self::Idle => (),
+            _ => {
+                *self = ADSRStage::QuickRelease;
+            }
+        }
+    }
+
+    pub(crate) fn decay(output: I1F31, base_and_coefficient: BaseAndCoefficient) -> I1F31 {
+        output.saturating_mul_add(base_and_coefficient.coefficient, base_and_coefficient.base)
+    }
+
+    pub(crate) fn progress(&mut self, output: I1F31, adsr_config: &ADSRConfig) -> I1F31 {
+        match *self {
+            Self::Idle => I1F31::ZERO,
+            Self::Attack => {
+                let output = Self::decay(output, adsr_config.attack_base_and_coefficient);
                 if output == I1F31::MAX {
-                    *self = Self::DECAY;
+                    *self = Self::Decay;
                 }
                 output
             }
-            Self::DECAY => {
-                let output = output.saturating_mul_add(
-                    adsr_config.decay_release_coefficient,
-                    adsr_config.decay_release_base,
-                );
+            Self::Decay => {
+                let output = Self::decay(output, adsr_config.decay_release_base_and_coefficient);
                 if output <= adsr_config.sustain_level {
-                    *self = Self::SUSTAIN;
+                    *self = Self::Sustain;
                     return adsr_config.sustain_level;
                 }
                 output
             }
-            Self::SUSTAIN => adsr_config.sustain_level,
-            Self::RELEASE => {
-                let output = output.saturating_mul_add(
-                    adsr_config.decay_release_coefficient,
-                    adsr_config.decay_release_base,
-                );
+            Self::Sustain => adsr_config.sustain_level,
+            Self::Release => {
+                let output = Self::decay(output, adsr_config.decay_release_base_and_coefficient);
                 if output <= I1F31::ZERO {
-                    *self = Self::SUSTAIN;
+                    *self = Self::Idle;
+                    return I1F31::ZERO;
+                }
+                output
+            }
+            Self::QuickRelease => {
+                let output = Self::decay(output, QUICK_RELEASE_BASE_COEFFICIENT);
+                if output <= I1F31::ZERO {
+                    *self = Self::Idle;
                     return I1F31::ZERO;
                 }
                 output
@@ -73,22 +97,52 @@ impl ADSRStage {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct ADSRConfig {
+pub(crate) struct ADSRConfig {
     sustain_level: I1F31,
-    attack_base: I1F31,
-    attack_coefficient: I1F31,
-    decay_release_base: I1F31,
-    decay_release_coefficient: I1F31,
+    attack_base_and_coefficient: BaseAndCoefficient,
+    decay_release_base_and_coefficient: BaseAndCoefficient,
+}
+
+impl ADSRConfig {
+    pub(crate) fn new(sustain_config: u8, attack_config: u8, decay_release_config: u8) -> Self {
+        Self {
+            sustain_level: SUSTAIN_AMPLITUDE_TABLE[sustain_config as usize],
+            attack_base_and_coefficient: ATTACK_BASE_COEFFICIENT_TABLE[attack_config as usize],
+            decay_release_base_and_coefficient: DECAY_RELEASE_BASE_COEFFICIENT_TABLE
+                [decay_release_config as usize],
+        }
+    }
+
+    pub(crate) fn set_sustain(&mut self, sustain_config: u8) {
+        self.sustain_level = SUSTAIN_AMPLITUDE_TABLE[sustain_config as usize];
+    }
+
+    pub(crate) fn set_attack(&mut self, attack_config: u8) {
+        self.attack_base_and_coefficient = ATTACK_BASE_COEFFICIENT_TABLE[attack_config as usize];
+    }
+
+    pub(crate) fn set_decay_release(&mut self, decay_release_config: u8) {
+        self.decay_release_base_and_coefficient =
+            DECAY_RELEASE_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct ADSR {
+pub struct ADSR {
     stage: ADSRStage,
     config: ADSRConfig,
     output: I1F31,
 }
 
 impl ADSR {
+    pub fn new(sustain_config: u8, attack_config: u8, decay_release_config: u8) -> ADSR {
+        ADSR {
+            stage: ADSRStage::Idle,
+            config: ADSRConfig::new(sustain_config, attack_config, decay_release_config),
+            output: I1F31::ZERO,
+        }
+    }
+
     pub fn play(&mut self) {
         self.stage.play()
     }
@@ -97,11 +151,27 @@ impl ADSR {
         self.stage.stop_playing()
     }
 
+    pub fn quick_release(&mut self) {
+        self.stage.quick_release()
+    }
+
     pub fn get_samples<const LEN: usize>(&mut self, buffer: &mut [Q15; LEN]) {
         for i in 0..LEN {
             buffer[i] = fixed::traits::LossyInto::lossy_into(
                 self.stage.progress(self.output, &self.config),
             );
         }
+    }
+
+    pub fn set_sustain(&mut self, sustain_config: u8) {
+        self.config.set_sustain(sustain_config);
+    }
+
+    pub fn set_attack(&mut self, attack_config: u8) {
+        self.config.set_attack(attack_config);
+    }
+
+    pub fn set_decay_release(&mut self, decay_release_config: u8) {
+        self.config.set_decay_release(decay_release_config);
     }
 }
