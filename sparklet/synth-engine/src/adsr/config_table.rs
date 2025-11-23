@@ -4,6 +4,12 @@ use crate::adsr::BaseAndCoefficient;
 
 use fixed::types::I1F31;
 
+// The first element from the release_base_coefficient table
+pub static QUICK_RELEASE_BASE_COEFFICIENT: BaseAndCoefficient = BaseAndCoefficient {
+    base: I1F31::from_bits(0xffcbb823_u32 as i32),
+    coefficient: I1F31::from_bits(0x7fdd256c_u32 as i32),
+};
+
 pub static ATTACK_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; 256] = [
     BaseAndCoefficient {
         base: I1F31::from_bits(0x00572271_u32 as i32),

@@ -21,7 +21,7 @@ use fixed::{
     types::I1F31,
 };
 
-use crate::adsr::BaseAndCoefficient;
+use crate::adsr::{ADSRStage, BaseAndCoefficient};
 
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct DecayConfig {
@@ -123,7 +123,7 @@ pub fn iterate_envelope(
     let mut output = initial;
 
     for iteration in 1..iterations {
-        output = output.saturating_mul_add(coefficient, base);
+        output = ADSRStage::decay(output, BaseAndCoefficient { base, coefficient });
         if output == I1F31::MAX {
             return (iteration + 1, I1F31::MAX);
         } else if output < I1F31::ZERO {
