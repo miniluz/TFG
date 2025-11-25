@@ -48,14 +48,14 @@ fn voice_bank_play_note_returns_err_when_full() {
     // Fill all voices
     for i in 0..TEST_VOICE_BANK_SIZE {
         let result = vb.play_note((i as u8).into(), 100.into());
-        assert_eq!(result, Ok(()));
+        assert_eq!(result, PlayNoteResult::Success);
     }
     assert_eq!(vb.count_active_voices(), TEST_VOICE_BANK_SIZE);
 
-    // Try to play one more note, it should return Err(()) since all voices are busy
+    // Try to play one more note, it should return AllVoicesBusy since all voices are busy
     let extra_note = TEST_VOICE_BANK_SIZE as u8;
     let result = vb.play_note(extra_note.into(), 120.into());
-    assert_eq!(result, Err(()));
+    assert_eq!(result, PlayNoteResult::AllVoicesBusy);
 
     // All voices should be untouched
     assert_eq!(vb.count_active_voices(), TEST_VOICE_BANK_SIZE); // Still full
@@ -87,9 +87,9 @@ fn voice_bank_release_note_releases_all_instances_of_a_note() {
 
     let note_to_play = 60;
     let result1 = vb.play_note(note_to_play.into(), 100.into()); // Voice 0
-    assert_eq!(result1, Ok(()));
+    assert_eq!(result1, PlayNoteResult::Success);
     let result2 = vb.play_duplicate_note(note_to_play.into(), 90.into()); // Voice 1 (if TEST_VOICE_BANK_SIZE >= 2)
-    assert_eq!(result2, Ok(()));
+    assert_eq!(result2, PlayNoteResult::Success);
     assert_eq!(vb.count_active_voices(), 2);
 
     vb.release_note(note_to_play.into());
@@ -146,7 +146,8 @@ fn voice_bank_quick_release_selects_quietest_in_release() {
     let mut buffer = [Q15::ZERO; 128];
 
     for i in 0..TEST_VOICE_BANK_SIZE {
-        vb.play_note((60 + i as u8).into(), 100.into()).unwrap();
+        let result = vb.play_note((60 + i as u8).into(), 100.into());
+        assert_eq!(result, PlayNoteResult::Success);
         // Advance to sustain stage
         for _ in 0..10 {
             vb.voices[i].adsr.get_samples::<128>(&mut buffer);
@@ -190,7 +191,8 @@ fn voice_bank_quick_release_selects_oldest_when_none_in_release() {
 
     // Fill all 4 voices with different timestamps
     for i in 0..TEST_VOICE_BANK_SIZE {
-        vb.play_note((60 + i as u8).into(), 100.into()).unwrap();
+        let result = vb.play_note((60 + i as u8).into(), 100.into());
+        assert_eq!(result, PlayNoteResult::Success);
     }
 
     // All voices are in Attack/Decay/Sustain (none in Release)

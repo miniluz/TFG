@@ -79,6 +79,15 @@ impl From<Velocity> for midi::u7 {
     }
 }
 
+/// Result of attempting to play a note
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlayNoteResult {
+    /// Successfully played the note (either retriggered or allocated a voice)
+    Success,
+    /// Could not play the note because all voices are busy
+    AllVoicesBusy,
+}
+
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoiceStage {
     Free,
@@ -146,18 +155,18 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
         }
     }
 
-    pub fn play_note(&mut self, note: Note, velocity: Velocity) -> Result<(), ()> {
+    pub fn play_note(&mut self, note: Note, velocity: Velocity) -> PlayNoteResult {
         self.play_note_optional_retrigger(note, velocity, true)
     }
 
-    fn play_note_optional_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) -> Result<(), ()> {
+    fn play_note_optional_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) -> PlayNoteResult {
         // Check for retriggering first
         if retrigger {
             for voice in self.voices.iter_mut() {
                 if voice.note == note && !voice.adsr.is_idle() {
                     self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
                     voice.retrigger(self.timestamp_counter, velocity);
-                    return Ok(());
+                    return PlayNoteResult::Success;
                 }
             }
         }
@@ -167,12 +176,12 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
             if voice.adsr.is_idle() {
                 self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
                 voice.play_note(self.timestamp_counter, note, velocity);
-                return Ok(());
+                return PlayNoteResult::Success;
             }
         }
 
         // No idle voice available
-        Err(())
+        PlayNoteResult::AllVoicesBusy
     }
 
     pub fn release_note(&mut self, note: Note) {
@@ -213,7 +222,7 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
     }
 
     #[cfg(test)]
-    pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) -> Result<(), ()> {
+    pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) -> PlayNoteResult {
         self.play_note_optional_retrigger(note, velocity, false)
     }
 

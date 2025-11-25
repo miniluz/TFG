@@ -14,3 +14,6 @@ cmsis-interface = { path = "../cmsis-interface" }
 [dev-dependencies]
 pretty_assertions = "1.4.1"
 cmsis-rust = { path = "../cmsis-rust" }
+midly = "0.5.3"
+hound = "3.5"
+clap = { version = "4.0", features = ["derive"] }

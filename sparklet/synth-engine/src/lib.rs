@@ -2,7 +2,7 @@
 
 pub mod adsr;
 mod voice_bank;
-mod wavetable;
+pub mod wavetable;
 
 /// Number of samples to process in each render cycle
 pub const WINDOW_SIZE: usize = 128;
@@ -15,7 +15,7 @@ use heapless::Deque;
 use midi::MidiEvent;
 
 pub use cmsis_interface::{CmsisOperations, Q15};
-pub use voice_bank::{Note, Velocity, VoiceBank, VoiceStage};
+pub use voice_bank::{Note, PlayNoteResult, Velocity, VoiceBank, VoiceStage};
 
 #[derive(Debug, Clone, Copy)]
 struct PendingNote {
@@ -38,11 +38,11 @@ pub struct SynthEngine<
 impl<'ch, 'wt, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: usize>
     SynthEngine<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE>
 {
-    const VOICE_BIT_SHIFT_SIZE: i8 = (if VOICE_BANK_SIZE == 1 {
+    const VOICE_BIT_SHIFT_SIZE: i8 = -((if VOICE_BANK_SIZE == 1 {
         0
     } else {
         (VOICE_BANK_SIZE - 1).ilog2() + 1
-    }) as i8;
+    }) as i8);
 
     pub fn new(
         receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
@@ -100,11 +100,11 @@ impl<'ch, 'wt, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: us
         // Phase 2: Process note queue
         while let Some(&pending) = self.note_queue.front() {
             match self.voice_bank.play_note(pending.note, pending.velocity) {
-                Ok(()) => {
+                PlayNoteResult::Success => {
                     // Successfully allocated voice (retriggered or found idle voice)
                     self.note_queue.pop_front();
                 }
-                Err(()) => {
+                PlayNoteResult::AllVoicesBusy => {
                     // No idle voice - quick_release one and leave note queued
                     self.voice_bank.quick_release();
                     break;
