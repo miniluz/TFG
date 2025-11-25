@@ -127,7 +127,7 @@ pub static DECAY_RELEASE_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
 
     println!("{}", contents);
 
-    eprintln!("");
+    eprintln!();
     eprintln!("Sanity check (index, time, final_value):");
     eprintln!("  Attack envelopes:");
     for (index, attack_time_expected, attack_time_real, attack_final, _, _, _) in &sanity_check_data

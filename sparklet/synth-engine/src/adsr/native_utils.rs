@@ -16,10 +16,7 @@
 extern crate std;
 use std::prelude::v1::*;
 
-use fixed::{
-    traits::{Fixed, ToFixed},
-    types::I1F31,
-};
+use fixed::{traits::ToFixed, types::I1F31};
 
 use crate::adsr::{ADSRStage, BaseAndCoefficient};
 

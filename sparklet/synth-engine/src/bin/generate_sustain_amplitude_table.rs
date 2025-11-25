@@ -60,7 +60,7 @@ pub static SUSTAIN_AMPLITUDE_TABLE: [I1F31; {}] = [
 
     println!("{}", contents);
 
-    eprintln!("");
+    eprintln!();
     eprintln!("Sanity check (index, time, final_value):");
     for (index, amplitude, level) in &sanity_check_data {
         eprintln!(

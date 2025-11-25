@@ -38,7 +38,7 @@ fn main() {
 
     println!("]");
 
-    eprintln!("");
+    eprintln!();
     eprintln!("Sanity check:");
     eprintln!("  Note 69 (A4): {}", a4);
     eprintln!(
