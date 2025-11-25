@@ -99,18 +99,16 @@ impl<'ch, 'wt, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: us
 
         // Phase 2: Process note queue
         while let Some(&pending) = self.note_queue.front() {
-            // Try to find an idle voice
-            if self.find_idle_voice().is_some() {
-                // Assign note to idle voice
-                self.voice_bank.play_note(pending.note, pending.velocity);
-                self.note_queue.pop_front();
-            } else {
-                // No idle voice - find one to quick_release
-                if let Some(voice_index) = self.find_voice_to_release() {
-                    self.quick_release_voice(voice_index);
+            match self.voice_bank.play_note(pending.note, pending.velocity) {
+                Ok(()) => {
+                    // Successfully allocated voice (retriggered or found idle voice)
+                    self.note_queue.pop_front();
                 }
-                // Leave note in queue for next render cycle
-                break;
+                Err(()) => {
+                    // No idle voice - quick_release one and leave note queued
+                    self.voice_bank.quick_release();
+                    break;
+                }
             }
         }
 
@@ -155,38 +153,6 @@ impl<'ch, 'wt, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: us
             T::add_q15(&output_buf, &velocity_scaled_buf, &mut result_buf);
             sample_buffer.copy_from_slice(&result_buf);
         }
-    }
-
-    fn find_idle_voice(&self) -> Option<usize> {
-        self.voice_bank.voices.iter().position(|v| v.adsr.is_idle())
-    }
-
-    fn find_voice_to_release(&self) -> Option<usize> {
-        // Priority 1: Find quietest voice in Release (not QuickRelease)
-        if let Some(index) = self
-            .voice_bank
-            .voices
-            .iter()
-            .enumerate()
-            .filter(|(_, v)| v.adsr.is_in_release())
-            .min_by_key(|(_, v)| v.adsr.output)
-            .map(|(index, _)| index)
-        {
-            return Some(index);
-        }
-
-        // Priority 2: Find oldest voice that's not in QuickRelease
-        self.voice_bank
-            .voices
-            .iter()
-            .enumerate()
-            .filter(|(_, v)| !v.adsr.is_in_quick_release() && !v.adsr.is_idle())
-            .min_by_key(|(_, v)| v.timestamp)
-            .map(|(index, _)| index)
-    }
-
-    fn quick_release_voice(&mut self, index: usize) {
-        self.voice_bank.voices[index].adsr.quick_release();
     }
 
     #[cfg(test)]

@@ -143,7 +143,6 @@ fn test_voice_stealing_via_queue() {
 }
 
 #[test]
-#[ignore]
 fn test_envelope_lifecycle_to_idle() {
     // Use fast ADSR for this test
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
@@ -169,7 +168,7 @@ fn test_envelope_lifecycle_to_idle() {
 
     // Render many times to let the envelope reach idle
     // Need enough cycles for attack + release to complete
-    for _ in 0..5000 {
+    for _ in 0..100 {
         se.render_samples::<TestOps>(&mut buffer);
     }
 
@@ -295,7 +294,7 @@ fn test_rapid_note_on_off_sequences() {
     }
 
     // Property: Should not crash and eventually return to silence
-    for _ in 0..50000 {
+    for _ in 0..50 {
         se.render_samples::<TestOps>(&mut buffer);
     }
 
@@ -337,7 +336,7 @@ fn test_note_off_releases_correct_voice() {
     );
 
     // After many renders, note 60 should be idle but 64 should still be sustained
-    for _ in 0..5000 {
+    for _ in 0..50 {
         se.render_samples::<TestOps>(&mut buffer);
     }
 

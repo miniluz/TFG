@@ -137,46 +137,42 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
 
     pub fn process_midi_event(&mut self, event: MidiEvent) {
         match event {
-            MidiEvent::NoteOn { key, vel } => self.play_note(key.into(), vel.into()),
-            MidiEvent::NoteOff { key, vel: _ } => self.release_note(key.into()),
+            MidiEvent::NoteOn { key, vel } => {
+                let _ = self.play_note(key.into(), vel.into());
+            }
+            MidiEvent::NoteOff { key, vel: _ } => {
+                self.release_note(key.into());
+            }
         }
     }
 
-    pub fn play_note(&mut self, note: Note, velocity: Velocity) {
-        self.play_note_with_retrigger(note, velocity, true);
+    pub fn play_note(&mut self, note: Note, velocity: Velocity) -> Result<(), ()> {
+        self.play_note_optional_retrigger(note, velocity, true)
     }
 
-    fn play_note_with_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) {
-        let voice_to_release = {
-            let mut earliest_timestamp_index: usize = 0;
-            let mut earliest_timestamp_value: u32 = u32::MAX;
-
-            let mut idle_voice_index: Option<&mut Voice> = None;
-
-            for (index, voice) in self.voices.iter_mut().enumerate() {
-                if retrigger && voice.note == note {
+    fn play_note_optional_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) -> Result<(), ()> {
+        // Check for retriggering first
+        if retrigger {
+            for voice in self.voices.iter_mut() {
+                if voice.note == note && !voice.adsr.is_idle() {
                     self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
                     voice.retrigger(self.timestamp_counter, velocity);
-                    return;
-                }
-
-                if idle_voice_index.is_none() && voice.adsr.is_idle() {
-                    idle_voice_index = Some(voice);
-                } else if voice.timestamp < earliest_timestamp_value {
-                    earliest_timestamp_index = index;
-                    earliest_timestamp_value = voice.timestamp;
+                    return Ok(());
                 }
             }
+        }
 
-            if let Some(voice) = idle_voice_index {
-                voice
-            } else {
-                &mut self.voices[earliest_timestamp_index]
+        // Find an idle voice
+        for voice in self.voices.iter_mut() {
+            if voice.adsr.is_idle() {
+                self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
+                voice.play_note(self.timestamp_counter, note, velocity);
+                return Ok(());
             }
-        };
+        }
 
-        self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
-        voice_to_release.play_note(self.timestamp_counter, note, velocity);
+        // No idle voice available
+        Err(())
     }
 
     pub fn release_note(&mut self, note: Note) {
@@ -187,9 +183,38 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
         }
     }
 
+    pub fn quick_release(&mut self) {
+        // Priority 1: Find quietest voice in Release (not QuickRelease)
+        if let Some(index) = self
+            .voices
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| v.adsr.is_in_release())
+            .min_by_key(|(_, v)| v.adsr.output)
+            .map(|(index, _)| index)
+        {
+            self.voices[index].adsr.quick_release();
+            return;
+        }
+
+        // Priority 2: Find oldest voice that's not in QuickRelease and not idle
+        if let Some(index) = self
+            .voices
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| !v.adsr.is_in_quick_release() && !v.adsr.is_idle())
+            .min_by_key(|(_, v)| v.timestamp)
+            .map(|(index, _)| index)
+        {
+            self.voices[index].adsr.quick_release();
+        }
+
+        // If no voice found (all idle or in QuickRelease), this is a no-op
+    }
+
     #[cfg(test)]
-    pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) {
-        self.play_note_with_retrigger(note, velocity, false);
+    pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) -> Result<(), ()> {
+        self.play_note_optional_retrigger(note, velocity, false)
     }
 
     #[cfg(test)]
