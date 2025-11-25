@@ -95,6 +95,12 @@ pub(crate) struct Voice<'a> {
 }
 
 impl<'a> Voice<'a> {
+    pub(crate) fn retrigger(&mut self, timestamp: u32, velocity: Velocity) {
+        self.timestamp = timestamp;
+        self.velocity = velocity;
+        self.adsr.retrigger();
+    }
+
     pub(crate) fn play_note(&mut self, timestamp: u32, note: Note, velocity: Velocity) {
         self.timestamp = timestamp;
         self.note = note;
@@ -137,24 +143,40 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
     }
 
     pub fn play_note(&mut self, note: Note, velocity: Velocity) {
-        let mut earliest_timestamp_index: usize = 0;
-        let mut earliest_timestamp_value: u32 = u32::MAX;
+        self.play_note_with_retrigger(note, velocity, true);
+    }
 
-        for (index, voice) in self.voices.iter_mut().enumerate() {
-            if voice.adsr.is_idle() {
-                self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
-                voice.play_note(self.timestamp_counter, note, velocity);
-                return;
-            } else if voice.timestamp < earliest_timestamp_value {
-                earliest_timestamp_index = index;
-                earliest_timestamp_value = voice.timestamp;
+    fn play_note_with_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) {
+        let voice_to_release = {
+            let mut earliest_timestamp_index: usize = 0;
+            let mut earliest_timestamp_value: u32 = u32::MAX;
+
+            let mut idle_voice_index: Option<&mut Voice> = None;
+
+            for (index, voice) in self.voices.iter_mut().enumerate() {
+                if retrigger && voice.note == note {
+                    self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
+                    voice.retrigger(self.timestamp_counter, velocity);
+                    return;
+                }
+
+                if idle_voice_index.is_none() && voice.adsr.is_idle() {
+                    idle_voice_index = Some(voice);
+                } else if voice.timestamp < earliest_timestamp_value {
+                    earliest_timestamp_index = index;
+                    earliest_timestamp_value = voice.timestamp;
+                }
             }
-        }
 
-        // No free voice found - steal oldest
-        let earliest_voice = &mut self.voices[earliest_timestamp_index];
+            if let Some(voice) = idle_voice_index {
+                voice
+            } else {
+                &mut self.voices[earliest_timestamp_index]
+            }
+        };
+
         self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
-        earliest_voice.play_note(self.timestamp_counter, note, velocity);
+        voice_to_release.play_note(self.timestamp_counter, note, velocity);
     }
 
     pub fn release_note(&mut self, note: Note) {
@@ -163,6 +185,11 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
                 voice.adsr.stop_playing();
             }
         }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) {
+        self.play_note_with_retrigger(note, velocity, false);
     }
 
     #[cfg(test)]

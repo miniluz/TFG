@@ -1,7 +1,7 @@
 use super::*;
+use crate::wavetable::sine_wavetable::SINE_WAVETABLE;
 use midi::u7;
 use pretty_assertions::assert_eq;
-use crate::wavetable::sine_wavetable::SINE_WAVETABLE;
 
 const TEST_VOICE_BANK_SIZE: usize = 4;
 
@@ -90,7 +90,7 @@ fn voice_bank_release_note_releases_all_instances_of_a_note() {
 
     let note_to_play = 60;
     vb.play_note(note_to_play.into(), 100.into()); // Voice 0
-    vb.play_note(note_to_play.into(), 90.into()); // Voice 1 (if TEST_VOICE_BANK_SIZE >= 2)
+    vb.play_duplicate_note(note_to_play.into(), 90.into()); // Voice 1 (if TEST_VOICE_BANK_SIZE >= 2)
     assert_eq!(vb.count_active_voices(), 2);
 
     vb.release_note(note_to_play.into());

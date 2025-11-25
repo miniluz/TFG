@@ -148,6 +148,10 @@ impl ADSR {
         self.stage.play()
     }
 
+    pub fn retrigger(&mut self) {
+        self.stage.play()
+    }
+
     pub fn stop_playing(&mut self) {
         self.stage.stop_playing()
     }
