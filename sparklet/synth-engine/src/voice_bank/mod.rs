@@ -106,6 +106,7 @@ pub(crate) struct Voice<'a> {
 impl<'a> Voice<'a> {
     pub(crate) fn retrigger(&mut self, timestamp: u32, velocity: Velocity) {
         self.timestamp = timestamp;
+        //  TODO: Velocity change is sudden, can lead to popping
         self.velocity = velocity;
         self.adsr.retrigger();
     }
@@ -159,7 +160,12 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
         self.play_note_optional_retrigger(note, velocity, true)
     }
 
-    fn play_note_optional_retrigger(&mut self, note: Note, velocity: Velocity, retrigger: bool) -> PlayNoteResult {
+    fn play_note_optional_retrigger(
+        &mut self,
+        note: Note,
+        velocity: Velocity,
+        retrigger: bool,
+    ) -> PlayNoteResult {
         // Check for retriggering first
         if retrigger {
             for voice in self.voices.iter_mut() {
