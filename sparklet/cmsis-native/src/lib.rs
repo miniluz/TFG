@@ -29,6 +29,14 @@ impl CmsisOperations for CmsisNativeOperations {
     fn negate_q15(src: &[Q15], dst: &mut [Q15]) {
         cmsis_dsp::basic::negate_q15(src, dst);
     }
+
+    fn shift_q15(src: &[Q15], shift_bits: i8, dst: &mut [Q15]) {
+        cmsis_dsp::basic::shift_q15(src, shift_bits, dst);
+    }
+
+    fn shift_in_place_q15(values: &mut [Q15], shift_bits: i8) {
+        cmsis_dsp::basic::shift_in_place_q15(values, shift_bits);
+    }
 }
 
 #[cfg(test)]

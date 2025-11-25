@@ -1,6 +1,8 @@
 use defmt::Format;
 use midi::MidiEvent;
 
+use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
+
 /// A MIDI note number (0-127)
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Note(u8);
@@ -83,28 +85,47 @@ pub enum VoiceStage {
     Held,
 }
 
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Voice {
-    start: u64,
-    note: Note,
-    velocity: Velocity,
-    stage: VoiceStage,
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Voice<'a> {
+    pub(crate) timestamp: u32,
+    pub(crate) note: Note,
+    pub(crate) velocity: Velocity,
+    pub(crate) adsr: ADSR,
+    pub(crate) wavetable_osc: WavetableOscillator<'a, SAMPLE_RATE>,
 }
 
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct VoiceBank<const N: usize> {
-    voices: [Voice; N],
+impl<'a> Voice<'a> {
+    pub(crate) fn play_note(&mut self, timestamp: u32, note: Note, velocity: Velocity) {
+        self.timestamp = timestamp;
+        self.note = note;
+        self.velocity = velocity;
+        self.wavetable_osc.set_note(&note);
+        self.adsr.play();
+    }
 }
 
-impl<const N: usize> VoiceBank<N> {
-    pub fn new() -> Self {
+#[derive(Debug, Clone, Copy)]
+pub struct VoiceBank<'a, const N: usize> {
+    pub(crate) voices: [Voice<'a>; N],
+    pub(crate) timestamp_counter: u32,
+}
+
+impl<'a, const N: usize> VoiceBank<'a, N> {
+    pub fn new(
+        wavetable: &'a [cmsis_interface::Q15; 256],
+        sustain_config: u8,
+        attack_config: u8,
+        decay_release_config: u8,
+    ) -> Self {
         Self {
             voices: [Voice {
-                start: 0,
+                timestamp: 0,
                 note: Note(0),
                 velocity: Velocity(0),
-                stage: VoiceStage::Free,
+                adsr: ADSR::new(sustain_config, attack_config, decay_release_config),
+                wavetable_osc: WavetableOscillator::new(wavetable),
             }; N],
+            timestamp_counter: 0,
         }
     }
 
@@ -116,48 +137,37 @@ impl<const N: usize> VoiceBank<N> {
     }
 
     pub fn play_note(&mut self, note: Note, velocity: Velocity) {
-        let mut earliest_start_index: usize = 0;
-        let mut earliest_start_value: u64 = 0;
+        let mut earliest_timestamp_index: usize = 0;
+        let mut earliest_timestamp_value: u32 = u32::MAX;
 
         for (index, voice) in self.voices.iter_mut().enumerate() {
-            match voice.stage {
-                VoiceStage::Free => {
-                    voice.note = note;
-                    voice.velocity = velocity;
-                    voice.stage = VoiceStage::Held;
-                    return;
-                }
-                VoiceStage::Held => {
-                    if voice.start < earliest_start_value {
-                        earliest_start_index = index;
-                        earliest_start_value = voice.start;
-                    }
-                }
+            if voice.adsr.is_idle() {
+                self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
+                voice.play_note(self.timestamp_counter, note, velocity);
+                return;
+            } else if voice.timestamp < earliest_timestamp_value {
+                earliest_timestamp_index = index;
+                earliest_timestamp_value = voice.timestamp;
             }
         }
 
-        // No free note found
-        let earliest_voice = &mut self.voices[earliest_start_index];
-        earliest_voice.start = 0;
-        earliest_voice.note = note;
-        earliest_voice.velocity = velocity;
-        earliest_voice.stage = VoiceStage::Held;
+        // No free voice found - steal oldest
+        let earliest_voice = &mut self.voices[earliest_timestamp_index];
+        self.timestamp_counter = self.timestamp_counter.wrapping_add(1);
+        earliest_voice.play_note(self.timestamp_counter, note, velocity);
     }
 
     pub fn release_note(&mut self, note: Note) {
         for voice in self.voices.iter_mut() {
-            if voice.note == note {
-                voice.stage = VoiceStage::Free;
+            if voice.note == note && !voice.adsr.is_idle() {
+                voice.adsr.stop_playing();
             }
         }
     }
 
     #[cfg(test)]
     pub(crate) fn count_active_voices(&self) -> usize {
-        self.voices
-            .iter()
-            .filter(|v| v.stage == VoiceStage::Held)
-            .count()
+        self.voices.iter().filter(|v| !v.adsr.is_idle()).count()
     }
 
     #[cfg(test)]
@@ -172,7 +182,12 @@ impl<const N: usize> VoiceBank<N> {
 
     #[cfg(test)]
     pub(crate) fn get_voice_stage(&self, index: usize) -> VoiceStage {
-        self.voices[index].stage
+        // For backward compatibility with tests
+        if self.voices[index].adsr.is_idle() {
+            VoiceStage::Free
+        } else {
+            VoiceStage::Held
+        }
     }
 }
 

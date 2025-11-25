@@ -66,6 +66,38 @@ impl CmsisOperations for CmsisRustOperations {
             *dst = src.saturating_neg();
         }
     }
+
+    fn shift_q15(
+        src: &[cmsis_interface::Q15],
+        shift_bits: i8,
+        dst: &mut [cmsis_interface::Q15],
+    ) {
+        if src.len() != dst.len() {
+            panic!("src.len() != dst.len()");
+        }
+
+        for (dst, src) in dst.iter_mut().zip(src.iter()) {
+            *dst = if shift_bits >= 0 {
+                // Left shift
+                *src << shift_bits
+            } else {
+                // Right shift
+                *src >> (-shift_bits)
+            };
+        }
+    }
+
+    fn shift_in_place_q15(values: &mut [cmsis_interface::Q15], shift_bits: i8) {
+        for value in values.iter_mut() {
+            *value = if shift_bits >= 0 {
+                // Left shift
+                *value << shift_bits
+            } else {
+                // Right shift
+                *value >> (-shift_bits)
+            };
+        }
+    }
 }
 
 cmsis_interface::declare_tests!(crate::CmsisRustOperations,,);

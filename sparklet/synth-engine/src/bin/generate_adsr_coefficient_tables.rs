@@ -70,7 +70,7 @@ fn main() {
             get_base_and_coefficient_for_index::<SAMPLE_RATE>(index, decay_release_config);
 
         // Collect sanity check data for selected indices
-        if index <= 2 || 126 <= index && index <= 128 || 253 <= index {
+        if index <= 3 || (126..=128).contains(&index) || 253 <= index {
             let attack_iterations = (attack_time * SAMPLE_RATE as f64) as usize;
             let decay_release_iterations = (decay_release_time * SAMPLE_RATE as f64) as usize;
 

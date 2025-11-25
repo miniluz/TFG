@@ -127,11 +127,11 @@ impl ADSRConfig {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ADSR {
-    stage: ADSRStage,
-    config: ADSRConfig,
-    output: I1F31,
+    pub(crate) stage: ADSRStage,
+    pub(crate) config: ADSRConfig,
+    pub(crate) output: I1F31,
 }
 
 impl ADSR {
@@ -144,6 +144,7 @@ impl ADSR {
     }
 
     pub fn play(&mut self) {
+        self.output = I1F31::ZERO;
         self.stage.play()
     }
 
@@ -156,10 +157,9 @@ impl ADSR {
     }
 
     pub fn get_samples<const LEN: usize>(&mut self, buffer: &mut [Q15; LEN]) {
-        for i in 0..LEN {
-            buffer[i] = fixed::traits::LossyInto::lossy_into(
-                self.stage.progress(self.output, &self.config),
-            );
+        for elem in buffer.iter_mut() {
+            self.output = self.stage.progress(self.output, &self.config);
+            *elem = fixed::traits::LossyInto::lossy_into(self.output);
         }
     }
 
@@ -173,5 +173,17 @@ impl ADSR {
 
     pub fn set_decay_release(&mut self, decay_release_config: u8) {
         self.config.set_decay_release(decay_release_config);
+    }
+
+    pub fn is_idle(&self) -> bool {
+        self.stage == ADSRStage::Idle
+    }
+
+    pub fn is_in_release(&self) -> bool {
+        self.stage == ADSRStage::Release
+    }
+
+    pub fn is_in_quick_release(&self) -> bool {
+        self.stage == ADSRStage::QuickRelease
     }
 }

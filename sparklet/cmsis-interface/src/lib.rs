@@ -9,6 +9,8 @@ pub trait CmsisOperations {
     fn multiply_q15(src1: &[Q15], src2: &[Q15], dst: &mut [Q15]);
     fn negate_in_place_q15(values: &mut [Q15]);
     fn negate_q15(src: &[Q15], dst: &mut [Q15]);
+    fn shift_q15(src: &[Q15], shift_bits: i8, dst: &mut [Q15]);
+    fn shift_in_place_q15(values: &mut [Q15], shift_bits: i8);
 }
 
 #[macro_export]
@@ -72,6 +74,67 @@ macro_rules! declare_tests {
                 let mut values = [Q15::from_num(0.5), Q15::from_num(-0.25), Q15::from_num(0.75)];
                 <$T>::negate_in_place_q15(&mut values);
                 assert_eq!(values, [Q15::from_num(-0.5), Q15::from_num(0.25), Q15::from_num(-0.75)]);
+            }
+
+            #[test]
+            pub fn test_shift_q15_left() {
+                let src = [Q15::from_num(0.25), Q15::from_num(0.125), Q15::from_num(0.0625)];
+                let mut dst = [Q15::from_num(0.0); 3];
+                <$T>::shift_q15(&src, 1, &mut dst);
+                assert_eq!(dst, [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(0.125)]);
+            }
+
+            #[test]
+            pub fn test_shift_q15_right() {
+                let src = [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(0.125)];
+                let mut dst = [Q15::from_num(0.0); 3];
+                <$T>::shift_q15(&src, -1, &mut dst);
+                assert_eq!(dst, [Q15::from_num(0.25), Q15::from_num(0.125), Q15::from_num(0.0625)]);
+            }
+
+            #[test]
+            pub fn test_shift_in_place_q15_left() {
+                let mut values = [Q15::from_num(0.25), Q15::from_num(0.125), Q15::from_num(0.0625)];
+                <$T>::shift_in_place_q15(&mut values, 1);
+                assert_eq!(values, [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(0.125)]);
+            }
+
+            #[test]
+            pub fn test_shift_in_place_q15_right() {
+                let mut values = [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(0.125)];
+                <$T>::shift_in_place_q15(&mut values, -1);
+                assert_eq!(values, [Q15::from_num(0.25), Q15::from_num(0.125), Q15::from_num(0.0625)]);
+            }
+
+            #[test]
+            pub fn test_shift_q15_zero() {
+                let src = [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(-0.5)];
+                let mut dst = [Q15::from_num(0.0); 3];
+                <$T>::shift_q15(&src, 0, &mut dst);
+                assert_eq!(dst, [Q15::from_num(0.5), Q15::from_num(0.25), Q15::from_num(-0.5)]);
+            }
+
+            #[test]
+            pub fn test_shift_q15_negative_values() {
+                let src = [Q15::from_num(-0.5), Q15::from_num(-0.25), Q15::from_num(-0.125)];
+                let mut dst = [Q15::from_num(0.0); 3];
+                <$T>::shift_q15(&src, -1, &mut dst);
+                assert_eq!(dst, [Q15::from_num(-0.25), Q15::from_num(-0.125), Q15::from_num(-0.0625)]);
+            }
+
+            #[test]
+            pub fn test_shift_q15_multiple_bits() {
+                let src = [Q15::from_num(0.0625), Q15::from_num(0.03125)];
+                let mut dst = [Q15::from_num(0.0); 2];
+                <$T>::shift_q15(&src, 2, &mut dst);
+                assert_eq!(dst, [Q15::from_num(0.25), Q15::from_num(0.125)]);
+            }
+
+            #[test]
+            pub fn test_shift_in_place_q15_negative_values() {
+                let mut values = [Q15::from_num(-0.5), Q15::from_num(-0.25)];
+                <$T>::shift_in_place_q15(&mut values, 1);
+                assert_eq!(values, [Q15::from_num(-1.0), Q15::from_num(-0.5)]);
             }
         }
     };

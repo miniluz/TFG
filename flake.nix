@@ -39,7 +39,7 @@
                 cargo-generate
                 cargo-nextest
                 bacon
-                gdb
+                lldb
                 openocd
                 usbutils
                 probe-rs-tools

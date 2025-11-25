@@ -36,7 +36,7 @@ fn main() {
             *sustain_amplitude = amplitude.to_fixed();
         }
 
-        if index <= 3 || 126 <= index && index <= 128 || 253 <= index {
+        if index <= 3 || (126..=128).contains(&index) || 253 <= index {
             sanity_check_data.push((
                 index,
                 f64::from_fixed(*sustain_amplitude),

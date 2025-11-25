@@ -1,13 +1,19 @@
 use super::*;
 use midi::u7;
 use pretty_assertions::assert_eq;
+use crate::wavetable::sine_wavetable::SINE_WAVETABLE;
 
 const TEST_VOICE_BANK_SIZE: usize = 4;
 
 macro_rules! setup_voice_bank {
     ($vb:ident) => {
         #[allow(unused_mut)]
-        let mut $vb = VoiceBank::<TEST_VOICE_BANK_SIZE>::new();
+        let mut $vb = VoiceBank::<TEST_VOICE_BANK_SIZE>::new(
+            &SINE_WAVETABLE,
+            200, // sustain
+            50,  // attack
+            100, // decay_release
+        );
     };
 }
 
@@ -64,7 +70,7 @@ fn voice_bank_play_note_steals_earliest_voice_when_full() {
 }
 
 #[test]
-fn voice_bank_release_note_frees_active_note() {
+fn voice_bank_release_note_triggers_release() {
     setup_voice_bank!(vb);
 
     let note_to_play = 60;
@@ -72,12 +78,14 @@ fn voice_bank_release_note_frees_active_note() {
     assert_eq!(vb.count_active_voices(), 1);
 
     vb.release_note(note_to_play.into());
-    assert_eq!(vb.count_active_voices(), 0);
-    assert_eq!(vb.get_voice_stage(0), VoiceStage::Free);
+    // Voice enters Release state, still counts as active until envelope completes
+    // (It won't be Free immediately - the ADSR release envelope needs to finish)
+    assert_eq!(vb.count_active_voices(), 1);
+    assert_eq!(vb.get_voice_stage(0), VoiceStage::Held); // Still reported as Held (non-idle)
 }
 
 #[test]
-fn voice_bank_release_note_frees_all_instances_of_a_note() {
+fn voice_bank_release_note_releases_all_instances_of_a_note() {
     setup_voice_bank!(vb);
 
     let note_to_play = 60;
@@ -86,9 +94,10 @@ fn voice_bank_release_note_frees_all_instances_of_a_note() {
     assert_eq!(vb.count_active_voices(), 2);
 
     vb.release_note(note_to_play.into());
-    assert_eq!(vb.count_active_voices(), 0);
-    assert_eq!(vb.get_voice_stage(0), VoiceStage::Free);
-    assert_eq!(vb.get_voice_stage(1), VoiceStage::Free);
+    // Both voices enter Release state, still count as active until envelopes complete
+    assert_eq!(vb.count_active_voices(), 2);
+    assert_eq!(vb.get_voice_stage(0), VoiceStage::Held); // Still reported as Held (non-idle)
+    assert_eq!(vb.get_voice_stage(1), VoiceStage::Held);
 }
 
 #[test]
@@ -124,6 +133,7 @@ fn voice_bank_process_midi_event_handles_note_on_and_off() {
 
     // NoteOff
     vb.process_midi_event(MidiEvent::NoteOff { key: note, vel: 0 });
-    assert_eq!(vb.count_active_voices(), 0);
-    assert_eq!(vb.get_voice_stage(0), VoiceStage::Free);
+    // Voice enters Release state, still active until envelope completes
+    assert_eq!(vb.count_active_voices(), 1);
+    assert_eq!(vb.get_voice_stage(0), VoiceStage::Held); // Still non-idle (in Release)
 }

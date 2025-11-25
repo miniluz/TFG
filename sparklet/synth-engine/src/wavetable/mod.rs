@@ -1,8 +1,8 @@
 mod phase_increment_table;
-mod saw_wavetable;
-mod sine_wavetable;
-mod square_wavetable;
-mod triangle_wavetable;
+pub mod saw_wavetable;
+pub mod sine_wavetable;
+pub mod square_wavetable;
+pub mod triangle_wavetable;
 
 #[cfg(test)]
 mod tests;
@@ -13,12 +13,24 @@ use fixed::types::U8F24;
 use crate::Note;
 use phase_increment_table::MIDI_TO_PHASE_INCREMENT;
 
-pub struct Wavetable<'a>(&'a [Q15; 256]);
+#[derive(Debug, Clone, Copy)]
+pub struct Wavetable<'a>(pub &'a [Q15; 256]);
 
+#[derive(Debug, Clone, Copy)]
 pub struct WavetableOscillator<'a, const SAMPLE_RATE: u32> {
     phase: U8F24,
     phase_increment: U8F24,
     wavetable: Wavetable<'a>,
+}
+
+impl<'a, const SAMPLE_RATE: u32> WavetableOscillator<'a, SAMPLE_RATE> {
+    pub fn new(wavetable: &'a [Q15; 256]) -> Self {
+        Self {
+            phase: U8F24::ZERO,
+            phase_increment: U8F24::ZERO,
+            wavetable: Wavetable(wavetable),
+        }
+    }
 }
 
 impl<'a, const SAMPLE_RATE: u32> WavetableOscillator<'a, SAMPLE_RATE> {
