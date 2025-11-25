@@ -5,7 +5,7 @@ use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channe
 use midi::{MidiEvent, MidiListener};
 use static_cell::StaticCell;
 
-pub const MIDI_CHANNEL_SIZE: usize = 4;
+pub const MIDI_CHANNEL_SIZE: usize = 16;
 
 pub struct MidiTaskState<'a> {
     midi_listener: MidiListener<'a, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE>,
