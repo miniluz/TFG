@@ -32,17 +32,22 @@
               nativeBuildInputs = with pkgs; [
                 (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
 
-                typst
-
                 cargo-binutils
                 cargo-expand
                 cargo-generate
                 cargo-nextest
                 bacon
+
                 lldb
                 openocd
                 usbutils
                 probe-rs-tools
+
+                alsa-utils
+                pavucontrol
+                audacity
+
+                typst
               ];
               buildInputs = [
               ];
