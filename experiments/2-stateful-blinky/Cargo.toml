@@ -14,3 +14,9 @@ embassy-sync = { version = "0.7.2", features = ["defmt"] }
 embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime"] }
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2.1.1"
+
+[patch.crates-io]
+embassy-executor = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
+embassy-stm32 = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
+embassy-sync = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
+embassy-time = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
