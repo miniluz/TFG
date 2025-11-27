@@ -4,6 +4,8 @@ use embassy_stm32::Config;
 pub struct Hardware {
     #[cfg(feature = "midi-din")]
     pub midi_hardware: crate::midi_task::midi_din::hardware::MidiDinHardware<'static>,
+    #[cfg(feature = "midi-usb")]
+    pub midi_hardware: crate::midi_task::midi_usb::hardware::MidiUsbHardware<'static>,
     #[cfg(feature = "usb")]
     pub usb_builder: embassy_usb::Builder<
         'static,
@@ -74,11 +76,16 @@ impl Hardware {
             usb_hardware.control_buf,
         );
 
+        #[cfg(feature = "midi-usb")]
+        let midi_hardware = crate::get_midi_usb_hardware!(&mut usb_builder);
+
         #[cfg(feature = "audio-usb")]
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
         Hardware {
             #[cfg(feature = "midi-din")]
+            midi_hardware,
+            #[cfg(feature = "midi-usb")]
             midi_hardware,
             #[cfg(feature = "usb")]
             usb_builder,

@@ -39,7 +39,7 @@ fn main() -> ! {
     info!("Setting up executor");
     let executor = EXECUTOR.init(embassy_executor::Executor::new());
 
-    #[cfg(feature = "midi-din")]
+    #[cfg(any(feature = "midi-din", feature = "midi-usb"))]
     let midi_task = {
         info!("Creating MIDI task");
         midi_task::create_midi_task(hardware.midi_hardware)
@@ -62,7 +62,7 @@ fn main() -> ! {
 
     info!("Setting up tasks in executors...");
     executor.run(|spawner| {
-        #[cfg(feature = "midi-din")]
+        #[cfg(any(feature = "midi-din", feature = "midi-usb"))]
         spawner.spawn(midi_task).unwrap();
 
         spawner.spawn(synth_engine_task).unwrap();

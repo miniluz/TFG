@@ -6,6 +6,11 @@ pub mod midi_din;
 #[cfg(feature = "midi-din")]
 pub use midi_din::create_midi_task;
 
+#[cfg(feature = "midi-usb")]
+pub mod midi_usb;
+#[cfg(feature = "midi-usb")]
+pub use midi_usb::create_midi_task;
+
 #[cfg(all(feature = "midi-usb", feature = "midi-din"))]
 compile_error!("feature \"midi-usb\" and feature \"midi-din\" cannot be enabled at the same time");
 
