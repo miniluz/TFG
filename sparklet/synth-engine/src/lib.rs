@@ -4,7 +4,8 @@ pub mod adsr;
 mod voice_bank;
 pub mod wavetable;
 
-/// Number of samples to process in each render cycle
+/// Default number of samples to process in each render cycle
+/// Used in tests and examples
 pub const WINDOW_SIZE: usize = 128;
 
 /// Sample rate in Hz
@@ -29,14 +30,21 @@ pub struct SynthEngine<
     M: RawMutex,
     const CHANNEL_SIZE: usize,
     const VOICE_BANK_SIZE: usize,
+    const WINDOW_SIZE: usize,
 > {
     voice_bank: VoiceBank<'wt, VOICE_BANK_SIZE>,
     receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
     note_queue: Deque<PendingNote, VOICE_BANK_SIZE>,
 }
 
-impl<'ch, 'wt, M: RawMutex, const CHANNEL_SIZE: usize, const VOICE_BANK_SIZE: usize>
-    SynthEngine<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE>
+impl<
+    'ch,
+    'wt,
+    M: RawMutex,
+    const CHANNEL_SIZE: usize,
+    const VOICE_BANK_SIZE: usize,
+    const WINDOW_SIZE: usize,
+> SynthEngine<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE>
 {
     const VOICE_BIT_SHIFT_SIZE: i8 = -((if VOICE_BANK_SIZE == 1 {
         0

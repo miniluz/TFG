@@ -15,22 +15,6 @@ use hardware::AudioUsbHardware;
 
 pub use hardware::{AUDIO_CHANNELS, USB_MAX_PACKET_SIZE, USB_MAX_SAMPLE_COUNT};
 
-const fn init_square_wave() -> [i16; USB_MAX_SAMPLE_COUNT] {
-    let mut arr = [0i16; USB_MAX_SAMPLE_COUNT];
-    let half = USB_MAX_SAMPLE_COUNT / 2;
-    let mut i = 0;
-    while i < half {
-        arr[i] = i16::MIN;
-        i += 1;
-    }
-    while i < USB_MAX_SAMPLE_COUNT {
-        arr[i] = i16::MAX;
-        i += 1;
-    }
-    arr
-}
-
-static SQUARE_WAVE: [i16; USB_MAX_SAMPLE_COUNT] = init_square_wave();
 
 /// Shared volume state accessible from both tasks
 struct VolumeState {
@@ -75,6 +59,7 @@ impl From<EndpointError> for Disconnected {
 async fn stream_handler<'d, T: usb::Instance + 'd>(
     stream: &mut microphone::Stream<'d, usb::Driver<'d, T>>,
     receiver: &mut zerocopy_channel::Receiver<'static, NoopRawMutex, super::SampleBlock>,
+    volume_state: &'static VolumeState,
 ) -> Result<(), Disconnected> {
     info!("USB Audio: Stream handler starting...");
     let mut usb_data = [0u8; USB_MAX_PACKET_SIZE];
@@ -82,7 +67,21 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
 
     loop {
         let samples = receiver.receive().await;
-        usb_data.copy_from_slice(samples);
+
+        // Get current volume
+        let volume_8q8 = volume_state.current_volume_8q8.load(Ordering::Relaxed);
+
+        // Apply volume gain to i16 samples and convert to bytes
+        let mut scaled_samples = [0i16; USB_MAX_SAMPLE_COUNT];
+        for (i, &sample) in samples.iter().enumerate() {
+            scaled_samples[i] = apply_volume_gain(sample, volume_8q8);
+        }
+
+        usb_data.copy_from_slice(&bytemuck::cast::<
+            [i16; USB_MAX_SAMPLE_COUNT],
+            [u8; USB_MAX_PACKET_SIZE],
+        >(scaled_samples));
+
         receiver.receive_done();
 
         stream.write_packet(&usb_data).await?;
@@ -94,45 +93,19 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
     }
 }
 
-/// Generates audio samples (test tone generator - square wave).
-#[embassy_executor::task]
-async fn audio_generator_task(
-    mut sender: zerocopy_channel::Sender<'static, NoopRawMutex, super::SampleBlock>,
-    volume_state: &'static VolumeState,
-) {
-    info!("USB Audio: Generator task starting...");
-    loop {
-        let samples = sender.send().await;
-
-        // Get current volume
-        let volume_8q8 = volume_state.current_volume_8q8.load(Ordering::Relaxed);
-
-        // Apply gain to square wave and convert to bytes
-        let mut scaled_samples = [0i16; USB_MAX_SAMPLE_COUNT];
-        for (i, &sample) in SQUARE_WAVE.iter().enumerate() {
-            scaled_samples[i] = apply_volume_gain(sample, volume_8q8);
-        }
-
-        samples.copy_from_slice(&bytemuck::cast::<
-            [i16; USB_MAX_SAMPLE_COUNT],
-            [u8; USB_MAX_PACKET_SIZE],
-        >(scaled_samples));
-
-        sender.send_done();
-    }
-}
 
 /// Sends audio samples to the host.
 #[embassy_executor::task]
 async fn usb_streaming_task(
     mut stream: microphone::Stream<'static, usb::Driver<'static, peripherals::USB_OTG_HS>>,
     mut receiver: zerocopy_channel::Receiver<'static, NoopRawMutex, super::SampleBlock>,
+    volume_state: &'static VolumeState,
 ) {
     loop {
         stream.wait_connection().await;
         info!("USB Audio: Connected - microphone streaming active");
 
-        _ = stream_handler(&mut stream, &mut receiver).await;
+        _ = stream_handler(&mut stream, &mut receiver, volume_state).await;
 
         info!("USB Audio: Disconnected");
     }
@@ -177,7 +150,7 @@ pub fn create_audio_tasks(
 ) -> (
     SpawnToken<impl Sized>,
     SpawnToken<impl Sized>,
-    SpawnToken<impl Sized>,
+    zerocopy_channel::Sender<'static, NoopRawMutex, super::SampleBlock>,
 ) {
     info!("USB Audio: Creating tasks...");
 
@@ -188,16 +161,15 @@ pub fn create_audio_tasks(
 
     // Initialize zero-copy channel for audio samples
     let sample_blocks =
-        super::SAMPLE_BLOCKS.init([[0; USB_MAX_PACKET_SIZE], [0; USB_MAX_PACKET_SIZE]]);
+        super::SAMPLE_BLOCKS.init([[0; super::USB_MAX_SAMPLE_COUNT]; 2]);
     let channel = super::AUDIO_CHANNEL.init(zerocopy_channel::Channel::new(sample_blocks));
     let (sender, receiver) = channel.split();
 
-    // Create spawn tokens for the three audio tasks
+    // Create spawn tokens for the two USB audio tasks
     let control_task = usb_control_task(audio_hardware.control_monitor, volume_state);
-    let streaming_task = usb_streaming_task(audio_hardware.stream, receiver);
-    let generator_task = audio_generator_task(sender, volume_state);
+    let streaming_task = usb_streaming_task(audio_hardware.stream, receiver, volume_state);
 
     info!("USB Audio: Tasks created successfully");
 
-    (control_task, streaming_task, generator_task)
+    (control_task, streaming_task, sender)
 }

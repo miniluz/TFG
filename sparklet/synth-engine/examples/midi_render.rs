@@ -234,7 +234,7 @@ fn render_audio<const VOICE_COUNT: usize>(
     let receiver = channel.receiver();
 
     // Create synth engine
-    let mut synth_engine = SynthEngine::<'_, '_, _, CHANNEL_SIZE, VOICE_COUNT>::new(
+    let mut synth_engine = SynthEngine::<'_, '_, _, CHANNEL_SIZE, VOICE_COUNT, WINDOW_SIZE>::new(
         receiver,
         wavetable,
         sustain,

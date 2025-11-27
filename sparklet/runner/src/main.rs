@@ -45,9 +45,6 @@ fn main() -> ! {
         midi_task::create_midi_task(hardware.midi_hardware)
     };
 
-    info!("Creating synth engine task");
-    let synth_engine_task = synth_engine_task::create_task();
-
     #[cfg(feature = "usb")]
     let usb_device = {
         info!("Building USB device");
@@ -55,10 +52,17 @@ fn main() -> ! {
     };
 
     #[cfg(feature = "audio-usb")]
-    let (audio_control_task, audio_streaming_task, audio_generator_task) = {
+    let (audio_control_task, audio_streaming_task, audio_sender) = {
         info!("Creating audio tasks");
         audio_task::create_audio_tasks(hardware.audio_hardware)
     };
+
+    info!("Creating synth engine task");
+    #[cfg(feature = "audio-usb")]
+    let synth_engine_task = synth_engine_task::create_task(audio_sender);
+
+    #[cfg(not(feature = "audio-usb"))]
+    let synth_engine_task = synth_engine_task::create_task();
 
     info!("Setting up tasks in executors...");
     executor.run(|spawner| {
@@ -78,7 +82,6 @@ fn main() -> ! {
             info!("Spawning audio tasks");
             spawner.spawn(audio_control_task).unwrap();
             spawner.spawn(audio_streaming_task).unwrap();
-            spawner.spawn(audio_generator_task).unwrap();
         }
     });
 }

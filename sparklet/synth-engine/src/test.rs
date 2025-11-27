@@ -1,6 +1,5 @@
 use super::*;
 use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel};
-use midi::u7;
 use pretty_assertions::assert_eq;
 use wavetable::sine_wavetable::SINE_WAVETABLE;
 
@@ -27,7 +26,7 @@ macro_rules! setup_synth_engine {
         let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
         let $sender = channel.sender();
         let receiver = channel.receiver();
-        let mut $se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE>::new(
+        let mut $se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE, WINDOW_SIZE>::new(
             receiver,
             &SINE_WAVETABLE,
             TEST_SUSTAIN,
@@ -148,7 +147,7 @@ fn test_envelope_lifecycle_to_idle() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let mut se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE>::new(
+    let mut se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE, WINDOW_SIZE>::new(
         receiver,
         &SINE_WAVETABLE,
         FAST_SUSTAIN,
@@ -272,7 +271,7 @@ fn test_rapid_note_on_off_sequences() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let mut se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE>::new(
+    let mut se = SynthEngine::<'_, '_, _, _, TEST_VOICE_BANK_SIZE, WINDOW_SIZE>::new(
         receiver,
         &SINE_WAVETABLE,
         FAST_SUSTAIN,
