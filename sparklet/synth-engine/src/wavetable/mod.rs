@@ -1,3 +1,5 @@
+use defmt::Format;
+
 mod phase_increment_table;
 pub mod saw_wavetable;
 pub mod sine_wavetable;
@@ -21,6 +23,12 @@ pub struct WavetableOscillator<'a, const SAMPLE_RATE: u32> {
     phase: U8F24,
     phase_increment: U8F24,
     wavetable: Wavetable<'a>,
+}
+
+impl<'a, const SAMPLE_RATE: u32> Format for WavetableOscillator<'a, SAMPLE_RATE> {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "WavetableOscillator")
+    }
 }
 
 impl<'a, const SAMPLE_RATE: u32> WavetableOscillator<'a, SAMPLE_RATE> {

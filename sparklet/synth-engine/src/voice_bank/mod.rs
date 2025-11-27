@@ -94,7 +94,7 @@ pub enum VoiceStage {
     Held,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Format, Debug, Clone, Copy)]
 pub(crate) struct Voice<'a> {
     pub(crate) timestamp: u32,
     pub(crate) note: Note,
@@ -120,7 +120,7 @@ impl<'a> Voice<'a> {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Format, Debug, Clone, Copy)]
 pub struct VoiceBank<'a, const N: usize> {
     pub(crate) voices: [Voice<'a>; N],
     pub(crate) timestamp_counter: u32,

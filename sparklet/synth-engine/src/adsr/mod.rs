@@ -1,4 +1,5 @@
 use cmsis_interface::Q15;
+use defmt::Format;
 use fixed::types::I1F31;
 
 use crate::adsr::{
@@ -20,7 +21,7 @@ pub struct BaseAndCoefficient {
     pub coefficient: I1F31,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ADSRStage {
     Idle,
     Attack,
@@ -132,6 +133,12 @@ pub struct ADSR {
     pub(crate) stage: ADSRStage,
     pub(crate) config: ADSRConfig,
     pub(crate) output: I1F31,
+}
+
+impl Format for ADSR {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "ADSR {{ stage: {} }}", self.stage)
+    }
 }
 
 impl ADSR {

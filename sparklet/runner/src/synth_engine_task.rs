@@ -4,7 +4,7 @@ use embassy_executor::SpawnToken;
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_time::{Duration, Timer};
 use static_cell::StaticCell;
-use synth_engine::{wavetable::saw_wavetable::SAW_WAVETABLE, Q15, SynthEngine, WINDOW_SIZE};
+use synth_engine::{Q15, SynthEngine, WINDOW_SIZE, wavetable::saw_wavetable::SAW_WAVETABLE};
 
 use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
 
@@ -16,12 +16,19 @@ const DECAY_RELEASE_CONFIG: u8 = 127;
 const SUSTAIN_CONFIG: u8 = 200;
 
 pub struct SynthEngineTaskState<'ch, 'wt> {
-    synth_engine: SynthEngine<'ch, 'wt, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE, VOICE_BANK_SIZE>,
+    synth_engine:
+        SynthEngine<'ch, 'wt, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE, VOICE_BANK_SIZE>,
 }
 
 impl<'ch, 'wt> SynthEngineTaskState<'ch, 'wt> {
     pub fn new(
-        synth_engine: SynthEngine<'ch, 'wt, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE, VOICE_BANK_SIZE>,
+        synth_engine: SynthEngine<
+            'ch,
+            'wt,
+            CriticalSectionRawMutex,
+            MIDI_CHANNEL_SIZE,
+            VOICE_BANK_SIZE,
+        >,
     ) -> SynthEngineTaskState<'ch, 'wt> {
         SynthEngineTaskState { synth_engine }
     }
@@ -47,10 +54,12 @@ pub async fn synth_engine_task(state: &'static mut SynthEngineTaskState<'static,
     let mut counter: u16 = 0;
 
     loop {
-        state.synth_engine.render_samples::<CmsisNativeOperations>(&mut buffer);
+        state
+            .synth_engine
+            .render_samples::<CmsisNativeOperations>(&mut buffer);
 
         if counter == 0 {
-            info!("Voice bank state");
+            info!("Voice bank state: {}", state.synth_engine.get_voice_bank());
         }
 
         counter = (counter + 1) % RUN_RATE_HZ;
