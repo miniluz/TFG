@@ -5,4 +5,5 @@ members = ["midi", "runner", "synth-engine", "cmsis-interface", "cmsis-native", 
 [patch.crates-io]
 embassy-executor = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
 embassy-stm32 = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
+embassy-sync = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
 embassy-time = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}

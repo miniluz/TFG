@@ -16,3 +16,4 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2.1.1"
 midi = { path = "../midi" }
 synth_engine = { path = "../synth-engine" }
+cmsis-native = { path = "../cmsis-native" }
