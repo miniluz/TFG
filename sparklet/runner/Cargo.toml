@@ -3,6 +3,17 @@ name = "runner"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["midi-din"]
+usb = ["dep:embassy-usb"]
+midi-din = []
+midi-usb = ["usb"]
+
+[profile.release]
+debug = 2
+lto = "fat"
+opt-level = "z"
+
 [dependencies]
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7.5"
@@ -12,6 +23,7 @@ embassy-executor = { version = "0.9.1", features = ["arch-cortex-m", "defmt", "e
 embassy-stm32 = { version = "0.4.0", features = ["stm32h723zg", "defmt", "memory-x", "time", "time-driver-any", "exti"] }
 embassy-sync = { version = "0.7.2", features = ["defmt"] }
 embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime"] }
+embassy-usb = { version = "0.5.1",  features = ["defmt"], optional = true }
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 static_cell = "2.1.1"
 midi = { path = "../midi" }

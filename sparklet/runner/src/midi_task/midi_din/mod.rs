@@ -1,11 +1,14 @@
 use defmt::trace;
 use embassy_executor::SpawnToken;
 use embassy_stm32::usart::RingBufferedUartRx;
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel};
-use midi::{MidiEvent, MidiListener};
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
+use midi::MidiListener;
 use static_cell::StaticCell;
 
-pub const MIDI_CHANNEL_SIZE: usize = 16;
+use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
+use hardware::MidiDinHardware;
+
+pub mod hardware;
 
 pub struct MidiTaskState<'a> {
     midi_listener: MidiListener<'a, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE>,
@@ -26,10 +29,9 @@ impl<'a> MidiTaskState<'a> {
 
 pub static MIDI_TASK_STATE: StaticCell<MidiTaskState> = StaticCell::new();
 
-pub static MIDI_TASK_CHANNEL: Channel<CriticalSectionRawMutex, MidiEvent, MIDI_CHANNEL_SIZE> =
-    Channel::new();
+pub fn create_midi_task(midi_hardware: MidiDinHardware<'static>) -> SpawnToken<impl Sized> {
+    let midi_uart_buffered = midi_hardware.midi_uart_buffered;
 
-pub fn create_task(midi_uart_buffered: RingBufferedUartRx<'static>) -> SpawnToken<impl Sized> {
     let midi_sender = MIDI_TASK_CHANNEL.sender();
 
     let midi_listener = MidiListener::new(midi_sender);

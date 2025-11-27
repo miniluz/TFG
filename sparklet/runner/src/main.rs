@@ -24,7 +24,7 @@ fn main() -> ! {
     let executor = EXECUTOR.init(embassy_executor::Executor::new());
 
     info!("Creating MIDI task");
-    let midi_task = midi_task::create_task(hardware.midi_uart_buffered);
+    let midi_task = midi_task::create_midi_task(hardware.midi_hardware);
 
     info!("Creating synth engine task");
     let synth_engine_task = synth_engine_task::create_task();

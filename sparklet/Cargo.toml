@@ -7,3 +7,4 @@ embassy-executor = { git = "https://github.com/miniluz/embassy.git", branch = "r
 embassy-stm32 = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
 embassy-sync = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
 embassy-time = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}
+embassy-usb = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}

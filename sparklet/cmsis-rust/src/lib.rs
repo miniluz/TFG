@@ -67,11 +67,7 @@ impl CmsisOperations for CmsisRustOperations {
         }
     }
 
-    fn shift_q15(
-        src: &[cmsis_interface::Q15],
-        shift_bits: i8,
-        dst: &mut [cmsis_interface::Q15],
-    ) {
+    fn shift_q15(src: &[cmsis_interface::Q15], shift_bits: i8, dst: &mut [cmsis_interface::Q15]) {
         if src.len() != dst.len() {
             panic!("src.len() != dst.len()");
         }
