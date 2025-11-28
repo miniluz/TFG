@@ -4,8 +4,34 @@ use midi::MidiEvent;
 use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
 
 /// A MIDI note number (0-127)
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Note(u8);
+
+impl Format for Note {
+    fn format(&self, fmt: defmt::Formatter) {
+        // MIDI note 69 = A4
+        let note_value = self.0 as i32;
+        let octave = (note_value / 12) - 1;
+        let note_index = note_value % 12;
+
+        // Use match to avoid storing string array in memory
+        match note_index {
+            0 => defmt::write!(fmt, "C{}", octave),
+            1 => defmt::write!(fmt, "C#{}", octave),
+            2 => defmt::write!(fmt, "D{}", octave),
+            3 => defmt::write!(fmt, "D#{}", octave),
+            4 => defmt::write!(fmt, "E{}", octave),
+            5 => defmt::write!(fmt, "F{}", octave),
+            6 => defmt::write!(fmt, "F#{}", octave),
+            7 => defmt::write!(fmt, "G{}", octave),
+            8 => defmt::write!(fmt, "G#{}", octave),
+            9 => defmt::write!(fmt, "A{}", octave),
+            10 => defmt::write!(fmt, "A#{}", octave),
+            11 => defmt::write!(fmt, "B{}", octave),
+            _ => defmt::write!(fmt, "?{}", octave),
+        }
+    }
+}
 
 impl Note {
     pub const fn new(value: u8) -> Self {
@@ -42,8 +68,14 @@ impl From<Note> for midi::u7 {
 }
 
 /// A MIDI velocity (0-127)
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Velocity(u8);
+
+impl Format for Velocity {
+    fn format(&self, fmt: defmt::Formatter) {
+        self.0.format(fmt);
+    }
+}
 
 impl Velocity {
     pub const fn new(value: u8) -> Self {
@@ -80,7 +112,7 @@ impl From<Velocity> for midi::u7 {
 }
 
 /// Result of attempting to play a note
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PlayNoteResult {
     /// Successfully played the note (either retriggered or allocated a voice)
     Success,
@@ -88,13 +120,13 @@ pub enum PlayNoteResult {
     AllVoicesBusy,
 }
 
-#[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoiceStage {
     Free,
     Held,
 }
 
-#[derive(Format, Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Voice<'a> {
     pub(crate) timestamp: u32,
     pub(crate) note: Note,
@@ -120,10 +152,29 @@ impl<'a> Voice<'a> {
     }
 }
 
-#[derive(Format, Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct VoiceBank<'a, const N: usize> {
     pub(crate) voices: [Voice<'a>; N],
     pub(crate) timestamp_counter: u32,
+}
+
+impl<'a, const N: usize> Format for VoiceBank<'a, N> {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "VoiceBank {{\n");
+
+        for (i, voice) in self.voices.iter().enumerate() {
+            defmt::write!(
+                fmt,
+                "   Voice {}: {} ({}) ({})\n",
+                i,
+                voice.note,
+                voice.velocity,
+                voice.adsr.stage
+            )
+        }
+
+        defmt::write!(fmt, "}}");
+    }
 }
 
 impl<'a, const N: usize> VoiceBank<'a, N> {

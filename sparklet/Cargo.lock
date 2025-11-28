@@ -1366,6 +1366,7 @@ dependencies = [
  "embassy-sync",
  "embassy-time",
  "embassy-usb",
+ "fixed",
  "midi",
  "panic-probe",
  "static_cell",

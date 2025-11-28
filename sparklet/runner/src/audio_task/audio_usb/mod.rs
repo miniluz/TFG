@@ -1,5 +1,6 @@
 pub mod hardware;
 
+use cmsis_native::CmsisNativeOperations;
 use core::sync::atomic::{AtomicI16, Ordering};
 use defmt::info;
 use embassy_executor::SpawnToken;
@@ -9,40 +10,31 @@ use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 use embassy_sync::zerocopy_channel;
 use embassy_usb::class::uac1::microphone::{self, Volume};
 use embassy_usb::driver::EndpointError;
+use fixed::traits::LossyInto;
 use static_cell::StaticCell;
+use synth_engine::Q15;
+use synth_engine::adsr::sustain_amplitude_table::SUSTAIN_AMPLITUDE_TABLE;
 
 use hardware::AudioUsbHardware;
 
 pub use hardware::{AUDIO_CHANNELS, USB_MAX_PACKET_SIZE, USB_MAX_SAMPLE_COUNT};
-
+use synth_engine::CmsisOperations;
 
 /// Shared volume state accessible from both tasks
 struct VolumeState {
-    current_volume_8q8: AtomicI16,
+    volume_mult: AtomicI16,
+}
+
+fn volume_8q8_to_mult(volume_8q8: i16) -> Q15 {
+    // I want to map the (-80 * 256)..0 range to 0..255
+    // x' = (x - min) / (max - min) * (max' - min') + min'
+    // x' = (x + 80 * 256) / (80 * 256) * (255) + 0
+    let index = (volume_8q8.clamp(-80 * 256, 0) + 80 * 256) / 256 * 255 / 80;
+    let mult: Q15 = SUSTAIN_AMPLITUDE_TABLE[index as usize].lossy_into();
+    mult
 }
 
 static VOLUME_STATE: StaticCell<VolumeState> = StaticCell::new();
-
-/// Applies volume gain to a sample using shift-based approximation.
-///
-/// Note: This uses LINEAR scaling which is NOT correct for audio (should be exponential),
-/// but provides a simple demonstration. Every -6 dB H halves the amplitude.
-#[inline]
-fn apply_volume_gain(sample: i16, volume_8q8: i16) -> i16 {
-    // Convert 8.8 fixed point to integer dB
-    let db = volume_8q8 / 256;
-
-    // Calculate right shifts needed (every -6 dB = 1 bit shift)
-    let shifts = (-db) / 6;
-
-    if shifts >= 15 {
-        0 // Essentially silent
-    } else if shifts <= 0 {
-        sample // 0 dB or positive
-    } else {
-        sample >> shifts
-    }
-}
 
 struct Disconnected {}
 
@@ -69,18 +61,16 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
         let samples = receiver.receive().await;
 
         // Get current volume
-        let volume_8q8 = volume_state.current_volume_8q8.load(Ordering::Relaxed);
+        let volume_mult = volume_state.volume_mult.load(Ordering::Relaxed);
 
-        // Apply volume gain to i16 samples and convert to bytes
-        let mut scaled_samples = [0i16; USB_MAX_SAMPLE_COUNT];
-        for (i, &sample) in samples.iter().enumerate() {
-            scaled_samples[i] = apply_volume_gain(sample, volume_8q8);
-        }
-
-        usb_data.copy_from_slice(&bytemuck::cast::<
-            [i16; USB_MAX_SAMPLE_COUNT],
-            [u8; USB_MAX_PACKET_SIZE],
-        >(scaled_samples));
+        // Copy and multiply in one operation c:
+        CmsisNativeOperations::multiply_q15(
+            bytemuck::cast_slice::<i16, Q15>(samples),
+            &[Q15::from_bits(volume_mult); USB_MAX_SAMPLE_COUNT],
+            bytemuck::cast_mut::<[u8; USB_MAX_PACKET_SIZE], [Q15; USB_MAX_SAMPLE_COUNT]>(
+                &mut usb_data,
+            ),
+        );
 
         receiver.receive_done();
 
@@ -88,11 +78,13 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
 
         packet_count += 1;
         if packet_count % 1000 == 0 {
-            info!("USB Audio: Streamed {} packets", packet_count);
+            info!(
+                "USB Audio: Streamed {} packets at volume {}",
+                packet_count, volume_mult
+            );
         }
     }
 }
-
 
 /// Sends audio samples to the host.
 #[embassy_executor::task]
@@ -125,9 +117,8 @@ async fn usb_control_task(
             match control_monitor.gain(channel).unwrap() {
                 Volume::Muted => {
                     info!("USB Audio: Channel {} muted", channel);
-                    volume_state
-                        .current_volume_8q8
-                        .store(-25600, Ordering::Relaxed);
+                    volume_state.volume_mult.store(0, Ordering::Relaxed);
+                    info!("USB Audio: Set volume_mult to 0");
                 }
                 Volume::DeciBel(vol_8q8) => {
                     let db_int = vol_8q8 / 256;
@@ -135,7 +126,9 @@ async fn usb_control_task(
                         "USB Audio: Channel {} gain: {} dB (raw: {})",
                         channel, db_int, vol_8q8
                     );
-                    volume_state.current_volume_8q8.store(vol_8q8, Ordering::Relaxed);
+                    let mult = volume_8q8_to_mult(vol_8q8).to_bits();
+                    volume_state.volume_mult.store(mult, Ordering::Relaxed);
+                    info!("USB Audio: Set volume_mult to {}", mult);
                 }
             }
         }
@@ -154,18 +147,15 @@ pub fn create_audio_tasks(
 ) {
     info!("USB Audio: Creating tasks...");
 
-    // Initialize volume state (start at 0 dB = maximum volume)
     let volume_state = VOLUME_STATE.init(VolumeState {
-        current_volume_8q8: AtomicI16::new(0),
+        volume_mult: AtomicI16::new(i16::MAX),
     });
+    info!("USB Audio: Set volume_mult to {}", i16::MAX);
 
-    // Initialize zero-copy channel for audio samples
-    let sample_blocks =
-        super::SAMPLE_BLOCKS.init([[0; super::USB_MAX_SAMPLE_COUNT]; 2]);
+    let sample_blocks = super::SAMPLE_BLOCKS.init([[0; super::USB_MAX_SAMPLE_COUNT]; 2]);
     let channel = super::AUDIO_CHANNEL.init(zerocopy_channel::Channel::new(sample_blocks));
     let (sender, receiver) = channel.split();
 
-    // Create spawn tokens for the two USB audio tasks
     let control_task = usb_control_task(audio_hardware.control_monitor, volume_state);
     let streaming_task = usb_streaming_task(audio_hardware.stream, receiver, volume_state);
 

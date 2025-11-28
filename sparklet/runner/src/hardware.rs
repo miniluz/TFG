@@ -51,30 +51,28 @@ impl Hardware {
 
         let peripherals = embassy_stm32::init(config);
 
-        #[cfg(feature = "midi-din")]
-        let midi_hardware = crate::get_midi_din_hardware!(peripherals);
+        #[cfg(feature = "usb")]
+        let mut usb_builder = {
+            let usb_hardware = crate::get_usb_hardware!(peripherals);
 
-        #[cfg(feature = "usb")]
-        let usb_hardware = crate::get_usb_hardware!(peripherals);
+            let mut usb_config = embassy_usb::Config::new(0xc0de, 0xcafe);
 
-        #[cfg(feature = "usb")]
-        let mut usb_config = embassy_usb::Config::new(0xc0de, 0xcafe);
-        #[cfg(feature = "usb")]
-        {
-            usb_config.manufacturer = Some("Sparklet");
+            usb_config.manufacturer = Some("miniluz");
             usb_config.product = Some("Sparklet Synth");
             usb_config.serial_number = Some("12345678");
-        }
 
-        #[cfg(feature = "usb")]
-        let mut usb_builder = embassy_usb::Builder::new(
-            usb_hardware.driver,
-            usb_config,
-            usb_hardware.config_descriptor,
-            usb_hardware.bos_descriptor,
-            &mut [],
-            usb_hardware.control_buf,
-        );
+            embassy_usb::Builder::new(
+                usb_hardware.driver,
+                usb_config,
+                usb_hardware.config_descriptor,
+                usb_hardware.bos_descriptor,
+                &mut [],
+                usb_hardware.control_buf,
+            )
+        };
+
+        #[cfg(feature = "midi-din")]
+        let midi_hardware = crate::get_midi_din_hardware!(peripherals);
 
         #[cfg(feature = "midi-usb")]
         let midi_hardware = crate::get_midi_usb_hardware!(&mut usb_builder);

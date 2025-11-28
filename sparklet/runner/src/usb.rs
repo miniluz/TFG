@@ -48,3 +48,14 @@ macro_rules! get_usb_hardware {
         }
     }};
 }
+
+#[cfg(feature = "usb")]
+#[embassy_executor::task]
+pub async fn usb_device_task(
+    mut usb_device: embassy_usb::UsbDevice<
+        'static,
+        embassy_stm32::usb::Driver<'static, embassy_stm32::peripherals::USB_OTG_HS>,
+    >,
+) {
+    usb_device.run().await;
+}

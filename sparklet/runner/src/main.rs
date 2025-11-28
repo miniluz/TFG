@@ -5,10 +5,10 @@ mod hardware;
 mod midi_task;
 mod synth_engine_task;
 
-#[cfg(feature = "usb")]
-mod usb;
 #[cfg(feature = "audio-usb")]
 mod audio_task;
+#[cfg(feature = "usb")]
+mod usb;
 
 use defmt::info;
 use embassy_executor::Executor;
@@ -17,17 +17,6 @@ use static_cell::StaticCell;
 use defmt_rtt as _;
 use embassy_stm32 as _;
 use panic_probe as _;
-
-#[cfg(feature = "usb")]
-#[embassy_executor::task]
-async fn usb_device_task(
-    mut usb_device: embassy_usb::UsbDevice<
-        'static,
-        embassy_stm32::usb::Driver<'static, embassy_stm32::peripherals::USB_OTG_HS>,
-    >,
-) {
-    usb_device.run().await;
-}
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
@@ -67,19 +56,23 @@ fn main() -> ! {
     info!("Setting up tasks in executors...");
     executor.run(|spawner| {
         #[cfg(any(feature = "midi-din", feature = "midi-usb"))]
-        spawner.spawn(midi_task).unwrap();
+        {
+            info!("Spawning MIDI task");
+            spawner.spawn(midi_task).unwrap();
+        }
 
+        info!("Spawning Synth Engine task");
         spawner.spawn(synth_engine_task).unwrap();
 
         #[cfg(feature = "usb")]
         {
             info!("Spawning USB device task");
-            spawner.spawn(usb_device_task(usb_device)).unwrap();
+            spawner.spawn(usb::usb_device_task(usb_device)).unwrap();
         }
 
         #[cfg(feature = "audio-usb")]
         {
-            info!("Spawning audio tasks");
+            info!("Spawning USB Audio tasks");
             spawner.spawn(audio_control_task).unwrap();
             spawner.spawn(audio_streaming_task).unwrap();
         }

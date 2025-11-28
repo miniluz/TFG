@@ -10,10 +10,10 @@ use crate::adsr::{
     sustain_amplitude_table::SUSTAIN_AMPLITUDE_TABLE,
 };
 
-mod config_table;
+pub mod config_table;
 #[cfg(not(target_os = "none"))]
 pub mod native_utils;
-mod sustain_amplitude_table;
+pub mod sustain_amplitude_table;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BaseAndCoefficient {
