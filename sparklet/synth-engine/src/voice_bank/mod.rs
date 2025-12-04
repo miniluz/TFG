@@ -278,6 +278,10 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
         // If no voice found (all idle or in QuickRelease), this is a no-op
     }
 
+    pub fn count_voices_in_quick_release(&self) -> usize {
+        self.voices.iter().filter(|v| v.adsr.is_in_quick_release()).count()
+    }
+
     #[cfg(test)]
     pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) -> PlayNoteResult {
         self.play_note_optional_retrigger(note, velocity, false)

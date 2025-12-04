@@ -114,7 +114,13 @@ impl<
                 }
                 PlayNoteResult::AllVoicesBusy => {
                     // No idle voice - quick_release one and leave note queued
-                    self.voice_bank.quick_release();
+                    // Only call quick_release if we have more queued notes than voices being released
+                    let queue_count = self.note_queue.len();
+                    let quick_release_count = self.voice_bank.count_voices_in_quick_release();
+
+                    if queue_count > quick_release_count {
+                        self.voice_bank.quick_release();
+                    }
                     break;
                 }
             }

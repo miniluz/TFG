@@ -355,3 +355,167 @@ fn test_wrong_buffer_size_panics() {
     let mut buffer = [Q15::ZERO; 64]; // Wrong size!
     se.render_samples::<TestOps>(&mut buffer);
 }
+
+#[test]
+fn test_voice_stealing_doesnt_release_all_voices() {
+    setup_synth_engine!(sender, se);
+
+    // Fill all 4 voices
+    for i in 0..TEST_VOICE_BANK_SIZE {
+        sender
+            .try_send(MidiEvent::NoteOn {
+                key: 60 + i as u8,
+                vel: 100,
+            })
+            .unwrap();
+    }
+
+    let mut buffer = [Q15::ZERO; WINDOW_SIZE];
+    se.render_samples::<TestOps>(&mut buffer);
+
+    // All voices should be active
+    assert_eq!(se.get_voice_bank().count_active_voices(), TEST_VOICE_BANK_SIZE);
+
+    // Play one more note over the limit
+    sender
+        .try_send(MidiEvent::NoteOn { key: 70, vel: 100 })
+        .unwrap();
+
+    // Render once - this will trigger quick_release on one voice
+    se.render_samples::<TestOps>(&mut buffer);
+
+    // Immediately after first render, check that we haven't released all voices
+    // At most 1 voice should be in quick release or have become idle
+    let quick_release_after_first = se.get_voice_bank().count_voices_in_quick_release();
+    assert!(
+        quick_release_after_first <= 1,
+        "Should have at most 1 voice in quick release, got {}",
+        quick_release_after_first
+    );
+
+    // Render a few more cycles
+    for _ in 0..10 {
+        se.render_samples::<TestOps>(&mut buffer);
+    }
+
+    // Property: The new note should have been allocated, and we should still have active voices
+    // This proves voice stealing worked without releasing all voices
+    assert_eq!(
+        se.get_voice_bank().count_active_voices(),
+        TEST_VOICE_BANK_SIZE,
+        "Should still have all voices active after voice stealing"
+    );
+}
+
+#[test]
+fn test_multiple_queued_notes_release_appropriate_voices() {
+    setup_synth_engine!(sender, se);
+
+    // Fill all 4 voices
+    for i in 0..TEST_VOICE_BANK_SIZE {
+        sender
+            .try_send(MidiEvent::NoteOn {
+                key: 60 + i as u8,
+                vel: 100,
+            })
+            .unwrap();
+    }
+
+    let mut buffer = [Q15::ZERO; WINDOW_SIZE];
+    se.render_samples::<TestOps>(&mut buffer);
+
+    // Queue 3 more notes over the limit
+    for i in 0..3 {
+        sender
+            .try_send(MidiEvent::NoteOn {
+                key: 70 + i as u8,
+                vel: 100,
+            })
+            .unwrap();
+    }
+
+    // Render several cycles
+    for _ in 0..5 {
+        se.render_samples::<TestOps>(&mut buffer);
+    }
+
+    // Property: At most 3 voices should be in quick release (not all 4)
+    let quick_release_count = se.get_voice_bank().count_voices_in_quick_release();
+    assert!(
+        quick_release_count <= 3,
+        "Should have at most 3 voices in quick release for 3 queued notes, got {}",
+        quick_release_count
+    );
+
+    // Property: Should not release all voices
+    assert!(
+        quick_release_count < TEST_VOICE_BANK_SIZE,
+        "Should not release all {} voices",
+        TEST_VOICE_BANK_SIZE
+    );
+}
+
+#[test]
+fn test_quick_release_not_repeated_per_cycle() {
+    setup_synth_engine!(sender, se);
+
+    // Fill all 4 voices with notes that will stay active
+    for i in 0..TEST_VOICE_BANK_SIZE {
+        sender
+            .try_send(MidiEvent::NoteOn {
+                key: 60 + i as u8,
+                vel: 100,
+            })
+            .unwrap();
+    }
+
+    let mut buffer = [Q15::ZERO; WINDOW_SIZE];
+    se.render_samples::<TestOps>(&mut buffer);
+    assert_eq!(se.get_voice_bank().count_active_voices(), TEST_VOICE_BANK_SIZE);
+
+    // Queue multiple notes over the limit
+    sender
+        .try_send(MidiEvent::NoteOn { key: 70, vel: 100 })
+        .unwrap();
+    sender
+        .try_send(MidiEvent::NoteOn { key: 72, vel: 100 })
+        .unwrap();
+
+    // Render once - should trigger quick_release on voices as needed
+    se.render_samples::<TestOps>(&mut buffer);
+    let first_count = se.get_voice_bank().count_voices_in_quick_release();
+
+    // Render several more times
+    for _ in 0..5 {
+        se.render_samples::<TestOps>(&mut buffer);
+    }
+
+    let final_count = se.get_voice_bank().count_voices_in_quick_release();
+
+    // Property: We shouldn't have released all voices
+    // The key insight is that we should have at most as many voices in quick release
+    // as we have queued notes (2), not all 4 voices
+    assert!(
+        first_count <= 2,
+        "Should have released at most 2 voices initially for 2 queued notes, got {}",
+        first_count
+    );
+
+    assert!(
+        final_count < TEST_VOICE_BANK_SIZE,
+        "Should not have all {} voices in quick release, got {}",
+        TEST_VOICE_BANK_SIZE,
+        final_count
+    );
+
+    // Eventually all voices should be active with the new notes
+    for _ in 0..10 {
+        se.render_samples::<TestOps>(&mut buffer);
+    }
+
+    assert_eq!(
+        se.get_voice_bank().count_active_voices(),
+        TEST_VOICE_BANK_SIZE,
+        "Should have all voices active after queue processing"
+    );
+}
