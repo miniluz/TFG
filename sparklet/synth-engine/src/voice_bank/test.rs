@@ -169,9 +169,9 @@ fn voice_bank_quick_release_selects_quietest_in_release() {
     vb.voices[0].adsr.get_samples::<128>(&mut buffer);
 
     // Verify voice 0 is quietest
-    assert!(vb.voices[0].adsr.output < vb.voices[1].adsr.output);
-    assert!(vb.voices[0].adsr.output < vb.voices[2].adsr.output);
-    assert!(vb.voices[0].adsr.output < vb.voices[3].adsr.output);
+    assert!(vb.voices[0].adsr.capacitor.get_level() < vb.voices[1].adsr.capacitor.get_level());
+    assert!(vb.voices[0].adsr.capacitor.get_level() < vb.voices[2].adsr.capacitor.get_level());
+    assert!(vb.voices[0].adsr.capacitor.get_level() < vb.voices[3].adsr.capacitor.get_level());
 
     // Call quick_release - it should select voice 0 (quietest in Release)
     vb.quick_release();

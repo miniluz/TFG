@@ -2,7 +2,7 @@
 
 use fixed::types::I1F31;
 
-pub static SUSTAIN_AMPLITUDE_TABLE: [I1F31; 256] = [
+pub static DB_LINEAR_AMPLITUDE_TABLE: [I1F31; 256] = [
     I1F31::from_bits(0x00000000_u32 as i32),
 I1F31::from_bits(0x014da6c8_u32 as i32),
 I1F31::from_bits(0x0153bb58_u32 as i32),

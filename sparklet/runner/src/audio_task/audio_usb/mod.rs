@@ -13,7 +13,7 @@ use embassy_usb::driver::EndpointError;
 use fixed::traits::LossyInto;
 use static_cell::StaticCell;
 use synth_engine::Q15;
-use synth_engine::adsr::sustain_amplitude_table::SUSTAIN_AMPLITUDE_TABLE;
+use synth_engine::adsr::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
 
 use hardware::AudioUsbHardware;
 
@@ -30,7 +30,7 @@ fn volume_8q8_to_mult(volume_8q8: i16) -> Q15 {
     // x' = (x - min) / (max - min) * (max' - min') + min'
     // x' = (x + 80 * 256) / (80 * 256) * (255) + 0
     let index = (volume_8q8.clamp(-80 * 256, 0) + 80 * 256) / 256 * 255 / 80;
-    let mult: Q15 = SUSTAIN_AMPLITUDE_TABLE[index as usize].lossy_into();
+    let mult: Q15 = DB_LINEAR_AMPLITUDE_TABLE[index as usize].lossy_into();
     mult
 }
 

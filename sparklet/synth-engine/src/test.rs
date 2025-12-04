@@ -40,7 +40,7 @@ macro_rules! setup_synth_engine {
 
 #[test]
 fn test_silence_when_no_notes() {
-    setup_synth_engine!(sender, se);
+    setup_synth_engine!(_sender, se);
 
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
     se.render_samples::<TestOps>(&mut buffer);
@@ -202,8 +202,11 @@ fn test_velocity_scaling() {
     let mut buffer1 = [Q15::ZERO; WINDOW_SIZE];
     let mut buffer2 = [Q15::ZERO; WINDOW_SIZE];
 
-    se1.render_samples::<TestOps>(&mut buffer1);
-    se2.render_samples::<TestOps>(&mut buffer2);
+    // Render multiple cycles to let the ADSR envelope progress
+    for _ in 0..10 {
+        se1.render_samples::<TestOps>(&mut buffer1);
+        se2.render_samples::<TestOps>(&mut buffer2);
+    }
 
     // Property: Higher velocity should produce larger absolute amplitude (on average)
     let avg_abs_1: f64 = buffer1
@@ -350,7 +353,7 @@ fn test_note_off_releases_correct_voice() {
 #[test]
 #[should_panic]
 fn test_wrong_buffer_size_panics() {
-    setup_synth_engine!(sender, se);
+    setup_synth_engine!(_sender, se);
 
     let mut buffer = [Q15::ZERO; 64]; // Wrong size!
     se.render_samples::<TestOps>(&mut buffer);

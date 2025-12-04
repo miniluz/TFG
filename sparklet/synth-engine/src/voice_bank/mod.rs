@@ -140,7 +140,7 @@ impl<'a> Voice<'a> {
         self.timestamp = timestamp;
         //  TODO: Velocity change is sudden, can lead to popping
         self.velocity = velocity;
-        self.adsr.retrigger();
+        self.adsr.retrigger(velocity.as_u8());
     }
 
     pub(crate) fn play_note(&mut self, timestamp: u32, note: Note, velocity: Velocity) {
@@ -148,7 +148,7 @@ impl<'a> Voice<'a> {
         self.note = note;
         self.velocity = velocity;
         self.wavetable_osc.set_note(&note);
-        self.adsr.play();
+        self.adsr.play(velocity.as_u8());
     }
 }
 
@@ -189,7 +189,7 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
                 timestamp: 0,
                 note: Note(0),
                 velocity: Velocity(0),
-                adsr: ADSR::new(sustain_config, attack_config, decay_release_config),
+                adsr: ADSR::new(sustain_config, attack_config, decay_release_config, 0),
                 wavetable_osc: WavetableOscillator::new(wavetable),
             }; N],
             timestamp_counter: 0,
@@ -256,7 +256,7 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
             .iter()
             .enumerate()
             .filter(|(_, v)| v.adsr.is_in_release())
-            .min_by_key(|(_, v)| v.adsr.output)
+            .min_by_key(|(_, v)| v.adsr.capacitor.get_level())
             .map(|(index, _)| index)
         {
             self.voices[index].adsr.quick_release();

@@ -1,6 +1,7 @@
 #![cfg_attr(not(test), no_std)]
 
 pub mod adsr;
+pub mod capacitor;
 mod voice_bank;
 pub mod wavetable;
 
@@ -140,36 +141,30 @@ impl<
             let mut wavetable_buf = [Q15::ZERO; WINDOW_SIZE];
             let mut envelope_buf = [Q15::ZERO; WINDOW_SIZE];
             let mut mixed_buf = [Q15::ZERO; WINDOW_SIZE];
-            let mut velocity_scaled_buf = [Q15::ZERO; WINDOW_SIZE];
 
             // Generate wavetable samples
             voice
                 .wavetable_osc
                 .get_samples::<T, WINDOW_SIZE>(&mut wavetable_buf);
 
-            // Generate ADSR envelope
+            // Generate ADSR envelope (now includes velocity scaling)
             voice.adsr.get_samples::<WINDOW_SIZE>(&mut envelope_buf);
 
             // Multiply wavetable by envelope (element-wise)
             T::multiply_q15(&wavetable_buf, &envelope_buf, &mut mixed_buf);
 
-            // Scale by velocity (0-127 -> Q15 scale factor)
-            // Velocity 127 = 1.0, velocity 64 ~= 0.5
-            let velocity_scale = Q15::from_bits((voice.velocity.as_u8() as i16) << 8);
-            let velocity_array = [velocity_scale; WINDOW_SIZE];
-            T::multiply_q15(&mixed_buf, &velocity_array, &mut velocity_scaled_buf);
-
-            T::shift_in_place_q15(&mut velocity_scaled_buf, Self::VOICE_BIT_SHIFT_SIZE);
+            T::shift_in_place_q15(&mut mixed_buf, Self::VOICE_BIT_SHIFT_SIZE);
 
             // Accumulate into output buffer using CMSIS add
             output_buf.copy_from_slice(sample_buffer);
             let mut result_buf = [Q15::ZERO; WINDOW_SIZE];
-            T::add_q15(&output_buf, &velocity_scaled_buf, &mut result_buf);
+            T::add_q15(&output_buf, &mixed_buf, &mut result_buf);
             sample_buffer.copy_from_slice(&result_buf);
         }
     }
 
     #[cfg(test)]
+    #[allow(dead_code)]
     pub(crate) fn get_voice_bank_mut(&mut self) -> &mut VoiceBank<'wt, VOICE_BANK_SIZE> {
         &mut self.voice_bank
     }
