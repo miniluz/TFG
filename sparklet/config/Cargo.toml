@@ -1,0 +1,11 @@
+[package]
+name = "config"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+embassy-sync = "0.7.2"
+defmt = "1.0.1"
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"
