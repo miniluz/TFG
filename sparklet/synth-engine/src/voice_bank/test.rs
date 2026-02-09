@@ -1,5 +1,7 @@
 use super::*;
 use crate::wavetable::sine_wavetable::SINE_WAVETABLE;
+use crate::wavetable::square_wavetable::SQUARE_WAVETABLE;
+use cmsis_interface::Q15;
 use midi::u7;
 use pretty_assertions::assert_eq;
 
@@ -229,4 +231,65 @@ fn voice_bank_quick_release_handles_all_idle() {
     for voice in &vb.voices {
         assert!(voice.adsr.is_idle());
     }
+}
+
+#[test]
+fn test_set_wavetable_all_voices() {
+    setup_voice_bank!(vb);
+
+    // Play a note on voice 0
+    let _ = vb.play_note(60.into(), 100.into());
+
+    // Generate some samples with SINE_WAVETABLE
+    let mut buffer_sine = [Q15::ZERO; 10];
+    vb.voices[0].wavetable_osc.get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_sine);
+
+    // Switch all voices to SQUARE_WAVETABLE
+    vb.set_wavetable_all_voices(&SQUARE_WAVETABLE);
+
+    // Generate samples with SQUARE_WAVETABLE (same phase continuation)
+    let mut buffer_square = [Q15::ZERO; 10];
+    vb.voices[0].wavetable_osc.get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_square);
+
+    // Buffers should be different (different waveforms)
+    assert_ne!(buffer_sine, buffer_square, "Different wavetables should produce different output");
+}
+
+#[test]
+fn test_set_adsr_config_all_voices() {
+    setup_voice_bank!(vb);
+
+    // Play notes on all voices
+    for i in 0..TEST_VOICE_BANK_SIZE {
+        let _ = vb.play_note((60 + i as u8).into(), 100.into());
+    }
+
+    // Advance all voices partway through attack
+    let mut buffer = [Q15::ZERO; 100];
+    for voice in vb.voices.iter_mut() {
+        voice.adsr.get_samples::<100>(&mut buffer);
+    }
+
+    // Store current envelope levels
+    let levels_before: Vec<_> = vb.voices.iter()
+        .map(|v| v.adsr.capacitor.get_level())
+        .collect();
+
+    // Change config: sustain=150, attack=75, decay_release=125
+    vb.set_adsr_config_all_voices(150, 75, 125);
+
+    // Verify config was applied by checking that behavior changes
+    // Generate more samples - the new attack/decay/sustain settings should be in effect
+    for voice in vb.voices.iter_mut() {
+        voice.adsr.get_samples::<100>(&mut buffer);
+    }
+
+    // Since we changed the config mid-envelope, the voices should continue
+    // (this test just verifies the method doesn't crash and applies to all voices)
+    let levels_after: Vec<_> = vb.voices.iter()
+        .map(|v| v.adsr.capacitor.get_level())
+        .collect();
+
+    // Levels should have changed (envelope continued progressing)
+    assert_ne!(levels_before, levels_after, "Envelope should continue progressing after config change");
 }

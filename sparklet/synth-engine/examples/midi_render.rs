@@ -1,6 +1,7 @@
 use clap::Parser;
 use cmsis_rust::CmsisRustOperations as Ops;
-use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel};
+use config::Config;
+use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel, signal::Signal};
 use hound::{WavSpec, WavWriter};
 use midi::MidiEvent;
 use midly::{MetaMessage, MidiMessage, Smf, TrackEventKind};
@@ -14,6 +15,8 @@ use synth_engine::wavetable::{
 use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
+const PAGE_AMOUNT: usize = 2;
+const ENCODER_AMOUNT: usize = 3;
 
 #[derive(Parser, Debug)]
 #[command(name = "MIDI Renderer")]
@@ -233,13 +236,40 @@ fn render_audio<const VOICE_COUNT: usize>(
     let sender = channel.sender();
     let receiver = channel.receiver();
 
+    // Create config signal with the specified ADSR settings
+    let config_signal = Signal::<NoopRawMutex, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>::new();
+    // Determine oscillator type based on wavetable pointer
+    let osc_type = if std::ptr::eq(wavetable, &SINE_WAVETABLE) {
+        0
+    } else if std::ptr::eq(wavetable, &SAW_WAVETABLE) {
+        1
+    } else if std::ptr::eq(wavetable, &SQUARE_WAVETABLE) {
+        2
+    } else {
+        3 // TRIANGLE_WAVETABLE
+    };
+    let config = Config {
+        pages: [
+            config::Page { values: [attack, sustain, decay_release] }, // Page 0: ADSR
+            config::Page { values: [osc_type, 0, 0] }, // Page 1: Oscillator type
+        ],
+    };
+    config_signal.signal(config);
+
     // Create synth engine
-    let mut synth_engine = SynthEngine::<'_, '_, _, CHANNEL_SIZE, VOICE_COUNT, WINDOW_SIZE>::new(
+    let mut synth_engine = SynthEngine::<
+        '_,
+        '_,
+        '_,
+        NoopRawMutex,
+        CHANNEL_SIZE,
+        VOICE_COUNT,
+        WINDOW_SIZE,
+        PAGE_AMOUNT,
+        ENCODER_AMOUNT,
+    >::new(
         receiver,
-        wavetable,
-        sustain,
-        attack,
-        decay_release,
+        &config_signal,
     );
 
     // Prepare output buffer

@@ -10,6 +10,7 @@ defmt = "1.0.1"
 heapless = "0.9.2"
 midi = { path = "../midi" }
 cmsis-interface = { path = "../cmsis-interface" }
+config = { path = "../config" }
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"
@@ -17,3 +18,4 @@ cmsis-rust = { path = "../cmsis-rust" }
 midly = "0.5.3"
 hound = "3.5"
 clap = { version = "4.0", features = ["derive"] }
+bytemuck = "1.20.0"

@@ -282,6 +282,20 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
         self.voices.iter().filter(|v| v.adsr.is_in_quick_release()).count()
     }
 
+    pub fn set_wavetable_all_voices(&mut self, wavetable: &'a [cmsis_interface::Q15; 256]) {
+        for voice in self.voices.iter_mut() {
+            voice.wavetable_osc.set_wavetable(wavetable);
+        }
+    }
+
+    pub fn set_adsr_config_all_voices(&mut self, sustain: u8, attack: u8, decay_release: u8) {
+        for voice in self.voices.iter_mut() {
+            voice.adsr.set_sustain(sustain);
+            voice.adsr.set_attack(attack);
+            voice.adsr.set_decay_release(decay_release);
+        }
+    }
+
     #[cfg(test)]
     pub(crate) fn play_duplicate_note(&mut self, note: Note, velocity: Velocity) -> PlayNoteResult {
         self.play_note_optional_retrigger(note, velocity, false)

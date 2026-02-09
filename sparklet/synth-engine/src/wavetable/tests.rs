@@ -328,3 +328,44 @@ fn test_phase_wrapping_behavior() {
     // Should still be continuous
     assert!(utils::check_continuity(&buffer, Q15::from_num(0.1)));
 }
+
+#[test]
+fn test_set_wavetable_preserves_phase() {
+    let note = Note::new(69); // A4
+    let mut osc = utils::create_osc(&SINE_WAVETABLE, note);
+
+    // Generate some samples to advance phase
+    let mut buffer = [Q15::ZERO; 100];
+    osc.get_samples::<TestOps, 100>(&mut buffer);
+
+    // Store the phase after advancing
+    let phase_before_switch = osc.phase;
+    assert_ne!(phase_before_switch, U8F24::ZERO, "Phase should have advanced");
+
+    // Switch to a different wavetable
+    osc.set_wavetable(&SQUARE_WAVETABLE);
+
+    // Phase should be preserved
+    assert_eq!(
+        osc.phase, phase_before_switch,
+        "Phase should be preserved during wavetable switch"
+    );
+
+    // Generate more samples - should be continuous
+    let last_sample_before = buffer[99];
+    let mut buffer_after = [Q15::ZERO; 100];
+    osc.get_samples::<TestOps, 100>(&mut buffer_after);
+
+    // Check that the transition is reasonably smooth (no huge jumps)
+    // Allow for wavetable shape difference but verify no phase discontinuity
+    let first_sample_after = buffer_after[0];
+    let max_expected_jump = Q15::from_num(0.5); // Conservative for shape change
+
+    let diff = (first_sample_after - last_sample_before).abs();
+    assert!(
+        diff <= max_expected_jump,
+        "Jump at wavetable boundary too large: {} exceeds {}",
+        diff,
+        max_expected_jump
+    );
+}

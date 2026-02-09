@@ -1366,6 +1366,7 @@ version = "0.1.0"
 dependencies = [
  "bytemuck",
  "cmsis-native",
+ "config",
  "cortex-m",
  "cortex-m-rt",
  "defmt 1.0.1",
@@ -1601,9 +1602,11 @@ dependencies = [
 name = "synth_engine"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "clap",
  "cmsis-interface",
  "cmsis-rust",
+ "config",
  "defmt 1.0.1",
  "embassy-sync",
  "fixed",

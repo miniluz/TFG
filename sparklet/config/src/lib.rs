@@ -11,7 +11,7 @@ pub enum ConfigEvent {
 
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Page<const ENCODER_AMOUNT: usize> {
-    values: [u8; ENCODER_AMOUNT],
+    pub values: [u8; ENCODER_AMOUNT],
 }
 
 impl<const ENCODER_AMOUNT: usize> Page<ENCODER_AMOUNT> {
@@ -24,7 +24,7 @@ impl<const ENCODER_AMOUNT: usize> Page<ENCODER_AMOUNT> {
 
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Config<const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize> {
-    pages: [Page<ENCODER_AMOUNT>; PAGE_AMOUNT],
+    pub pages: [Page<ENCODER_AMOUNT>; PAGE_AMOUNT],
 }
 
 impl<const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize> Config<PAGE_AMOUNT, ENCODER_AMOUNT> {

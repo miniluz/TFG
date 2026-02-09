@@ -12,12 +12,15 @@ pub const WINDOW_SIZE: usize = 128;
 /// Sample rate in Hz
 pub const SAMPLE_RATE: u32 = 48000;
 
-use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
+use config::Config;
+use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver, signal::Signal};
 use heapless::Deque;
 use midi::MidiEvent;
 
 pub use cmsis_interface::{CmsisOperations, Q15};
 pub use voice_bank::{Note, PlayNoteResult, Velocity, VoiceBank, VoiceStage};
+
+use crate::wavetable::{saw_wavetable::SAW_WAVETABLE, sine_wavetable::SINE_WAVETABLE, square_wavetable::SQUARE_WAVETABLE, triangle_wavetable::TRIANGLE_WAVETABLE};
 
 #[derive(Debug, Clone, Copy)]
 struct PendingNote {
@@ -25,27 +28,35 @@ struct PendingNote {
     velocity: Velocity,
 }
 
+
 pub struct SynthEngine<
     'ch,
     'wt,
+    'cfg,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
     const VOICE_BANK_SIZE: usize,
     const WINDOW_SIZE: usize,
+    const PAGE_AMOUNT: usize,
+    const ENCODER_AMOUNT: usize,
 > {
     voice_bank: VoiceBank<'wt, VOICE_BANK_SIZE>,
     receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
     note_queue: Deque<PendingNote, VOICE_BANK_SIZE>,
+    config_signal: &'cfg Signal<M, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
 }
 
 impl<
     'ch,
     'wt,
+    'cfg,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
     const VOICE_BANK_SIZE: usize,
     const WINDOW_SIZE: usize,
-> SynthEngine<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE>
+    const PAGE_AMOUNT: usize,
+    const ENCODER_AMOUNT: usize,
+> SynthEngine<'ch, 'wt, 'cfg, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE, PAGE_AMOUNT, ENCODER_AMOUNT>
 {
     const VOICE_BIT_SHIFT_SIZE: i8 = -((if VOICE_BANK_SIZE == 1 {
         0
@@ -53,22 +64,50 @@ impl<
         (VOICE_BANK_SIZE - 1).ilog2() + 1
     }) as i8);
 
+    pub fn get_wavetable_for_encoder(encoder: u8) -> &'static [Q15; 256] {
+        match encoder % 4 {
+            0 => &SINE_WAVETABLE,
+            1 => &SAW_WAVETABLE,
+            2 => &SQUARE_WAVETABLE,
+            3 => &TRIANGLE_WAVETABLE,
+            _ => &SINE_WAVETABLE,
+        }
+    }
+
     pub fn new(
         receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
-        wavetable: &'wt [Q15; 256],
-        sustain_config: u8,
-        attack_config: u8,
-        decay_release_config: u8,
+        config_signal: &'cfg Signal<M, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
     ) -> Self {
+        // Get initial config from signal or use defaults
+        let initial_config = config_signal.try_take();
+
+        let (sustain, attack, decay_release, initial_wavetable) = if let Some(config) = initial_config {
+            let sustain = config.pages[0].values[1];
+            let attack = config.pages[0].values[0];
+            let decay_release = config.pages[0].values[2];
+            let osc_type = config.pages[1].values[0] % 4;
+            let wavetable = match osc_type {
+                0 => &SINE_WAVETABLE,
+                1 => &SAW_WAVETABLE,
+                2 => &SQUARE_WAVETABLE,
+                _ => &TRIANGLE_WAVETABLE
+            };
+            (sustain, attack, decay_release, wavetable)
+        } else {
+            // Default values
+            (200, 50, 100, &SINE_WAVETABLE)
+        };
+
         Self {
             voice_bank: VoiceBank::new(
-                wavetable,
-                sustain_config,
-                attack_config,
-                decay_release_config,
+                initial_wavetable,
+                sustain,
+                attack,
+                decay_release,
             ),
             receiver,
             note_queue: Deque::new(),
+            config_signal,
         }
     }
 
@@ -76,10 +115,31 @@ impl<
         &self.voice_bank
     }
 
+    fn check_and_apply_config_updates(&mut self) {
+        // Non-blocking check for config updates
+        if let Some(config) = self.config_signal.try_take() {
+            // Page 0: ADSR configuration
+            let attack = config.pages[0].values[0];
+            let sustain = config.pages[0].values[1];
+            let decay_release = config.pages[0].values[2];
+
+            self.voice_bank.set_adsr_config_all_voices(sustain, attack, decay_release);
+
+            // Page 1: Oscillator type (modulo 4)
+            let osc_type = config.pages[1].values[0] % 4;
+            let wavetable = Self::get_wavetable_for_encoder(osc_type);
+
+            self.voice_bank.set_wavetable_all_voices(wavetable);
+        }
+    }
+
     pub fn render_samples<T: CmsisOperations>(&mut self, sample_buffer: &mut [Q15]) {
         if sample_buffer.len() != WINDOW_SIZE {
             panic!();
         }
+
+        // Phase 0: Check for config updates
+        self.check_and_apply_config_updates();
 
         // Phase 1: Process incoming MIDI events
         while let Ok(event) = self.receiver.try_receive() {

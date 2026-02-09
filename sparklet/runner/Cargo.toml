@@ -32,3 +32,4 @@ bytemuck = "1.20.0"
 midi = { path = "../midi" }
 synth_engine = { path = "../synth-engine" }
 cmsis-native = { path = "../cmsis-native" }
+config = { path = "../config" }

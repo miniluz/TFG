@@ -124,4 +124,9 @@ impl<'a, const SAMPLE_RATE: u32> WavetableOscillator<'a, SAMPLE_RATE> {
         self.phase = U8F24::ZERO;
         self.phase_increment = MIDI_TO_PHASE_INCREMENT[note.as_u8() as usize]
     }
+
+    pub fn set_wavetable(&mut self, wavetable: &'a [Q15; 256]) {
+        self.wavetable = Wavetable(wavetable);
+        // Phase preserved - smooth transition without clicks
+    }
 }
