@@ -4,15 +4,7 @@ use defmt::info;
 use embassy_executor::SpawnToken;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
 use static_cell::StaticCell;
-use synth_engine::{
-    Q15, SynthEngine,
-    wavetable::{
-        saw_wavetable::SAW_WAVETABLE,
-        sine_wavetable::SINE_WAVETABLE,
-        square_wavetable::SQUARE_WAVETABLE,
-        triangle_wavetable::TRIANGLE_WAVETABLE,
-    },
-};
+use synth_engine::{Q15, SynthEngine};
 
 use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
 
@@ -99,10 +91,6 @@ pub fn create_task(
     let synth_engine = SynthEngine::new(
         MIDI_TASK_CHANNEL.receiver(),
         &CONFIG_SIGNAL,
-        &SINE_WAVETABLE,
-        &SAW_WAVETABLE,
-        &SQUARE_WAVETABLE,
-        &TRIANGLE_WAVETABLE,
     );
 
     synth_engine_task(
@@ -125,10 +113,6 @@ pub fn create_task() -> SpawnToken<impl Sized> {
     let synth_engine = SynthEngine::new(
         MIDI_TASK_CHANNEL.receiver(),
         &CONFIG_SIGNAL,
-        &SINE_WAVETABLE,
-        &SAW_WAVETABLE,
-        &SQUARE_WAVETABLE,
-        &TRIANGLE_WAVETABLE,
     );
 
     synth_engine_task(SYNTH_ENGINE_TASK_STATE.init(SynthEngineTaskState::new(synth_engine)))

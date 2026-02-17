@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+mod config_task;
 mod hardware;
 mod midi_task;
 mod synth_engine_task;
@@ -46,6 +47,10 @@ fn main() -> ! {
         audio_task::create_audio_tasks(hardware.audio_hardware)
     };
 
+    info!("Creating config tasks");
+    let config_manager_task = config_task::create_config_manager_task();
+    let encoder_simulator_task = config_task::create_encoder_simulator_task();
+
     info!("Creating synth engine task");
     #[cfg(feature = "audio-usb")]
     let synth_engine_task = synth_engine_task::create_task(audio_sender);
@@ -60,6 +65,12 @@ fn main() -> ! {
             info!("Spawning MIDI task");
             spawner.spawn(midi_task).unwrap();
         }
+
+        info!("Spawning Config Manager task");
+        spawner.spawn(config_manager_task).unwrap();
+
+        info!("Spawning Encoder Simulator task");
+        spawner.spawn(encoder_simulator_task).unwrap();
 
         info!("Spawning Synth Engine task");
         spawner.spawn(synth_engine_task).unwrap();
