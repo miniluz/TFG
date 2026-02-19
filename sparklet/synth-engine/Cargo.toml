@@ -19,3 +19,5 @@ midly = "0.5.3"
 hound = "3.5"
 clap = { version = "4.0", features = ["derive"] }
 bytemuck = "1.20.0"
+biquad = "0.5"
+rand = "0.10.0"

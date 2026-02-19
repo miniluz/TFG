@@ -242,17 +242,24 @@ fn test_set_wavetable_all_voices() {
 
     // Generate some samples with SINE_WAVETABLE
     let mut buffer_sine = [Q15::ZERO; 10];
-    vb.voices[0].wavetable_osc.get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_sine);
+    vb.voices[0]
+        .wavetable_osc
+        .get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_sine);
 
     // Switch all voices to SQUARE_WAVETABLE
     vb.set_wavetable_all_voices(&SQUARE_WAVETABLE);
 
     // Generate samples with SQUARE_WAVETABLE (same phase continuation)
     let mut buffer_square = [Q15::ZERO; 10];
-    vb.voices[0].wavetable_osc.get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_square);
+    vb.voices[0]
+        .wavetable_osc
+        .get_samples::<cmsis_rust::CmsisRustOperations, 10>(&mut buffer_square);
 
     // Buffers should be different (different waveforms)
-    assert_ne!(buffer_sine, buffer_square, "Different wavetables should produce different output");
+    assert_ne!(
+        buffer_sine, buffer_square,
+        "Different wavetables should produce different output"
+    );
 }
 
 #[test]
@@ -271,7 +278,9 @@ fn test_set_adsr_config_all_voices() {
     }
 
     // Store current envelope levels
-    let levels_before: Vec<_> = vb.voices.iter()
+    let levels_before: Vec<_> = vb
+        .voices
+        .iter()
         .map(|v| v.adsr.capacitor.get_level())
         .collect();
 
@@ -286,10 +295,15 @@ fn test_set_adsr_config_all_voices() {
 
     // Since we changed the config mid-envelope, the voices should continue
     // (this test just verifies the method doesn't crash and applies to all voices)
-    let levels_after: Vec<_> = vb.voices.iter()
+    let levels_after: Vec<_> = vb
+        .voices
+        .iter()
         .map(|v| v.adsr.capacitor.get_level())
         .collect();
 
     // Levels should have changed (envelope continued progressing)
-    assert_ne!(levels_before, levels_after, "Envelope should continue progressing after config change");
+    assert_ne!(
+        levels_before, levels_after,
+        "Envelope should continue progressing after config change"
+    );
 }

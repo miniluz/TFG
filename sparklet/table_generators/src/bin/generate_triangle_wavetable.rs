@@ -1,25 +1,37 @@
 use std::env;
-use std::f64::consts::PI;
 
-use synth_engine::Q15;
+use cmsis_interface::Q15;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     let wavetable_size: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(256);
 
-    eprintln!("Generating sine wavetable:");
+    eprintln!("Generating triangle wavetable:");
     eprintln!("  WAVETABLE_SIZE: {}", wavetable_size);
     eprintln!();
 
-    print!("[");
+    println!("use cmsis_interface::Q15;");
+    println!();
+    print!(
+        "pub static TRIANGLE_WAVETABLE: [Q15; {}] = [",
+        wavetable_size
+    );
 
     let mut samples = Vec::new();
 
     for i in 0..wavetable_size {
-        // Calculate sine value: sin(2π * i / wavetable_size)
-        let phase = 2.0 * PI * (i as f64) / (wavetable_size as f64);
-        let value = phase.sin();
+        // Calculate triangle value
+        // Starts at 0, rises to 1 at quarter point, falls to -1 at 3/4 point, returns to 0
+        let phase = (i as f64) / (wavetable_size as f64);
+
+        let value = if phase < 0.25 {
+            4.0 * phase
+        } else if phase < 0.75 {
+            2.0 - 4.0 * phase
+        } else {
+            -4.0 + 4.0 * phase
+        };
 
         // Convert to Q15 fixed-point format (1 sign bit, 15 fractional bits)
         // Range: [-1.0, 1.0) maps to [-32768, 32767]
@@ -27,10 +39,15 @@ fn main() {
 
         samples.push(Q15::from_bits(fixed_value));
 
-        print!("Q15::from_bits({:#06x}_u16 as i16),", fixed_value as u16);
+        println!();
+        print!(
+            "    Q15::from_bits({:#06x}_u16 as i16),",
+            fixed_value as u16
+        );
     }
 
-    println!("]");
+    println!();
+    println!("];");
 
     eprintln!();
     eprintln!("Sanity checks:");

@@ -1,0 +1,68 @@
+# Justfile for synth-engine table generation
+# Usage: just <recipe>
+
+# Default recipe - show available commands
+default:
+    @just --list
+
+# Format all Rust code
+format:
+    @echo "Formatting Rust code..."
+    @cargo fmt --all
+
+# Generate all tables
+gen-all: gen-wavetables gen-phase-increment gen-adsr gen-sustain gen-octave-filter
+    @echo "All tables generated successfully!"
+
+# Generate all wavetables
+gen-wavetables: gen-sine gen-saw gen-triangle gen-square
+
+# Generate sine wavetable
+gen-sine wavetable_size="256":
+    @echo "Generating sine wavetable (size={{wavetable_size}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_sine_wavetable -- {{wavetable_size}} > synth-engine/src/wavetable/sine_wavetable.rs
+
+# Generate saw wavetable
+gen-saw wavetable_size="256":
+    @echo "Generating saw wavetable (size={{wavetable_size}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_saw_wavetable -- {{wavetable_size}} > synth-engine/src/wavetable/saw_wavetable.rs
+
+# Generate triangle wavetable
+gen-triangle wavetable_size="256":
+    @echo "Generating triangle wavetable (size={{wavetable_size}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_triangle_wavetable -- {{wavetable_size}} > synth-engine/src/wavetable/triangle_wavetable.rs
+
+# Generate square wavetable
+gen-square wavetable_size="256":
+    @echo "Generating square wavetable (size={{wavetable_size}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_square_wavetable -- {{wavetable_size}} > synth-engine/src/wavetable/square_wavetable.rs
+
+# Generate phase increment table
+gen-phase-increment wavetable_size="256" sample_rate="48000":
+    @echo "Generating phase increment table (wavetable={{wavetable_size}}, rate={{sample_rate}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_phase_increment_table -- {{wavetable_size}} {{sample_rate}} > synth-engine/src/wavetable/phase_increment_table.rs
+
+# Generate ADSR coefficient tables
+gen-adsr target_ratio="1.5" time_control_ratio="-4.8":
+    @echo "Generating ADSR coefficient tables (target_ratio={{target_ratio}}, time_control={{time_control_ratio}})..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_adsr_coefficient_tables -- {{target_ratio}} {{time_control_ratio}} > synth-engine/src/adsr/config_table.rs
+
+# Generate sustain amplitude table
+gen-sustain starting_level="-40":
+    @echo "Generating sustain amplitude table (starting_level={{starting_level}}dB)..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_sustain_amplitude_table -- {{starting_level}} > synth-engine/src/adsr/db_linear_amplitude_table.rs
+
+# Generate octave filter coefficients
+gen-octave-filter:
+    @echo "Generating octave filter coefficients..."
+    @cargo run --manifest-path table_generators/Cargo.toml --bin generate_octave_filter_coefficients > synth-engine/src/octave_filter/filter_coefficients.rs
+
+# Build the table generators without running them
+build-generators:
+    @echo "Building table generators..."
+    @cargo build --manifest-path table_generators/Cargo.toml --release
+
+# Clean generated files
+clean-generators:
+    @echo "Cleaning table generators build artifacts..."
+    @cargo clean --manifest-path table_generators/Cargo.toml

@@ -3,17 +3,13 @@ use defmt::Format;
 use fixed::types::I1F31;
 
 use crate::adsr::{
-    config_table::{
-        RISE_BASE_COEFFICIENT_TABLE, FALL_BASE_COEFFICIENT_TABLE,
-    },
+    config_table::{FALL_BASE_COEFFICIENT_TABLE, RISE_BASE_COEFFICIENT_TABLE},
     db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE,
 };
 use crate::capacitor::{Capacitor, CapacitorStatus};
 
 pub mod config_table;
 pub mod db_linear_amplitude_table;
-#[cfg(not(target_os = "none"))]
-pub mod native_utils;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BaseAndCoefficient {
@@ -54,7 +50,11 @@ impl ADSRStage {
         }
     }
 
-    pub(crate) fn progress(&mut self, capacitor: &mut Capacitor, adsr_config: &ADSRConfig) -> I1F31 {
+    pub(crate) fn progress(
+        &mut self,
+        capacitor: &mut Capacitor,
+        adsr_config: &ADSRConfig,
+    ) -> I1F31 {
         match *self {
             Self::Idle => I1F31::ZERO,
             Self::Attack => {
@@ -66,7 +66,8 @@ impl ADSRStage {
                 capacitor.get_level()
             }
             Self::Decay => {
-                let decay_target = adsr_config.sustain_level
+                let decay_target = adsr_config
+                    .sustain_level
                     .saturating_mul(adsr_config.velocity_amplitude);
                 capacitor.set_target(decay_target);
                 let status = capacitor.step();
@@ -105,13 +106,17 @@ pub(crate) struct ADSRConfig {
 }
 
 impl ADSRConfig {
-    pub(crate) fn new(sustain_config: u8, attack_config: u8, decay_release_config: u8, velocity: u8) -> Self {
+    pub(crate) fn new(
+        sustain_config: u8,
+        attack_config: u8,
+        decay_release_config: u8,
+        velocity: u8,
+    ) -> Self {
         Self {
             sustain_level: DB_LINEAR_AMPLITUDE_TABLE[sustain_config as usize],
             velocity_amplitude: DB_LINEAR_AMPLITUDE_TABLE[(velocity * 2) as usize],
             rise_base_and_coefficient: RISE_BASE_COEFFICIENT_TABLE[attack_config as usize],
-            fall_base_and_coefficient: FALL_BASE_COEFFICIENT_TABLE
-                [decay_release_config as usize],
+            fall_base_and_coefficient: FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize],
         }
     }
 
@@ -128,8 +133,7 @@ impl ADSRConfig {
     }
 
     pub(crate) fn set_fall(&mut self, decay_release_config: u8) {
-        self.fall_base_and_coefficient =
-            FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
+        self.fall_base_and_coefficient = FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
     }
 }
 
@@ -147,11 +151,24 @@ impl Format for ADSR {
 }
 
 impl ADSR {
-    pub fn new(sustain_config: u8, attack_config: u8, decay_release_config: u8, velocity: u8) -> ADSR {
-        let config = ADSRConfig::new(sustain_config, attack_config, decay_release_config, velocity);
+    pub fn new(
+        sustain_config: u8,
+        attack_config: u8,
+        decay_release_config: u8,
+        velocity: u8,
+    ) -> ADSR {
+        let config = ADSRConfig::new(
+            sustain_config,
+            attack_config,
+            decay_release_config,
+            velocity,
+        );
         ADSR {
             stage: ADSRStage::Idle,
-            capacitor: Capacitor::new(config.rise_base_and_coefficient, config.fall_base_and_coefficient),
+            capacitor: Capacitor::new(
+                config.rise_base_and_coefficient,
+                config.fall_base_and_coefficient,
+            ),
             config,
         }
     }
@@ -193,12 +210,14 @@ impl ADSR {
 
     pub fn set_attack(&mut self, attack_config: u8) {
         self.config.set_rise(attack_config);
-        self.capacitor.set_rise_coeff(self.config.rise_base_and_coefficient);
+        self.capacitor
+            .set_rise_coeff(self.config.rise_base_and_coefficient);
     }
 
     pub fn set_decay_release(&mut self, decay_release_config: u8) {
         self.config.set_fall(decay_release_config);
-        self.capacitor.set_fall_coeff(self.config.fall_base_and_coefficient);
+        self.capacitor
+            .set_fall_coeff(self.config.fall_base_and_coefficient);
     }
 
     pub fn is_idle(&self) -> bool {
@@ -245,7 +264,11 @@ mod tests {
         let mut adsr = ADSR::new(200, 10, 100, 100); // Fast attack
         adsr.play(100);
 
-        assert_eq!(adsr.stage, ADSRStage::Attack, "Should start in Attack stage");
+        assert_eq!(
+            adsr.stage,
+            ADSRStage::Attack,
+            "Should start in Attack stage"
+        );
 
         let mut prev_level = I1F31::ZERO;
         let mut reached_decay = false;
@@ -436,7 +459,10 @@ mod tests {
             );
         }
 
-        assert!(!levels.is_empty(), "Should have collected some attack samples");
+        assert!(
+            !levels.is_empty(),
+            "Should have collected some attack samples"
+        );
     }
 
     #[test]
@@ -471,7 +497,10 @@ mod tests {
             );
         }
 
-        assert!(!levels.is_empty(), "Should have collected some decay samples");
+        assert!(
+            !levels.is_empty(),
+            "Should have collected some decay samples"
+        );
     }
 
     #[test]
@@ -770,7 +799,10 @@ mod tests {
             iterations += 1;
         }
 
-        assert!(adsr.is_idle(), "Should reach idle after changing to fast release");
+        assert!(
+            adsr.is_idle(),
+            "Should reach idle after changing to fast release"
+        );
         assert!(
             iterations < 5000,
             "Should reach idle relatively quickly with fast release, took {} iterations",
@@ -799,7 +831,11 @@ mod tests {
 
         // Retrigger
         adsr.retrigger(100);
-        assert_eq!(adsr.stage, ADSRStage::Attack, "Should be in Attack after retrigger");
+        assert_eq!(
+            adsr.stage,
+            ADSRStage::Attack,
+            "Should be in Attack after retrigger"
+        );
 
         // Get one sample
         let mut buffer = [Q15::ZERO; 1];
@@ -828,7 +864,10 @@ mod tests {
         );
 
         let sustain_level = get_envelope_level(&adsr);
-        assert!(sustain_level > I1F31::ZERO, "Should have non-zero sustain level");
+        assert!(
+            sustain_level > I1F31::ZERO,
+            "Should have non-zero sustain level"
+        );
 
         // Play again
         adsr.play(100);
@@ -867,7 +906,11 @@ mod tests {
 
         // Retrigger with much lower velocity
         adsr.retrigger(64);
-        assert_eq!(adsr.stage, ADSRStage::Attack, "Should be in Attack after retrigger");
+        assert_eq!(
+            adsr.stage,
+            ADSRStage::Attack,
+            "Should be in Attack after retrigger"
+        );
 
         // Get a few samples and track the transition
         let mut buffer = [Q15::ZERO; 1];
@@ -901,16 +944,17 @@ mod tests {
 
         // Verify levels change gradually over multiple samples
         for i in 1..levels.len() {
-            let step_diff = if levels[i] > levels[i-1] {
-                levels[i] - levels[i-1]
+            let step_diff = if levels[i] > levels[i - 1] {
+                levels[i] - levels[i - 1]
             } else {
-                levels[i-1] - levels[i]
+                levels[i - 1] - levels[i]
             };
 
             assert!(
                 step_diff < I1F31::from_num(0.1),
                 "Each step should be gradual, not sudden jumps (decreasing): step {}->{}",
-                i-1, i
+                i - 1,
+                i
             );
         }
 
@@ -932,7 +976,11 @@ mod tests {
 
         // Retrigger with much higher velocity
         adsr2.retrigger(127);
-        assert_eq!(adsr2.stage, ADSRStage::Attack, "Should be in Attack after retrigger");
+        assert_eq!(
+            adsr2.stage,
+            ADSRStage::Attack,
+            "Should be in Attack after retrigger"
+        );
 
         // Get a few samples and track the transition
         let mut levels2 = Vec::new();
@@ -961,16 +1009,17 @@ mod tests {
 
         // Verify levels change gradually over multiple samples
         for i in 1..levels2.len() {
-            let step_diff = if levels2[i] > levels2[i-1] {
-                levels2[i] - levels2[i-1]
+            let step_diff = if levels2[i] > levels2[i - 1] {
+                levels2[i] - levels2[i - 1]
             } else {
-                levels2[i-1] - levels2[i]
+                levels2[i - 1] - levels2[i]
             };
 
             assert!(
                 step_diff < I1F31::from_num(0.1),
                 "Each step should be gradual, not sudden jumps (increasing): step {}->{}",
-                i-1, i
+                i - 1,
+                i
             );
         }
     }
@@ -1019,7 +1068,10 @@ mod tests {
         }
 
         let level_mid_attack = get_envelope_level(&adsr);
-        assert!(level_mid_attack > I1F31::ZERO, "Should have progressed in attack");
+        assert!(
+            level_mid_attack > I1F31::ZERO,
+            "Should have progressed in attack"
+        );
 
         // Call play again
         adsr.play(100);

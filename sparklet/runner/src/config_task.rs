@@ -7,9 +7,9 @@ use static_cell::StaticCell;
 
 use crate::synth_engine_task::CONFIG_SIGNAL;
 
-const CONFIG_PAGE_COUNT: usize = 2;
+const CONFIG_PAGE_COUNT: usize = 4;
 const CONFIG_ENCODER_COUNT: usize = 3;
-const UPDATE_RATE_HZ: u32 = 100;
+const UPDATE_RATE_HZ: u32 = 500;
 
 const CONFIG_CHANNEL_SIZE: usize = 32;
 pub static CONFIG_EVENT_CHANNEL: Channel<
@@ -67,97 +67,69 @@ pub async fn encoder_simulator_task() {
     let start_time = Instant::now();
     let sender = CONFIG_EVENT_CHANNEL.sender();
 
-    let mut attack = 40u8;
-    let mut attack_dir = 1i8;
-
-    let mut sustain = 200u8;
-    let mut sustain_dir = 1i8;
-
-    let mut release = 127u8;
-    let mut release_dir = 1i8;
-
-    const ATTACK_UPDATE_EVERY: u32 = 1;
-    const SUSTAIN_UPDATE_EVERY: u32 = 2;
-    const RELEASE_UPDATE_EVERY: u32 = 3;
-
-    let osc_change_interval_ms = 10000u64;
-    let mut last_osc_type = 1u8;
+    let mut encoder_states = [
+        [(0u8, 1i8, 5u32), (0u8, 1i8, 6u32), (0u8, 1i8, 7u32)],
+        [(1u8, 0i8, 0u32), (0u8, 1i8, 8u32), (0u8, 1i8, 9u32)],
+        [(0u8, 1i8, 10u32), (0u8, 1i8, 11u32), (0u8, 1i8, 12u32)],
+        [(0u8, 1i8, 13u32), (0u8, 1i8, 14u32), (0u8, 1i8, 15u32)],
+    ];
 
     let mut counter = 0u32;
+    let mut current_page = 0u8;
 
     loop {
         let elapsed_ms = start_time.elapsed().as_millis();
 
-        if counter.is_multiple_of(ATTACK_UPDATE_EVERY) {
-            sender
-                .send(ConfigEvent::EncoderChange {
-                    encoder: 0,
-                    amount: attack_dir,
-                })
-                .await;
-            attack = attack.saturating_add_signed(attack_dir);
-            if attack == 255 || attack == 0 {
-                attack_dir = -attack_dir;
+        for page in 0..CONFIG_PAGE_COUNT {
+            for encoder in 0..CONFIG_ENCODER_COUNT {
+                let (value, dir, update_every) = &mut encoder_states[page][encoder];
+
+                if page == 1 && encoder == 0 {
+                    continue;
+                }
+
+                if counter.is_multiple_of(*update_every) {
+                    let target_page = page as u8;
+                    if target_page != current_page {
+                        let page_delta = (target_page as i8) - (current_page as i8);
+                        sender
+                            .send(ConfigEvent::PageChange { amount: page_delta })
+                            .await;
+                        current_page = target_page;
+                    }
+
+                    sender
+                        .send(ConfigEvent::EncoderChange {
+                            encoder: encoder as u8,
+                            amount: *dir,
+                        })
+                        .await;
+
+                    *value = value.saturating_add_signed(*dir);
+                    if *value == 255 || *value == 0 {
+                        *dir = -*dir;
+                    }
+                }
             }
         }
 
-        if counter.is_multiple_of(SUSTAIN_UPDATE_EVERY) {
-            sender
-                .send(ConfigEvent::EncoderChange {
-                    encoder: 1,
-                    amount: sustain_dir,
-                })
-                .await;
-            sustain = sustain.saturating_add_signed(sustain_dir);
-            if sustain == 255 || sustain == 0 {
-                sustain_dir = -sustain_dir;
-            }
-        }
-
-        if counter.is_multiple_of(RELEASE_UPDATE_EVERY) {
-            sender
-                .send(ConfigEvent::EncoderChange {
-                    encoder: 2,
-                    amount: release_dir,
-                })
-                .await;
-            release = release.saturating_add_signed(release_dir);
-            if release == 255 || release == 0 {
-                release_dir = -release_dir;
-            }
-        }
-
-        let target_osc_type = ((elapsed_ms / osc_change_interval_ms) as u8) % 4;
-        if target_osc_type != last_osc_type {
-            sender.send(ConfigEvent::PageChange { amount: 1 }).await;
-
-            let delta = (target_osc_type as i16 - last_osc_type as i16).signum() as i8;
-            sender
-                .send(ConfigEvent::EncoderChange {
-                    encoder: 0,
-                    amount: delta,
-                })
-                .await;
-            last_osc_type = target_osc_type;
-
-            sender.send(ConfigEvent::PageChange { amount: -1 }).await;
-
-            let osc_name = match target_osc_type {
-                0 => "Sine",
-                1 => "Sawtooth",
-                2 => "Square",
-                _ => "Triangle",
-            };
-            info!(
-                "Encoder Simulator: Switching to {} waveform at {}ms",
-                osc_name, elapsed_ms
-            );
-        }
-
+        // Log status every 5 seconds
         if counter.is_multiple_of(UPDATE_RATE_HZ * 5) {
             info!(
-                "Encoder Simulator: t={}ms Attack={}, Sustain={}, Release={}, Osc={}",
-                elapsed_ms, attack, sustain, release, last_osc_type
+                "Encoder Simulator: t={}ms P0=[{},{},{}] P1=[{},{},{}] P2=[{},{},{}] P3=[{},{},{}]",
+                elapsed_ms,
+                encoder_states[0][0].0,
+                encoder_states[0][1].0,
+                encoder_states[0][2].0,
+                encoder_states[1][0].0,
+                encoder_states[1][1].0,
+                encoder_states[1][2].0,
+                encoder_states[2][0].0,
+                encoder_states[2][1].0,
+                encoder_states[2][2].0,
+                encoder_states[3][0].0,
+                encoder_states[3][1].0,
+                encoder_states[3][2].0,
             );
         }
 

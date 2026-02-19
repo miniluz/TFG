@@ -50,7 +50,7 @@ fn main() {
 
 use fixed::types::I1F31;
 
-pub static SUSTAIN_AMPLITUDE_TABLE: [I1F31; {}] = [
+pub static DB_LINEAR_AMPLITUDE_TABLE: [I1F31; {}] = [
     {}
 ];
 ",

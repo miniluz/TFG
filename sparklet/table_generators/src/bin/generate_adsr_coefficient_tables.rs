@@ -1,12 +1,9 @@
 use std::env;
 
 use fixed::types::I1F31;
-use synth_engine::adsr::{
-    BaseAndCoefficient,
-    native_utils::{
-        ParamConfig, TimeConfig, get_base_and_coefficient_for_index, get_time_for_index,
-        iterate_envelope,
-    },
+use table_generators::adsr_utils::{
+    BaseAndCoefficient, ParamConfig, TimeConfig, get_base_and_coefficient_for_index,
+    get_time_for_index, iterate_envelope,
 };
 
 const SAMPLE_RATE: u32 = 48000;
@@ -107,14 +104,14 @@ use crate::adsr::BaseAndCoefficient;
 
 use fixed::types::I1F31;
 
-// The first element from the release_base_coefficient table
-pub static QUICK_RELEASE_BASE_COEFFICIENT: BaseAndCoefficient = {};
+// The first element from the fall_base_coefficient table
+pub static QUICK_FALL_BASE_COEFFICIENT: BaseAndCoefficient = {};
 
-pub static ATTACK_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
+pub static RISE_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
     {}
 ];
 
-pub static DECAY_RELEASE_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
+pub static FALL_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
     {}
 ];
 ",

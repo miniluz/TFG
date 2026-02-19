@@ -1,0 +1,41 @@
+[package]
+name = "table_generators"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "generate_saw_wavetable"
+path = "src/bin/generate_saw_wavetable.rs"
+
+[[bin]]
+name = "generate_sine_wavetable"
+path = "src/bin/generate_sine_wavetable.rs"
+
+[[bin]]
+name = "generate_triangle_wavetable"
+path = "src/bin/generate_triangle_wavetable.rs"
+
+[[bin]]
+name = "generate_square_wavetable"
+path = "src/bin/generate_square_wavetable.rs"
+
+[[bin]]
+name = "generate_phase_increment_table"
+path = "src/bin/generate_phase_increment_table.rs"
+
+[[bin]]
+name = "generate_adsr_coefficient_tables"
+path = "src/bin/generate_adsr_coefficient_tables.rs"
+
+[[bin]]
+name = "generate_sustain_amplitude_table"
+path = "src/bin/generate_sustain_amplitude_table.rs"
+
+[[bin]]
+name = "generate_octave_filter_coefficients"
+path = "src/bin/generate_octave_filter_coefficients.rs"
+
+[dependencies]
+cmsis-interface = { path = "../cmsis-interface" }
+fixed = "1.29.0"

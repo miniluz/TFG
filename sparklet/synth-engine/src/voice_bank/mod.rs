@@ -279,7 +279,10 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
     }
 
     pub fn count_voices_in_quick_release(&self) -> usize {
-        self.voices.iter().filter(|v| v.adsr.is_in_quick_release()).count()
+        self.voices
+            .iter()
+            .filter(|v| v.adsr.is_in_quick_release())
+            .count()
     }
 
     pub fn set_wavetable_all_voices(&mut self, wavetable: &'a [cmsis_interface::Q15; 256]) {

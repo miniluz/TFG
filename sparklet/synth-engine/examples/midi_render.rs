@@ -15,38 +15,32 @@ use synth_engine::wavetable::{
 use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
-const PAGE_AMOUNT: usize = 2;
+const PAGE_AMOUNT: usize = 4;
 const ENCODER_AMOUNT: usize = 3;
+const OCTAVE_FILTER_FIRST_PAGE: usize = 2;
 
 #[derive(Parser, Debug)]
 #[command(name = "MIDI Renderer")]
 #[command(about = "Renders MIDI files using the synth engine", long_about = None)]
 struct Args {
-    /// Wavetable to use (sine, square, sawtooth, triangle)
     #[arg(long)]
     wavetable: String,
 
-    /// Attack config (0-255)
     #[arg(long)]
     attack: u8,
 
-    /// Decay/Release config (0-255)
     #[arg(long, name = "decay-release")]
     decay_release: u8,
 
-    /// Sustain config (0-255)
     #[arg(long)]
     sustain: u8,
 
-    /// Number of voices
     #[arg(long)]
     voices: usize,
 
-    /// Path to MIDI file
     #[arg(long, default_value = "./The Entertainer.mid")]
     midi: PathBuf,
 
-    /// Output WAV file path
     #[arg(long, default_value = "./test-results/output.wav")]
     output: PathBuf,
 }
@@ -54,7 +48,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    // Select wavetable
     let wavetable: &[Q15; 256] = match args.wavetable.to_lowercase().as_str() {
         "sine" => &SINE_WAVETABLE,
         "square" => &SQUARE_WAVETABLE,
@@ -71,11 +64,9 @@ fn main() {
         args.wavetable, args.attack, args.decay_release, args.sustain, args.voices
     );
 
-    // Read MIDI file
     let midi_data = fs::read(&args.midi).expect("Failed to read MIDI file");
     let smf = Smf::parse(&midi_data).expect("Failed to parse MIDI file");
 
-    // Extract timing information
     let ticks_per_beat = match smf.header.timing {
         midly::Timing::Metrical(tpb) => tpb.as_int() as u64,
         _ => {
@@ -90,15 +81,12 @@ fn main() {
         ticks_per_beat
     );
 
-    // Parse all MIDI events and convert to sample times
     let mut events = parse_midi_events(&smf, ticks_per_beat);
 
-    // Sort events by time
     events.sort_by_key(|(time, _)| *time);
 
     println!("Parsed {} MIDI events", events.len());
 
-    // Calculate total render duration (last event + 5 seconds margin)
     let last_event_time = events.last().map(|(time, _)| *time).unwrap_or(0);
     let margin_samples = SAMPLE_RATE as u64 * 15;
     let total_samples = last_event_time + margin_samples;
@@ -109,7 +97,6 @@ fn main() {
         duration_secs, total_samples
     );
 
-    // Render audio based on voice count
     let audio_samples = match args.voices {
         2 => render_audio::<2>(
             &events,
@@ -143,7 +130,6 @@ fn main() {
 
     println!("Rendered {} samples", audio_samples.len());
 
-    // Write WAV file
     write_wav(&args.output, &audio_samples);
 
     println!("Output written to: {}", args.output.display());
@@ -151,7 +137,7 @@ fn main() {
 
 fn parse_midi_events(smf: &Smf, ticks_per_beat: u64) -> Vec<(u64, MidiEvent)> {
     let mut events = Vec::new();
-    let mut tempo_us_per_qn = 500_000u64; // Default: 120 BPM
+    let mut tempo_us_per_qn = 500_000u64;
 
     for track in &smf.tracks {
         let mut accumulated_ticks = 0u64;
@@ -177,7 +163,6 @@ fn parse_midi_events(smf: &Smf, ticks_per_beat: u64) -> Vec<(u64, MidiEvent)> {
                     channel: _,
                     message,
                 } => {
-                    // Convert current position to samples
                     let samples_per_tick =
                         (SAMPLE_RATE as u64 * last_tempo_us) / (ticks_per_beat * 1_000_000);
                     let sample_time = accumulated_samples + (accumulated_ticks * samples_per_tick);
@@ -212,10 +197,10 @@ fn parse_midi_events(smf: &Smf, ticks_per_beat: u64) -> Vec<(u64, MidiEvent)> {
                                 },
                             ));
                         }
-                        _ => {} // Ignore other MIDI messages
+                        _ => {}
                     }
                 }
-                _ => {} // Ignore other event types
+                _ => {}
             }
         }
     }
@@ -231,14 +216,12 @@ fn render_audio<const VOICE_COUNT: usize>(
     decay_release: u8,
     sustain: u8,
 ) -> Vec<i16> {
-    // Create channel for MIDI events
     let channel = Channel::<NoopRawMutex, MidiEvent, CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
 
-    // Create config signal with the specified ADSR settings
     let config_signal = Signal::<NoopRawMutex, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>::new();
-    // Determine oscillator type based on wavetable pointer
+
     let osc_type = if std::ptr::eq(wavetable, &SINE_WAVETABLE) {
         0
     } else if std::ptr::eq(wavetable, &SAW_WAVETABLE) {
@@ -246,17 +229,26 @@ fn render_audio<const VOICE_COUNT: usize>(
     } else if std::ptr::eq(wavetable, &SQUARE_WAVETABLE) {
         2
     } else {
-        3 // TRIANGLE_WAVETABLE
+        3
     };
     let config = Config {
         pages: [
-            config::Page { values: [attack, sustain, decay_release] }, // Page 0: ADSR
-            config::Page { values: [osc_type, 0, 0] }, // Page 1: Oscillator type
+            config::Page {
+                values: [attack, sustain, decay_release],
+            }, // Page 0: ADSR
+            config::Page {
+                values: [osc_type, 0, 0],
+            }, // Page 1: Oscillator type
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 2: Octave filter bands 0-2
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 3: Octave filter bands 3-5
         ],
     };
     config_signal.signal(config);
 
-    // Create synth engine
     let mut synth_engine = SynthEngine::<
         '_,
         '_,
@@ -267,30 +259,23 @@ fn render_audio<const VOICE_COUNT: usize>(
         WINDOW_SIZE,
         PAGE_AMOUNT,
         ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+        OCTAVE_FILTER_FIRST_PAGE,
+    >::new(receiver, &config_signal);
 
-    // Prepare output buffer
     let mut output = Vec::with_capacity(total_samples as usize);
     let mut current_sample = 0u64;
     let mut event_index = 0;
 
-    // Rendering loop
     while current_sample < total_samples {
-        // Send all events that should happen before the next window
         while event_index < events.len() && events[event_index].0 <= current_sample {
             let (_, event) = events[event_index];
             sender.try_send(event).ok(); // Ignore if channel is full
             event_index += 1;
         }
 
-        // Render one window of samples
         let mut buffer = [Q15::ZERO; WINDOW_SIZE];
         synth_engine.render_samples::<Ops>(&mut buffer);
 
-        // Convert Q15 to i16 and add to output
         for sample in &buffer {
             if (current_sample as usize) < total_samples as usize {
                 output.push(sample.to_bits());
@@ -303,7 +288,6 @@ fn render_audio<const VOICE_COUNT: usize>(
 }
 
 fn write_wav(path: &PathBuf, samples: &[i16]) {
-    // Ensure parent directory exists
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).expect("Failed to create output directory");
     }

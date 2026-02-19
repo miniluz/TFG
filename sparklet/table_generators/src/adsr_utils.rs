@@ -1,47 +1,24 @@
-//! Native utilities for ADSR envelope tables.
-//!
-//! This module provides utilities for calculating exponential envelope curves
-//! and generating lookup tables. These functions use floating-point math and
-//! are only available on host platforms (not embedded targets).
-//!
-//! The core algorithm uses the recursive formula:
-//! ```text
-//! output = base + output * coefficient
-//! ```
-//!
-//! This module is conditionally compiled and only available when not targeting
-//! embedded platforms (target_os != "none").
-
-// This module requires std for floating-point math and string formatting
-extern crate std;
-use std::prelude::v1::*;
-
 use fixed::{traits::ToFixed, types::I1F31};
 
-use crate::adsr::BaseAndCoefficient;
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
+pub struct BaseAndCoefficient {
+    pub base: I1F31,
+    pub coefficient: I1F31,
+}
 
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct DecayConfig {
-    /// Rate: number of samples for the curve
     pub rate: f64,
-    /// Target ratio: controls the exponential curve shape, must be more than 0 and the higher it
-    /// is the more linear the curve gets.
     pub target_ratio: f64,
-    /// Initial value of the envelope
     pub initial: f64,
-    /// Target value of the envelope
     pub target: f64,
 }
 
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub struct TimeConfig {
-    /// Rate: maximum index value (typically table size - 1)
     pub rate: f64,
-    /// Ratio: controls exponential vs linear time mapping. Goes from -infinity to infinity.
     pub ratio: f64,
-    /// Initial time value (in seconds)
     pub initial: f64,
-    /// Target time value (in seconds)
     pub target: f64,
 }
 
@@ -61,11 +38,7 @@ pub fn get_base_and_coefficient<const SAMPLE_RATE: u32>(
         target,
     }: DecayConfig,
 ) -> BaseAndCoefficient {
-    // coefficient = e^(ln(target_ratio / (1 + target_ratio)) / rate)
     let coefficient = f64::exp(f64::ln(target_ratio / (1. + target_ratio)) / rate);
-
-    // Calculate final value: initial + (target - initial) * (1 + target_ratio)
-    // base = final * (1 - coefficient)
     let r#final = initial + (target - initial) * (1. + target_ratio);
     let base = r#final * (1. - coefficient);
 
@@ -84,7 +57,6 @@ pub fn get_time_for_index<const SAMPLE_RATE: u32>(
         target,
     }: TimeConfig,
 ) -> f64 {
-    // time = initial + (target - initial) * (e^(ratio + (ln(e^ratio + 1) - ratio) * x/rate) - e^ratio)
     initial
         + (target - initial)
             * (f64::exp(ratio + (f64::ln(f64::exp(ratio) + 1.) - ratio) * (index as f64) / rate)

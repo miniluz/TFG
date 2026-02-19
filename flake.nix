@@ -38,6 +38,9 @@
                 cargo-nextest
                 bacon
 
+                just
+                (octave.withPackages (octavePackages: with octavePackages; [ signal ]))
+
                 lldb
                 openocd
                 usbutils

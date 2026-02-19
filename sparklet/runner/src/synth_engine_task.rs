@@ -27,8 +27,11 @@ const WINDOW_SIZE: usize = USB_MAX_SAMPLE_COUNT;
 const WINDOW_SIZE: usize = 128;
 
 // Config dimensions
-const CONFIG_PAGE_COUNT: usize = 2;
+const CONFIG_PAGE_COUNT: usize = 4; // Pages 0-1: ADSR/Oscillator, Pages 2-3: Octave Filter
 const CONFIG_ENCODER_COUNT: usize = 3;
+
+// Octave filter configuration
+const OCTAVE_FILTER_FIRST_PAGE: usize = 2; // Use pages 2-3 for octave filter (6 bands, 3 encoders per page)
 
 // Default ADSR configuration
 const ATTACK_CONFIG: u8 = 40;
@@ -52,6 +55,7 @@ pub struct SynthEngineTaskState<'ch, 'wt, 'cfg> {
         WINDOW_SIZE,
         CONFIG_PAGE_COUNT,
         CONFIG_ENCODER_COUNT,
+        OCTAVE_FILTER_FIRST_PAGE,
     >,
 }
 
@@ -67,6 +71,7 @@ impl<'ch, 'wt, 'cfg> SynthEngineTaskState<'ch, 'wt, 'cfg> {
             WINDOW_SIZE,
             CONFIG_PAGE_COUNT,
             CONFIG_ENCODER_COUNT,
+            OCTAVE_FILTER_FIRST_PAGE,
         >,
     ) -> SynthEngineTaskState<'ch, 'wt, 'cfg> {
         SynthEngineTaskState { synth_engine }
@@ -82,16 +87,21 @@ pub fn create_task(
     // Initialize config signal with default values
     let initial_config = Config {
         pages: [
-            config::Page { values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG] }, // Page 0: ADSR
+            config::Page {
+                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
+            }, // Page 0: ADSR
             config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 2: Octave filter bands 0-2 (default gain)
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 3: Octave filter bands 3-5 (default gain)
         ],
     };
     CONFIG_SIGNAL.signal(initial_config);
 
-    let synth_engine = SynthEngine::new(
-        MIDI_TASK_CHANNEL.receiver(),
-        &CONFIG_SIGNAL,
-    );
+    let synth_engine = SynthEngine::new(MIDI_TASK_CHANNEL.receiver(), &CONFIG_SIGNAL);
 
     synth_engine_task(
         SYNTH_ENGINE_TASK_STATE.init(SynthEngineTaskState::new(synth_engine)),
@@ -104,16 +114,21 @@ pub fn create_task() -> SpawnToken<impl Sized> {
     // Initialize config signal with default values
     let initial_config = Config {
         pages: [
-            config::Page { values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG] }, // Page 0: ADSR
+            config::Page {
+                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
+            }, // Page 0: ADSR
             config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 2: Octave filter bands 0-2 (default gain)
+            config::Page {
+                values: [200, 200, 200],
+            }, // Page 3: Octave filter bands 3-5 (default gain)
         ],
     };
     CONFIG_SIGNAL.signal(initial_config);
 
-    let synth_engine = SynthEngine::new(
-        MIDI_TASK_CHANNEL.receiver(),
-        &CONFIG_SIGNAL,
-    );
+    let synth_engine = SynthEngine::new(MIDI_TASK_CHANNEL.receiver(), &CONFIG_SIGNAL);
 
     synth_engine_task(SYNTH_ENGINE_TASK_STATE.init(SynthEngineTaskState::new(synth_engine)))
 }
@@ -156,7 +171,9 @@ pub async fn synth_engine_task(
 
 #[cfg(not(feature = "audio-usb"))]
 #[embassy_executor::task]
-pub async fn synth_engine_task(state: &'static mut SynthEngineTaskState<'static, 'static, 'static>) {
+pub async fn synth_engine_task(
+    state: &'static mut SynthEngineTaskState<'static, 'static, 'static>,
+) {
     use embassy_time::{Duration, Timer};
 
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];

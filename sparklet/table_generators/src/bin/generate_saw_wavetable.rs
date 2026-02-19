@@ -1,6 +1,6 @@
 use std::env;
 
-use synth_engine::Q15;
+use cmsis_interface::Q15;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -11,7 +11,9 @@ fn main() {
     eprintln!("  WAVETABLE_SIZE: {}", wavetable_size);
     eprintln!();
 
-    print!("[");
+    println!("use cmsis_interface::Q15;");
+    println!();
+    print!("pub static SAW_WAVETABLE: [Q15; {}] = [", wavetable_size);
 
     let mut samples = Vec::new();
 
@@ -26,10 +28,15 @@ fn main() {
 
         samples.push(Q15::from_bits(fixed_value));
 
-        print!("Q15::from_bits({:#06x}_u16 as i16),", fixed_value as u16);
+        println!();
+        print!(
+            "    Q15::from_bits({:#06x}_u16 as i16),",
+            fixed_value as u16
+        );
     }
 
-    println!("]");
+    println!();
+    println!("];");
 
     eprintln!();
     eprintln!("Sanity checks:");

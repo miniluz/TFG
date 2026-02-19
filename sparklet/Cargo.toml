@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["midi", "runner", "synth-engine", "cmsis-interface", "cmsis-native", "cmsis-rust", "config"]
+members = ["midi", "runner", "synth-engine", "cmsis-interface", "cmsis-native", "cmsis-rust", "config", "table_generators"]
 
 [patch.crates-io]
 embassy-executor = { git = "https://github.com/miniluz/embassy.git", branch = "reference-9.1"}

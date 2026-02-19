@@ -1,4 +1,5 @@
 use super::*;
+use crate::WINDOW_SIZE;
 use config::Config;
 use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel, signal::Signal};
 use pretty_assertions::assert_eq;
@@ -24,22 +25,25 @@ const FAST_SUSTAIN: u8 = 200;
 const FAST_ATTACK: u8 = 10;
 const FAST_DECAY_RELEASE: u8 = 10;
 
-// Macro for easily setting up a SynthEngine instance with a Sender and config signal
+// Macro for easily setting up a Generator instance with a Sender and config signal
 macro_rules! setup_synth_engine {
     ($sender:ident, $se:ident) => {
         let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
         let $sender = channel.sender();
         let receiver = channel.receiver();
-        let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+        let config_signal =
+            Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
         // Initialize config signal with default test values
         let test_config = Config {
             pages: [
-                config::Page { values: [TEST_ATTACK, TEST_SUSTAIN, TEST_DECAY_RELEASE] }, // Page 0: ADSR
+                config::Page {
+                    values: [TEST_ATTACK, TEST_SUSTAIN, TEST_DECAY_RELEASE],
+                }, // Page 0: ADSR
                 config::Page { values: [0, 0, 0] }, // Page 1: Oscillator type = 0 (sine)
             ],
         };
         config_signal.signal(test_config);
-        let mut $se = SynthEngine::<
+        let mut $se = Generator::<
             '_,
             '_,
             '_,
@@ -49,10 +53,7 @@ macro_rules! setup_synth_engine {
             WINDOW_SIZE,
             TEST_PAGE_AMOUNT,
             TEST_ENCODER_AMOUNT,
-        >::new(
-            receiver,
-            &config_signal,
-        );
+        >::new(receiver, &config_signal);
     };
 }
 
@@ -167,15 +168,18 @@ fn test_envelope_lifecycle_to_idle() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
     let fast_config = Config {
         pages: [
-            config::Page { values: [FAST_ATTACK, FAST_SUSTAIN, FAST_DECAY_RELEASE] },
+            config::Page {
+                values: [FAST_ATTACK, FAST_SUSTAIN, FAST_DECAY_RELEASE],
+            },
             config::Page { values: [0, 0, 0] }, // Sine wavetable
         ],
     };
     config_signal.signal(fast_config);
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -185,10 +189,7 @@ fn test_envelope_lifecycle_to_idle() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     // Send NoteOn then immediate NoteOff
     sender
@@ -309,15 +310,18 @@ fn test_rapid_note_on_off_sequences() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
     let fast_config = Config {
         pages: [
-            config::Page { values: [FAST_ATTACK, FAST_SUSTAIN, FAST_DECAY_RELEASE] },
+            config::Page {
+                values: [FAST_ATTACK, FAST_SUSTAIN, FAST_DECAY_RELEASE],
+            },
             config::Page { values: [0, 0, 0] }, // Sine wavetable
         ],
     };
     config_signal.signal(fast_config);
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -327,10 +331,7 @@ fn test_rapid_note_on_off_sequences() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
 
@@ -427,7 +428,10 @@ fn test_voice_stealing_doesnt_release_all_voices() {
     se.render_samples::<TestOps>(&mut buffer);
 
     // All voices should be active
-    assert_eq!(se.get_voice_bank().count_active_voices(), TEST_VOICE_BANK_SIZE);
+    assert_eq!(
+        se.get_voice_bank().count_active_voices(),
+        TEST_VOICE_BANK_SIZE
+    );
 
     // Play one more note over the limit
     sender
@@ -524,7 +528,10 @@ fn test_quick_release_not_repeated_per_cycle() {
 
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
     se.render_samples::<TestOps>(&mut buffer);
-    assert_eq!(se.get_voice_bank().count_active_voices(), TEST_VOICE_BANK_SIZE);
+    assert_eq!(
+        se.get_voice_bank().count_active_voices(),
+        TEST_VOICE_BANK_SIZE
+    );
 
     // Queue multiple notes over the limit
     sender
@@ -580,18 +587,21 @@ fn test_config_signal_adsr_update() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
 
     // Initialize with default config
     let initial_config = Config {
         pages: [
-            config::Page { values: [50, 200, 100] }, // Attack=50, Sustain=200, Decay/Release=100
+            config::Page {
+                values: [50, 200, 100],
+            }, // Attack=50, Sustain=200, Decay/Release=100
             config::Page { values: [0, 0, 0] },
         ],
     };
     config_signal.signal(initial_config);
 
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -601,20 +611,21 @@ fn test_config_signal_adsr_update() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     // Play a note
-    sender.try_send(MidiEvent::NoteOn { key: 60, vel: 100 }).unwrap();
+    sender
+        .try_send(MidiEvent::NoteOn { key: 60, vel: 100 })
+        .unwrap();
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
     se.render_samples::<TestOps>(&mut buffer);
 
     // Update config with new ADSR values
     let new_config = Config {
         pages: [
-            config::Page { values: [10, 100, 10] }, // Fast attack/release, lower sustain
+            config::Page {
+                values: [10, 100, 10],
+            }, // Fast attack/release, lower sustain
             config::Page { values: [0, 0, 0] },
         ],
     };
@@ -632,18 +643,21 @@ fn test_config_signal_wavetable_switch() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
 
     // Start with sine wave (osc_type = 0)
     let sine_config = Config {
         pages: [
-            config::Page { values: [50, 200, 100] },
+            config::Page {
+                values: [50, 200, 100],
+            },
             config::Page { values: [0, 0, 0] }, // Sine wave
         ],
     };
     config_signal.signal(sine_config);
 
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -653,20 +667,21 @@ fn test_config_signal_wavetable_switch() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     // Play a note and generate samples
-    sender.try_send(MidiEvent::NoteOn { key: 60, vel: 100 }).unwrap();
+    sender
+        .try_send(MidiEvent::NoteOn { key: 60, vel: 100 })
+        .unwrap();
     let mut buffer_sine = [Q15::ZERO; WINDOW_SIZE];
     se.render_samples::<TestOps>(&mut buffer_sine);
 
     // Switch to square wave (osc_type = 2)
     let square_config = Config {
         pages: [
-            config::Page { values: [50, 200, 100] },
+            config::Page {
+                values: [50, 200, 100],
+            },
             config::Page { values: [2, 0, 0] }, // Square wave
         ],
     };
@@ -677,7 +692,10 @@ fn test_config_signal_wavetable_switch() {
     se.render_samples::<TestOps>(&mut buffer_square);
 
     // The buffers should be different (different waveforms)
-    assert_ne!(buffer_sine, buffer_square, "Sine and square waves should produce different output");
+    assert_ne!(
+        buffer_sine, buffer_square,
+        "Sine and square waves should produce different output"
+    );
 }
 
 #[test]
@@ -685,17 +703,20 @@ fn test_config_update_mid_note() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let sender = channel.sender();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
 
     let initial_config = Config {
         pages: [
-            config::Page { values: [50, 200, 100] },
+            config::Page {
+                values: [50, 200, 100],
+            },
             config::Page { values: [0, 0, 0] },
         ],
     };
     config_signal.signal(initial_config);
 
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -705,13 +726,12 @@ fn test_config_update_mid_note() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     // Play a note
-    sender.try_send(MidiEvent::NoteOn { key: 60, vel: 100 }).unwrap();
+    sender
+        .try_send(MidiEvent::NoteOn { key: 60, vel: 100 })
+        .unwrap();
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
     se.render_samples::<TestOps>(&mut buffer);
 
@@ -721,7 +741,9 @@ fn test_config_update_mid_note() {
     // Update config mid-note
     let new_config = Config {
         pages: [
-            config::Page { values: [10, 150, 50] },
+            config::Page {
+                values: [10, 150, 50],
+            },
             config::Page { values: [1, 0, 0] }, // Switch to sawtooth
         ],
     };
@@ -734,25 +756,31 @@ fn test_config_update_mid_note() {
     // Check for reasonable continuity (no huge jumps)
     let diff = (first_sample_after - last_sample_before).abs();
     // Allow for waveform shape change but no extreme discontinuity
-    assert!(diff < Q15::from_num(0.5), "Config change should not cause extreme discontinuity");
+    assert!(
+        diff < Q15::from_num(0.5),
+        "Config change should not cause extreme discontinuity"
+    );
 }
 
 #[test]
 fn test_config_oscillator_modulo() {
     let channel = Channel::<NoopRawMutex, MidiEvent, TEST_CHANNEL_SIZE>::new();
     let receiver = channel.receiver();
-    let config_signal = Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
+    let config_signal =
+        Signal::<NoopRawMutex, Config<TEST_PAGE_AMOUNT, TEST_ENCODER_AMOUNT>>::new();
 
     // Test that oscillator type values >= 4 wrap around via modulo
     let config_with_high_osc = Config {
         pages: [
-            config::Page { values: [50, 200, 100] },
+            config::Page {
+                values: [50, 200, 100],
+            },
             config::Page { values: [7, 0, 0] }, // 7 % 4 = 3 (triangle)
         ],
     };
     config_signal.signal(config_with_high_osc);
 
-    let mut se = SynthEngine::<
+    let mut se = Generator::<
         '_,
         '_,
         '_,
@@ -762,10 +790,7 @@ fn test_config_oscillator_modulo() {
         WINDOW_SIZE,
         TEST_PAGE_AMOUNT,
         TEST_ENCODER_AMOUNT,
-    >::new(
-        receiver,
-        &config_signal,
-    );
+    >::new(receiver, &config_signal);
 
     // Engine should initialize without panic
     let mut buffer = [Q15::ZERO; WINDOW_SIZE];
@@ -774,7 +799,9 @@ fn test_config_oscillator_modulo() {
     // Test another value: 5 % 4 = 1 (saw)
     let config_with_wrap = Config {
         pages: [
-            config::Page { values: [50, 200, 100] },
+            config::Page {
+                values: [50, 200, 100],
+            },
             config::Page { values: [5, 0, 0] }, // 5 % 4 = 1 (saw)
         ],
     };

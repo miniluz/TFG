@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 cmsis-interface = { path = "../cmsis-interface" }
+fixed = "1.29.0"

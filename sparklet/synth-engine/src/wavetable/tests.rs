@@ -340,7 +340,11 @@ fn test_set_wavetable_preserves_phase() {
 
     // Store the phase after advancing
     let phase_before_switch = osc.phase;
-    assert_ne!(phase_before_switch, U8F24::ZERO, "Phase should have advanced");
+    assert_ne!(
+        phase_before_switch,
+        U8F24::ZERO,
+        "Phase should have advanced"
+    );
 
     // Switch to a different wavetable
     osc.set_wavetable(&SQUARE_WAVETABLE);

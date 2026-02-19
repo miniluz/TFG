@@ -35,7 +35,8 @@ pub static STATE: StaticCell<microphone::State> = StaticCell::new();
 #[macro_export]
 macro_rules! get_audio_usb_hardware {
     ($builder:expr) => {{
-        let state = $crate::audio_task::audio_usb::hardware::STATE.init(embassy_usb::class::uac1::microphone::State::new());
+        let state = $crate::audio_task::audio_usb::hardware::STATE
+            .init(embassy_usb::class::uac1::microphone::State::new());
 
         // Create the UAC1 Microphone class components (synchronous mode)
         let (stream, control_monitor) = embassy_usb::class::uac1::microphone::Microphone::new(
