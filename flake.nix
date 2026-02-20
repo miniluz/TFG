@@ -36,6 +36,7 @@
                 cargo-expand
                 cargo-generate
                 cargo-nextest
+                cargo-bloat
                 bacon
 
                 just
