@@ -15,9 +15,9 @@ embassy-stm32 = { version = "0.4.0", features = ["stm32h723zg", "defmt", "memory
 bytemuck = { version = "1.21", default-features = false }
 
 [dependencies.cmsis_dsp]
-# git = "https://github.com/miniluz/cmsis_dsp.rs"
-# branch = "feature/bit-shifts"
-path = "../../../cmsis_dsp.rs/"
+git = "https://github.com/miniluz/cmsis_dsp.rs"
+branch = "feature/bit-shifts"
+# path = "../../../cmsis_dsp.rs/"
 features = ["cortex-m7", "double-precision-fpu", "micromath"]
 
 [lib]
