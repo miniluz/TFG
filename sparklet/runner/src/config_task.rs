@@ -7,7 +7,14 @@ use static_cell::StaticCell;
 
 use crate::synth_engine_task::CONFIG_SIGNAL;
 
-const CONFIG_PAGE_COUNT: usize = 4;
+const BASE_PAGE_COUNT: usize = 2;
+
+#[cfg(feature = "octave-filter")]
+const OCTAVE_FILTER_PAGE_COUNT: usize = 2;
+#[cfg(not(feature = "octave-filter"))]
+const OCTAVE_FILTER_PAGE_COUNT: usize = 0;
+
+const CONFIG_PAGE_COUNT: usize = BASE_PAGE_COUNT + OCTAVE_FILTER_PAGE_COUNT;
 const CONFIG_ENCODER_COUNT: usize = 3;
 const UPDATE_RATE_HZ: u32 = 500;
 
@@ -67,11 +74,18 @@ pub async fn encoder_simulator_task() {
     let start_time = Instant::now();
     let sender = CONFIG_EVENT_CHANNEL.sender();
 
+    #[cfg(feature = "octave-filter")]
     let mut encoder_states = [
         [(0u8, 1i8, 5u32), (0u8, 1i8, 6u32), (0u8, 1i8, 7u32)],
         [(1u8, 0i8, 0u32), (0u8, 1i8, 8u32), (0u8, 1i8, 9u32)],
         [(0u8, 1i8, 10u32), (0u8, 1i8, 11u32), (0u8, 1i8, 12u32)],
         [(0u8, 1i8, 13u32), (0u8, 1i8, 14u32), (0u8, 1i8, 15u32)],
+    ];
+
+    #[cfg(not(feature = "octave-filter"))]
+    let mut encoder_states = [
+        [(0u8, 1i8, 5u32), (0u8, 1i8, 6u32), (0u8, 1i8, 7u32)],
+        [(1u8, 0i8, 0u32), (0u8, 1i8, 8u32), (0u8, 1i8, 9u32)],
     ];
 
     let mut counter = 0u32;
@@ -115,6 +129,7 @@ pub async fn encoder_simulator_task() {
 
         // Log status every 5 seconds
         if counter.is_multiple_of(UPDATE_RATE_HZ * 5) {
+            #[cfg(feature = "octave-filter")]
             info!(
                 "Encoder Simulator: t={}ms P0=[{},{},{}] P1=[{},{},{}] P2=[{},{},{}] P3=[{},{},{}]",
                 elapsed_ms,
@@ -130,6 +145,18 @@ pub async fn encoder_simulator_task() {
                 encoder_states[3][0].0,
                 encoder_states[3][1].0,
                 encoder_states[3][2].0,
+            );
+
+            #[cfg(not(feature = "octave-filter"))]
+            info!(
+                "Encoder Simulator: t={}ms P0=[{},{},{}] P1=[{},{},{}]",
+                elapsed_ms,
+                encoder_states[0][0].0,
+                encoder_states[0][1].0,
+                encoder_states[0][2].0,
+                encoder_states[1][0].0,
+                encoder_states[1][1].0,
+                encoder_states[1][2].0,
             );
         }
 

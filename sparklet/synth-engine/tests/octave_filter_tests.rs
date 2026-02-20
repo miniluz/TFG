@@ -1,3 +1,5 @@
+#![cfg(feature = "octave-filter")]
+
 use cmsis_rust::CmsisRustOperations as Ops;
 use synth_engine::{OctaveFilterBank, Q15, SAMPLE_RATE};
 

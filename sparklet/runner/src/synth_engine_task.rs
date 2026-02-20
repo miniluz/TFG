@@ -26,12 +26,23 @@ const WINDOW_SIZE: usize = USB_MAX_SAMPLE_COUNT;
 #[cfg(not(feature = "audio-usb"))]
 const WINDOW_SIZE: usize = 128;
 
-// Config dimensions
-const CONFIG_PAGE_COUNT: usize = 4; // Pages 0-1: ADSR/Oscillator, Pages 2-3: Octave Filter
+// Config dimensions using additive pattern
+const BASE_PAGE_COUNT: usize = 2; // Pages 0-1: ADSR and Oscillator
+
+#[cfg(feature = "octave-filter")]
+const OCTAVE_FILTER_PAGE_COUNT: usize = 2; // Pages 2-3: Octave filter (6 bands)
+#[cfg(not(feature = "octave-filter"))]
+const OCTAVE_FILTER_PAGE_COUNT: usize = 0;
+
+const CONFIG_PAGE_COUNT: usize = BASE_PAGE_COUNT + OCTAVE_FILTER_PAGE_COUNT;
 const CONFIG_ENCODER_COUNT: usize = 3;
 
 // Octave filter configuration
-const OCTAVE_FILTER_FIRST_PAGE: usize = 2; // Use pages 2-3 for octave filter (6 bands, 3 encoders per page)
+#[cfg(feature = "octave-filter")]
+const OCTAVE_FILTER_FIRST_PAGE: usize = BASE_PAGE_COUNT; // Starts after base pages
+
+#[cfg(not(feature = "octave-filter"))]
+const OCTAVE_FILTER_FIRST_PAGE: usize = 0; // Unused but needed for type signature
 
 // Default ADSR configuration
 const ATTACK_CONFIG: u8 = 40;
@@ -85,6 +96,7 @@ pub fn create_task(
     audio_sender: zerocopy_channel::Sender<'static, NoopRawMutex, SampleBlock>,
 ) -> SpawnToken<impl Sized> {
     // Initialize config signal with default values
+    #[cfg(feature = "octave-filter")]
     let initial_config = Config {
         pages: [
             config::Page {
@@ -99,6 +111,17 @@ pub fn create_task(
             }, // Page 3: Octave filter bands 3-5 (default gain)
         ],
     };
+
+    #[cfg(not(feature = "octave-filter"))]
+    let initial_config = Config {
+        pages: [
+            config::Page {
+                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
+            }, // Page 0: ADSR
+            config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
+        ],
+    };
+
     CONFIG_SIGNAL.signal(initial_config);
 
     let synth_engine = SynthEngine::new(MIDI_TASK_CHANNEL.receiver(), &CONFIG_SIGNAL);
@@ -112,6 +135,7 @@ pub fn create_task(
 #[cfg(not(feature = "audio-usb"))]
 pub fn create_task() -> SpawnToken<impl Sized> {
     // Initialize config signal with default values
+    #[cfg(feature = "octave-filter")]
     let initial_config = Config {
         pages: [
             config::Page {
@@ -126,6 +150,17 @@ pub fn create_task() -> SpawnToken<impl Sized> {
             }, // Page 3: Octave filter bands 3-5 (default gain)
         ],
     };
+
+    #[cfg(not(feature = "octave-filter"))]
+    let initial_config = Config {
+        pages: [
+            config::Page {
+                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
+            }, // Page 0: ADSR
+            config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
+        ],
+    };
+
     CONFIG_SIGNAL.signal(initial_config);
 
     let synth_engine = SynthEngine::new(MIDI_TASK_CHANNEL.receiver(), &CONFIG_SIGNAL);

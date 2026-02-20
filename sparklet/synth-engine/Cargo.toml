@@ -3,6 +3,13 @@ name = "synth_engine"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+octave-filter = []
+
+[[example]]
+name = "octave_filter_frequency_response"
+required-features = ["octave-filter"]
+
 [dependencies]
 embassy-sync = "0.7.2"
 fixed = "1.29.0"
