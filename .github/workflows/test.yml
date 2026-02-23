@@ -2,9 +2,7 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   test:
@@ -13,32 +11,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Cache cargo registry
-      uses: actions/cache@v4
+    - name: Install Nix
+      uses: cachix/install-nix-action@v18
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
-    - name: Cache cargo index
-      uses: actions/cache@v4
+    - name: Restore and save Nix store
+      uses: nix-community/cache-nix-action@v7
       with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-
-    - name: Cache cargo build
-      uses: actions/cache@v4
-      with:
-        path: sparklet/target
-        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
-
-    - name: Install just
-      uses: taiki-e/install-action@v2
-      with:
-        tool: just
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        gc-max-store-size-linux: 1073741824
+        purge: true
+        purge-prefixes: nix-${{ runner.os }}-
+        purge-primary-key: never
 
     - name: Run tests
-      working-directory: sparklet
-      run: just test
+      uses: workflow/nix-shell-action@v3
+      with:
+        flakes-from-devshell: true
+        script: |
+          cd sparklet
+          just test
