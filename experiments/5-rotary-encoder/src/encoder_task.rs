@@ -1,16 +1,17 @@
 use defmt::info;
 use embassy_stm32::exti::ExtiInput;
+use embassy_stm32::gpio::Input;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel};
 use static_cell::StaticCell;
 
 pub struct EncoderTaskState<'a> {
     encoder_a: ExtiInput<'a>,
-    encoder_b: ExtiInput<'a>,
+    encoder_b: Input<'a>,
     position: u8,
 }
 
 impl<'a> EncoderTaskState<'a> {
-    pub fn new(encoder_a: ExtiInput<'a>, encoder_b: ExtiInput<'a>) -> Self {
+    pub fn new(encoder_a: ExtiInput<'a>, encoder_b: Input<'a>) -> Self {
         Self {
             encoder_a,
             encoder_b,
