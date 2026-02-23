@@ -35,7 +35,9 @@ jobs:
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Install just
-      run: cargo install just
+      uses: taiki-e/install-action@v2
+      with:
+        tool: just
 
     - name: Run tests
       working-directory: sparklet
