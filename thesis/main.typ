@@ -2,11 +2,11 @@
 
 #show: TFC.with(
   titulo: "Trabajo fin de grado",
-  alumno: "Nombre Del Alumno",
+  alumno: "Javier Ignacio Milá de la Roca Dos Santos",
   titulacion: "Grado en Ingeniería Informática - Ingeniería del Software",
   director: [Director 1 \ Director 2],
-  departamento: "Lenguajes y Sistemas Informáticos",
-  convocatoria: "Convocatoria de junio/julio/diciembre, curso 20XX/YY",
+  departamento: "Departamento de Tecnología Electrónica",
+  convocatoria: "Convocatoria de junio, curso 2025/26",
   dedicatoria: "Aquí la dedicatoria del trabajo",
   agradecimientos: [
     Quiero agradecer a X por...
@@ -17,20 +17,20 @@
     Incluya aquí un resumen de los aspectos generales de su trabajo, en español
   ],
   palabras-clave: (
-    "palabra clave 1", 
-    "palabra clave 2", 
-    "...", 
-    "palabra clave N"
+    "palabra clave 1",
+    "palabra clave 2",
+    "...",
+    "palabra clave N",
   ),
   abstract: [
     This section should contain an English version of the Spanish abstract.
   ],
   keywords: (
-    "keyword 1", 
-    "keyword 2", 
-    "...", 
-    "keyword N"
-  )
+    "keyword 1",
+    "keyword 2",
+    "...",
+    "keyword N",
+  ),
 )
 
 #include "sections/ejemplos_borrame.typ"
@@ -43,3 +43,4 @@
 #include "sections/XX_Conclusiones.typ"
 
 #bibliography("/bibliografia.bib")
+

@@ -66,3 +66,15 @@ build-generators:
 clean-generators:
     @echo "Cleaning table generators build artifacts..."
     @cargo clean --manifest-path table_generators/Cargo.toml
+
+# Run tests for all modules
+test:
+    @echo "Running tests for midi..."
+    @cargo test --manifest-path midi/Cargo.toml --lib
+    @echo "Running tests for synth-engine..."
+    @cargo test --manifest-path synth-engine/Cargo.toml --lib
+    @echo "Running tests for cmsis-rust..."
+    @cargo test --manifest-path cmsis-rust/Cargo.toml --lib
+    @echo "Running tests for config..."
+    @cargo test --manifest-path config/Cargo.toml --lib
+    @echo "All tests passed!"
