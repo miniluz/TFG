@@ -22,4 +22,3 @@ features = ["cortex-m7", "double-precision-fpu", "micromath"]
 
 [lib]
 harness = false # Important: As we bring our own test harness for all tests
-

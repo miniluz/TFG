@@ -1,0 +1,16 @@
+# Justfile for synth-engine table generation
+# Usage: just <recipe>
+
+# Default recipe - show available commands
+default:
+    @just --list
+
+# Format all Rust code
+write:
+    @echo "Compiling and watching for changes..."
+    @typst watch main.typ
+    @open main.pdf
+
+compile:
+    @echo "Compiling"
+    @typst compile main.typ

@@ -77,7 +77,7 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
         stream.write_packet(&usb_data).await?;
 
         packet_count += 1;
-        if packet_count % 1000 == 0 {
+        if packet_count.is_multiple_of(1000) {
             info!(
                 "USB Audio: Streamed {} packets at volume {}",
                 packet_count, volume_mult

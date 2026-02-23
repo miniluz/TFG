@@ -377,4 +377,3 @@ Herramientas útiles:
 
 Ya que es una etapa de ampliación, considero que tiene un riesgo muy bajo. De no
 ser posible o tomar demasiado, se puede ignorar.
-

@@ -11,7 +11,7 @@ En este capítulo se muestran ejemplos de uso de Typst para operaciones
 comunes. En el código fuente se pueden observar dos modos: contenido, y código. En un archivo, el modo por defecto es el modo contenido. Para usar el modo código dentro del contenido, por ejemplo para llamar a una función, se usa el símbolo ```Typst #```, pero si ya se está en modo código no es necesario usarlo. De forma inversa, para indicar contenido estando en el modo código, se delimita el contenido con ```Typst [...]```.
 
 == Estilos
-<sec:estilos> 
+<sec:estilos>
 
 Se pueden aplicar estilos al texto como *negritas*, _cursiva_, #underline[subrayado] y ` monoespaciado`. También se #text(fill: red)[pueden] #text(fill: blue)[aplicar] #text(fill: green)[colores] y #underline[_combinar_] #text(fill: red)[*estilos*]. Se recomienda usar sólo negritas para hacer énfasis, y no abusar de este recurso.
 
@@ -55,8 +55,8 @@ Este es un tercer nivel de profundidad, que no aparece en el índice general. Se
 Todas las imágenes y figuras del documento se incluirán en la carpeta 'figures'. Se pueden incluir de la siguiente manera:
 
 #figure(
-  image("/figures/ejemplo.png", width:70%),
-  caption: "Un feroz depredador"
+  image("/figures/ejemplo.png", width: 70%),
+  caption: "Un feroz depredador",
 )<fig:ejemplo>
 
 Observe que las figuras se numeran automáticamente según el capítulo y el número de figuras que hayan aparecido anteriormente en dicho capítulo. Existen muchas maneras de definir el tamaño de una figura, pero se aconseja utilizar la mostrada en este ejemplo: se define el ancho de la figura como un porcentaje del ancho total de la página, y la altura se escala automáticamente.
@@ -74,7 +74,7 @@ Usando un ```Typst #grid``` se podría colocar manualmente dónde hay bordes con
 Para tablas con un formato más complejo, considere la posibilidad de diseñarla usando otro software externo (por ejemplo Excel) e incluirla de manera similar a una figura. *Observe en el código Typst a continuación cómo usar el atributo ```Typst kind``` para indicar manualmente el tipo de figura (figura en Typst no son las imágenes sino un elemento genérico con leyenda). Se puede indicar cualquier ```Typst kind``` personalizado como se indica en la documentación:*
 
 #figure(
-  image("../tables/complex_table.png", width:100%),
+  image("../tables/complex_table.png", width: 100%),
   caption: "Tabla compleja introducida como imagen",
   kind: table,
 )<table:ejemplo2>
@@ -100,15 +100,15 @@ Es habitual nombrar las etiquetas con un prefijo que indica el tipo de elemento 
 Se pueden incluir extractos de código, existiendo paquetes que los hacen más bonitos como #link("https://typst.app/universe/package/codly")[codly]:
 
 #figure(
-```python
-if num > 0:
-   print("Positive number")
-elif num == 0:
-   print("Zero")
-else:
-   print("Negative number")
-```,
-caption: "Código Python"
+  ```python
+  if num > 0:
+     print("Positive number")
+  elif num == 0:
+     print("Zero")
+  else:
+     print("Negative number")
+  ```,
+  caption: "Código Python",
 )<cod:python>
 
 Se puede usar la función proporcionada para cambiar desde el momento que se usa el estilo de los fragmentos. Por ejemplo, al comienzo de esta plantilla se llama a `Typst #codly(zebra-fill:none)` para eliminar el sombreado alterno de las líneas.
@@ -116,18 +116,18 @@ Se puede usar la función proporcionada para cambiar desde el momento que se usa
 Para evitar tener que incluir el código directamente en el texto del documento, se pueden guardar en archivos separados y referenciarlos:
 
 #figure(
-raw(read("/code/java_example.java"), block: true, lang:"java"),
-caption: "Código Java"
+  raw(read("/code/java_example.java"), block: true, lang: "java"),
+  caption: "Código Java",
 )<cod:java>
 
 #figure(
-raw(read("/code/html_example.html"), block: true, lang:"html"),
-caption: "Código HTML"
+  raw(read("/code/html_example.html"), block: true, lang: "html"),
+  caption: "Código HTML",
 )<cod:html>
 
 #figure(
-raw(read("/code/javascript_example.js"), block: true, lang:"javascript"),
-caption: "Código JavaScript"
+  raw(read("/code/javascript_example.js"), block: true, lang: "javascript"),
+  caption: "Código JavaScript",
 )<cod:js>
 /*
 Los extractos de código también se pueden referenciar: @cod:python, @cod:java, @cod:html, @cod:js.
@@ -138,7 +138,7 @@ Puede enlazar una web externa mediante la función ```Typst #link``` o directame
 
 == Citas y bibliografía
 
-En Typst, los elementos de la bibliografía se almacenan en un fichero bibliográfico en un formato llamado `.bib`, en el caso de este proyecto se encuentran en `bibliografia.bib`. Para citar un elemento se usa el mismo formato de ```Typst @referencias```. Se pueden citar tanto artículos científicos @borrego2019 como enlaces web @webETSII. 
+En Typst, los elementos de la bibliografía se almacenan en un fichero bibliográfico en un formato llamado `.bib`, en el caso de este proyecto se encuentran en `bibliografia.bib`. Para citar un elemento se usa el mismo formato de ```Typst @referencias```. Se pueden citar tanto artículos científicos @borrego2019 como enlaces web @webETSII.
 
 También se puede usar la función ```Typst #cite``` para incluir opciones adicionales o personalizar el resultado, como incluir una referencia junto con el nombre de su autor o autores: #cite(<borrego2021>, form: "prose") #footnote[El estilo bibliográfico, determinado por un archivo CSL que puede personalizarse, determina cuando la lista de autores se reemplaza por '_et al_'. Ver https://github.com/typst/hayagriva/issues/164]. Todas las citas se numeran automáticamente y se incluyen en la sección de bibliografía del trabajo. El orden por defecto es según su orden de aparición en el documento. Para ordenarlas por orden alfabético del autor, puede modificar la opción `style` de la función ```Typst #bibliography("/bibliografia.bib", style:...)``` del archivo principal y reemplazar su valor por otro estilo.
 
@@ -150,9 +150,11 @@ Typst tiene un potente motor para mostrar ecuaciones matemáticas y un amplio ca
 
 Las ecuaciones más complejas pueden expresarse aparte y son numeradas: @eq:ecuacion
 
-$ limits("lím")_(x -> 0) (e^x - 1) / (2x) limits(=)_(upright(H))^[0/0] 
-limits("lím")_(x -> 0) e^2/2 =
-1/2 + 7 integral_0^2(-1/4(e^(-4t_1) + e^(4t_1-8) )) dif t_1 $<eq:ecuacion>
+$
+  limits("lím")_(x -> 0) (e^x - 1) / (2x) limits(=)_(upright(H))^[0/0]
+  limits("lím")_(x -> 0) e^2/2 =
+  1/2 + 7 integral_0^2(-1/4(e^(-4t_1) + e^(4t_1-8) )) dif t_1
+$<eq:ecuacion>
 
 Dispone #link("https://typst.app/docs/reference/symbols/sym/")[aquí] de un amplio listado de símbolos que pueden usarse en modo matemático.
 

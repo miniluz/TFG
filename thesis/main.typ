@@ -43,4 +43,3 @@
 #include "sections/XX_Conclusiones.typ"
 
 #bibliography("/bibliografia.bib")
-

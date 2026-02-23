@@ -40,6 +40,7 @@
                 bacon
 
                 just
+                prek
                 (octave.withPackages (octavePackages: with octavePackages; [ signal ]))
 
                 lldb
@@ -52,6 +53,7 @@
                 audacity
 
                 typst
+                typstyle
               ];
               buildInputs = [
               ];

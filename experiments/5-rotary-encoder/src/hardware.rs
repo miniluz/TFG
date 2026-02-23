@@ -12,8 +12,8 @@ impl<'a> Hardware<'a> {
         info!("Initializing");
         let peripherals = embassy_stm32::init(Default::default());
 
-        let encoder_a = ExtiInput::new(peripherals.PA0, peripherals.EXTI0, Pull::Up);
-        let encoder_b = ExtiInput::new(peripherals.PA1, peripherals.EXTI1, Pull::Up);
+        let encoder_a = ExtiInput::new(peripherals.PA3, peripherals.EXTI3, Pull::Up);
+        let encoder_b = ExtiInput::new(peripherals.PC0, peripherals.EXTI0, Pull::Up);
 
         Hardware {
             encoder_a,

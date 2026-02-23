@@ -7,6 +7,7 @@ use std::process::Command;
 const SAMPLE_RATE: f64 = 48000.0;
 const BAND_AMOUNT: usize = 6;
 
+#[allow(clippy::enum_variant_names)]
 enum FilterType {
     LowPass(f64),
     BandPass(f64, f64),

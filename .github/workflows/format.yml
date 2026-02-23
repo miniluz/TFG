@@ -1,0 +1,32 @@
+name: Format
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@v18
+      with:
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+    - name: Restore and save Nix store
+      uses: nix-community/cache-nix-action@v7
+      with:
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        gc-max-store-size-linux: 1073741824
+        purge: true
+        purge-prefixes: nix-${{ runner.os }}-
+        purge-primary-key: never
+
+    - name: Run prek checks
+      run: |
+        nix develop --command prek run --all-files

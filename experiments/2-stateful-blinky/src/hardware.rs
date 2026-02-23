@@ -9,6 +9,7 @@ pub struct Hardware<'a> {
     pub button: Button<'a>,
 }
 
+#[allow(dead_code)]
 pub enum Polarity {
     ActiveLow,
     ActiveHigh,

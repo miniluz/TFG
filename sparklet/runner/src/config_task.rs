@@ -94,9 +94,8 @@ pub async fn encoder_simulator_task() {
     loop {
         let elapsed_ms = start_time.elapsed().as_millis();
 
-        for page in 0..CONFIG_PAGE_COUNT {
-            for encoder in 0..CONFIG_ENCODER_COUNT {
-                let (value, dir, update_every) = &mut encoder_states[page][encoder];
+        for (page, page_states) in encoder_states.iter_mut().enumerate() {
+            for (encoder, (value, dir, update_every)) in page_states.iter_mut().enumerate() {
 
                 if page == 1 && encoder == 0 {
                     continue;
