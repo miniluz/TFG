@@ -29,4 +29,4 @@ jobs:
 
     - name: Run prek checks
       run: |
-        nix develop --command prek run --all-files
+        nix develop .#ci --command prek run --all-files

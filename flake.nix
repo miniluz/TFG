@@ -26,37 +26,44 @@
           let
             overlays = [ (import rust-overlay) ];
             pkgs = import nixpkgs { inherit system overlays; };
+            ciPackages = with pkgs; [
+              (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
+              just
+              prek
+              typstyle
+            ];
           in
           {
-            devShells.${system}.default = pkgs.mkShell {
-              nativeBuildInputs = with pkgs; [
-                (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
+            devShells.${system} = {
+              ci = pkgs.mkShell {
+                nativeBuildInputs = ciPackages;
+                buildInputs = [ ];
+              };
 
-                cargo-binutils
-                cargo-expand
-                cargo-generate
-                cargo-nextest
-                cargo-bloat
-                bacon
+              default = pkgs.mkShell {
+                nativeBuildInputs = ciPackages ++ (with pkgs; [
+                  cargo-binutils
+                  cargo-expand
+                  cargo-generate
+                  cargo-nextest
+                  cargo-bloat
+                  bacon
 
-                just
-                prek
-                (octave.withPackages (octavePackages: with octavePackages; [ signal ]))
+                  (octave.withPackages (octavePackages: with octavePackages; [ signal ]))
 
-                lldb
-                openocd
-                usbutils
-                probe-rs-tools
+                  lldb
+                  openocd
+                  usbutils
+                  probe-rs-tools
 
-                alsa-utils
-                pavucontrol
-                audacity
+                  alsa-utils
+                  pavucontrol
+                  audacity
 
-                typst
-                typstyle
-              ];
-              buildInputs = [
-              ];
+                  typst
+                ]);
+                buildInputs = [ ];
+              };
             };
           }
         )

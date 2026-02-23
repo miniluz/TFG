@@ -29,4 +29,4 @@ jobs:
 
     - name: Run tests
       run: |
-        nix develop --command bash -c 'cd sparklet && just test'
+        nix develop .#ci --command bash -c 'cd sparklet && just test'
