@@ -1,0 +1,27 @@
+# Pre-commit configuration for TFG repository
+# https://pre-commit.com/
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: clippy-per-crate
+        name: clippy (per crate)
+        language: system
+        entry: bash -c 'crates=$(for f in "$@"; do d=$(dirname "$f"); while [ "$d" != "." ] && [ "$d" != "/" ]; do if [ -f "$d/Cargo.toml" ]; then echo "$d"; break; fi; d=$(dirname "$d"); done; done | sort -u); for crate in $crates; do echo "Running clippy in $crate"; (cd "$crate" && cargo clippy -- -D warnings) || exit 1; done' --
+        files: \.rs$
+        pass_filenames: true
+      - id: typstyle
+        name: typstyle
+        language: system
+        entry: typstyle --inplace
+        files: \.typ$
+        pass_filenames: true
