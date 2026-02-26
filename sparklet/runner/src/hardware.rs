@@ -1,5 +1,18 @@
 use defmt::info;
+use embassy_stm32::exti::ExtiInput;
+use embassy_stm32::gpio::{Input, Pull};
 use embassy_stm32::Config;
+
+pub struct InputHardware<'a> {
+    pub button_page_down: ExtiInput<'a>,
+    pub button_page_up: ExtiInput<'a>,
+    pub encoder0_exti: ExtiInput<'a>,
+    pub encoder0_input: Input<'a>,
+    pub encoder1_exti: ExtiInput<'a>,
+    pub encoder1_input: Input<'a>,
+    pub encoder2_exti: ExtiInput<'a>,
+    pub encoder2_input: Input<'a>,
+}
 
 pub struct Hardware {
     #[cfg(feature = "midi-din")]
@@ -13,6 +26,7 @@ pub struct Hardware {
     >,
     #[cfg(feature = "audio-usb")]
     pub audio_hardware: crate::audio_task::audio_usb::hardware::AudioUsbHardware<'static>,
+    pub input_hardware: InputHardware<'static>,
 }
 
 impl Hardware {
@@ -80,6 +94,17 @@ impl Hardware {
         #[cfg(feature = "audio-usb")]
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
+        let input_hardware = InputHardware {
+            button_page_down: ExtiInput::new(peripherals.PA3, peripherals.EXTI3, Pull::Up),
+            button_page_up: ExtiInput::new(peripherals.PC13, peripherals.EXTI13, Pull::None),
+            encoder0_exti: ExtiInput::new(peripherals.PB1, peripherals.EXTI1, Pull::Up),
+            encoder0_input: Input::new(peripherals.PB2, Pull::Up),
+            encoder1_exti: ExtiInput::new(peripherals.PC2, peripherals.EXTI2, Pull::Up),
+            encoder1_input: Input::new(peripherals.PE9, Pull::Up),
+            encoder2_exti: ExtiInput::new(peripherals.PF10, peripherals.EXTI10, Pull::Up),
+            encoder2_input: Input::new(peripherals.PF2, Pull::Up),
+        };
+
         Hardware {
             #[cfg(feature = "midi-din")]
             midi_hardware,
@@ -89,6 +114,7 @@ impl Hardware {
             usb_builder,
             #[cfg(feature = "audio-usb")]
             audio_hardware,
+            input_hardware,
         }
     }
 }
