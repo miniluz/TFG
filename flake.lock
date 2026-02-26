@@ -33,7 +33,8 @@
       "inputs": {
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs",
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay",
+        "typst-wrapper": "typst-wrapper"
       }
     },
     "rust-overlay": {
@@ -53,6 +54,26 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "typst-wrapper": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772097528,
+        "narHash": "sha256-zOXkg7FuQxrwOu3a7Y7MFHMu0EbZX4M1bLolPpgK7DY=",
+        "owner": "miniluz",
+        "repo": "typst-wrapper",
+        "rev": "bcf30278fab2311e2adfe20aa09e41ac4269ee83",
+        "type": "github"
+      },
+      "original": {
+        "owner": "miniluz",
+        "repo": "typst-wrapper",
         "type": "github"
       }
     }

@@ -1,7 +1,7 @@
 #import "@preview/deal-us-tfc-template:1.0.0": *
 
 #show: TFC.with(
-  titulo: "Trabajo fin de grado",
+  titulo: "Síntesis en Rust",
   alumno: "Javier Ignacio Milá de la Roca Dos Santos",
   titulacion: "Grado en Ingeniería Informática - Ingeniería del Software",
   director: [Director 1 \ Director 2],
@@ -9,7 +9,7 @@
   convocatoria: "Convocatoria de junio, curso 2025/26",
   dedicatoria: "Aquí la dedicatoria del trabajo",
   agradecimientos: [
-    Quiero agradecer a X por...
+    Quiero agradecer a Z por...
 
     También quiero agradecer a Y por...
   ],
@@ -31,6 +31,7 @@
     "...",
     "keyword N",
   ),
+  font: "TeX Gyre Pagella",
 )
 
 #include "sections/ejemplos_borrame.typ"
