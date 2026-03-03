@@ -36,13 +36,13 @@
   font: "TeX Gyre Pagella",
 )
 
-#include "sections/ejemplos_bórrame.typ"
-#include "sections/01_introducción.typ" // cspell:disable-line
-#include "sections/02_Gestión.typ"
-#include "sections/03_Análisis.typ"
-#include "sections/04_Diseño.typ"
-#include "sections/05_Implementación.typ"
-#include "sections/06_Pruebas.typ"
-#include "sections/XX_Conclusiones.typ"
+#include "sections/01_Introducción.typ"
+#include "sections/02_Planificación.typ"
+#include "sections/03_Metodología.typ"
+#include "sections/04_Análisis.typ"
+#include "sections/05_Diseño.typ"
+#include "sections/06_Implementación.typ"
+#include "sections/07_Manuales.typ"
+#include "sections/08_Conclusiones.typ"
 
-#bibliography("/bibliografía.bib")
+#bibliography("/bibliografía.bib") // cspell:disable-line
