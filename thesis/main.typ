@@ -1,9 +1,11 @@
 #import "@preview/deal-us-tfc-template:1.0.0": *
 
 #show: TFC.with(
-  titulo: "Síntesis en Rust",
+  titulo: // cspell:disable-line
+  "Síntesis en Rust",
   alumno: "Javier Ignacio Milá de la Roca Dos Santos",
-  titulacion: "Grado en Ingeniería Informática - Ingeniería del Software",
+  titulacion: // cspell:disable-line
+  "Grado en Ingeniería Informática - Ingeniería del Software",
   director: [Director 1 \ Director 2],
   departamento: "Departamento de Tecnología Electrónica",
   convocatoria: "Convocatoria de junio, curso 2025/26",
@@ -34,13 +36,13 @@
   font: "TeX Gyre Pagella",
 )
 
-#include "sections/ejemplos_borrame.typ"
-#include "sections/01_introduccion.typ"
-#include "sections/02_Gestion.typ"
-#include "sections/03_Analisis.typ"
+#include "sections/ejemplos_bórrame.typ"
+#include "sections/01_introducción.typ" // cspell:disable-line
+#include "sections/02_Gestión.typ"
+#include "sections/03_Análisis.typ"
 #include "sections/04_Diseño.typ"
-#include "sections/05_Implementacion.typ"
+#include "sections/05_Implementación.typ"
 #include "sections/06_Pruebas.typ"
 #include "sections/XX_Conclusiones.typ"
 
-#bibliography("/bibliografia.bib")
+#bibliography("/bibliografía.bib")

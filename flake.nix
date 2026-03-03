@@ -85,6 +85,7 @@
 
                 wrappedTypst
                 typstLive
+                cspell
               ]);
             buildInputs = [ ];
           };
