@@ -16,6 +16,7 @@
     "project-words"
   ],
   "ignorePaths": [
-    "/project-words.txt"
+    "/project-words.txt",
+    "/sections/ejemplos_bórrame.typ"
   ]
 }

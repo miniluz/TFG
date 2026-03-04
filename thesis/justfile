@@ -5,11 +5,23 @@
 default:
     @just --list
 
-# Format all Rust code
 write:
     @echo "Compiling and watching for changes..."
     @typst watch main.typ
     @open main.pdf
+
+spell-check:
+    @echo "Checking for spelling errors"
+    @cspell **/*.typ **/*.bib
+
+spell-watch:
+    @echo "Watching for spelling errors"
+    @find . -name '*.typ' -o -name '*.bib' | entr -c cspell **/*.typ **/*.bib
+
+spell-add-unknown:
+    @echo "Adding unknown words to dictionary"
+    @echo "# Unknown words" >> project-words.txt
+    @cspell --words-only --unique **/*.typ | sort --ignore-case >> project-words.txt
 
 compile:
     @echo "Compiling"

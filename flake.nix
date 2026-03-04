@@ -37,6 +37,7 @@
         let
           overlays = [ (import rust-overlay) ];
           pkgs = import nixpkgs { inherit system overlays; };
+
           wrappedTypst = wrapTypst pkgs;
           typstLive = pkgs.symlinkJoin {
             name = "typst-live";
@@ -48,11 +49,13 @@
             '';
             meta.mainProgram = "typst-live";
           };
+
           ciPackages = with pkgs; [
             (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
             just
             prek
             typstyle
+            cspell
           ];
         in
         {
@@ -67,7 +70,6 @@
               ++ (with pkgs; [
                 cargo-binutils
                 cargo-expand
-                cargo-generate
                 cargo-nextest
                 cargo-bloat
                 bacon
@@ -75,17 +77,12 @@
                 (octave.withPackages (octavePackages: with octavePackages; [ signal ]))
 
                 lldb
-                openocd
                 usbutils
                 probe-rs-tools
 
-                alsa-utils
-                pavucontrol
-                audacity
-
                 wrappedTypst
                 typstLive
-                cspell
+                entr
               ]);
             buildInputs = [ ];
           };
