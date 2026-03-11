@@ -48,15 +48,18 @@ fn main() -> ! {
         audio_task::create_audio_tasks(hardware.audio_hardware)
     };
 
+    info!("Initialising config transport");
+    let (config_producer, config_consumer) = synth_engine_task::init_config_transport();
+
     info!("Creating config tasks");
-    let config_manager_task = config_task::create_config_manager_task();
+    let config_manager_task = config_task::create_config_manager_task(config_producer);
 
     info!("Creating synth engine task");
     #[cfg(feature = "audio-usb")]
-    let synth_engine_task = synth_engine_task::create_task(audio_sender);
+    let synth_engine_task = synth_engine_task::create_task(config_consumer, audio_sender);
 
     #[cfg(not(feature = "audio-usb"))]
-    let synth_engine_task = synth_engine_task::create_task();
+    let synth_engine_task = synth_engine_task::create_task(config_consumer);
 
     info!("Setting up tasks in executors...");
     executor.run(|spawner| {

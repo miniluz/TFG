@@ -2,6 +2,7 @@ pub mod filter_coefficients;
 
 use crate::adsr::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
 use cmsis_interface::{BiquadCascadeDf1StateQ15, CmsisOperations, Q15};
+use config::Config;
 use filter_coefficients::{OCTAVE_FILTER_COEFFS, OCTAVE_FILTER_POST_SHIFT};
 
 pub struct OctaveFilterBank {
@@ -18,6 +19,23 @@ impl OctaveFilterBank {
         }
     }
 
+    pub fn set_band_gains_from_config<
+        const PAGE_AMOUNT: usize,
+        const ENCODER_AMOUNT: usize,
+        const OCTAVE_FILTER_FIRST_PAGE: usize,
+    >(
+        &mut self,
+        config: &Config<PAGE_AMOUNT, ENCODER_AMOUNT>,
+    ) {
+        for band in 0..6 {
+            let page_idx = OCTAVE_FILTER_FIRST_PAGE + (band / 3);
+            let encoder_idx = band % 3;
+            if page_idx < PAGE_AMOUNT && encoder_idx < ENCODER_AMOUNT {
+                let gain_value = config.pages[page_idx].values[encoder_idx];
+                self.set_band_gain(band, gain_value);
+            }
+        }
+    }
     pub fn set_band_gain(&mut self, band: usize, encoder_value: u8) {
         assert!(band < 6, "Band index must be 0-5");
 

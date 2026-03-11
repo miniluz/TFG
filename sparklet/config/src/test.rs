@@ -1,11 +1,18 @@
-use embassy_sync::{blocking_mutex::raw::NoopRawMutex, signal::Signal};
+use amity::triple::TripleBuffer;
 
-use crate::{Config, ConfigEvent, ConfigManager};
+use crate::{Config, ConfigEvent, ConfigManager, Page};
+
+fn default_config() -> Config<8, 8> {
+    Config {
+        pages: [Page { values: [127; 8] }; 8],
+    }
+}
 
 #[test]
 fn page_wrapping_forward_and_backward() {
-    let signal = Signal::<NoopRawMutex, Config<8, 8>>::new();
-    let mut manager = ConfigManager::new(&signal);
+    let mut buffer = TripleBuffer::new(default_config(), default_config(), default_config());
+    let (producer, _consumer) = buffer.split_mut();
+    let mut manager = ConfigManager::new(producer);
 
     manager.current_page = 0;
     manager.handle_event(ConfigEvent::PageChange { amount: -1 });
@@ -18,8 +25,9 @@ fn page_wrapping_forward_and_backward() {
 
 #[test]
 fn encoder_saturation_at_boundaries() {
-    let signal = Signal::<NoopRawMutex, Config<8, 8>>::new();
-    let mut manager = ConfigManager::new(&signal);
+    let mut buffer = TripleBuffer::new(default_config(), default_config(), default_config());
+    let (producer, _consumer) = buffer.split_mut();
+    let mut manager = ConfigManager::new(producer);
 
     manager.config.pages[0].values[0] = 126;
     manager.handle_event(ConfigEvent::EncoderChange {
@@ -37,26 +45,28 @@ fn encoder_saturation_at_boundaries() {
 }
 
 #[test]
-fn signal_only_on_encoder_change() {
-    let signal = Signal::<NoopRawMutex, Config<8, 8>>::new();
-    let mut manager = ConfigManager::new(&signal);
+fn publishes_only_on_encoder_change() {
+    let mut buffer = TripleBuffer::new(default_config(), default_config(), default_config());
+    let (producer, consumer) = buffer.split_mut();
+    let mut manager = ConfigManager::new(producer);
 
-    signal.reset();
-
+    // No publish yet — PageChange does not publish
     manager.handle_event(ConfigEvent::PageChange { amount: 1 });
-    assert!(!signal.signaled());
+    assert!(!consumer.published());
 
+    // EncoderChange must publish
     manager.handle_event(ConfigEvent::EncoderChange {
         encoder: 0,
         amount: 1,
     });
-    assert!(signal.signaled());
+    assert!(consumer.published());
 }
 
 #[test]
 fn encoder_index_modulo() {
-    let signal = Signal::<NoopRawMutex, Config<8, 8>>::new();
-    let mut manager = ConfigManager::new(&signal);
+    let mut buffer = TripleBuffer::new(default_config(), default_config(), default_config());
+    let (producer, mut consumer) = buffer.split_mut();
+    let mut manager = ConfigManager::new(producer);
 
     manager.config.pages[0].values[2] = 100;
 
@@ -66,4 +76,9 @@ fn encoder_index_modulo() {
     });
 
     assert_eq!(manager.config.pages[0].values[2], 110);
+
+    // Consume and verify the published config reflects the change
+    assert!(consumer.published());
+    consumer.consume();
+    assert_eq!(consumer.get().pages[0].values[2], 110);
 }

@@ -30,6 +30,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "amity"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "323c848715f945a211198241051151659f253273bd8eb2677e930df42b8e6657"
+dependencies = [
+ "lock_api",
+]
+
+[[package]]
 name = "anstream"
 version = "0.6.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -309,8 +318,8 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 name = "config"
 version = "0.1.0"
 dependencies = [
+ "amity",
  "defmt 1.0.1",
- "embassy-sync",
  "pretty_assertions",
 ]
 
@@ -1238,6 +1247,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5e54036fe321fd421e10d732f155734c4e4afd610dd556d9a82833ab3ee0bed"
 
 [[package]]
+name = "lock_api"
+version = "0.4.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "224399e74b87b5f3557511d98dff8b14089b3dadafcab6bb93eab67d3aace965"
+dependencies = [
+ "scopeguard",
+]
+
+[[package]]
 name = "log"
 version = "0.4.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1518,6 +1536,7 @@ dependencies = [
 name = "runner"
 version = "0.1.0"
 dependencies = [
+ "amity",
  "bytemuck",
  "cmsis-native",
  "config",
@@ -1580,6 +1599,12 @@ dependencies = [
  "rustls-pki-types",
  "untrusted",
 ]
+
+[[package]]
+name = "scopeguard"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "sdio-host"
@@ -1775,6 +1800,7 @@ dependencies = [
 name = "synth_engine"
 version = "0.1.0"
 dependencies = [
+ "amity",
  "biquad",
  "bytemuck",
  "clap",

@@ -4,7 +4,7 @@ use embassy_executor::SpawnToken;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel};
 use static_cell::StaticCell;
 
-use crate::synth_engine_task::CONFIG_SIGNAL;
+use crate::synth_engine_task::ConfigProducer;
 
 const BASE_PAGE_COUNT: usize = 2;
 
@@ -23,19 +23,13 @@ pub static CONFIG_EVENT_CHANNEL: Channel<
     CONFIG_CHANNEL_SIZE,
 > = Channel::new();
 
-pub struct ConfigManagerTaskState<'cfg> {
-    config_manager:
-        ConfigManager<'cfg, CriticalSectionRawMutex, CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
+pub struct ConfigManagerTaskState<'buf> {
+    config_manager: ConfigManager<'buf, CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
 }
 
-impl<'cfg> ConfigManagerTaskState<'cfg> {
+impl<'buf> ConfigManagerTaskState<'buf> {
     pub fn new(
-        config_manager: ConfigManager<
-            'cfg,
-            CriticalSectionRawMutex,
-            CONFIG_PAGE_COUNT,
-            CONFIG_ENCODER_COUNT,
-        >,
+        config_manager: ConfigManager<'buf, CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
     ) -> Self {
         Self { config_manager }
     }
@@ -43,8 +37,8 @@ impl<'cfg> ConfigManagerTaskState<'cfg> {
 
 pub static CONFIG_MANAGER_TASK_STATE: StaticCell<ConfigManagerTaskState> = StaticCell::new();
 
-pub fn create_config_manager_task() -> SpawnToken<impl Sized> {
-    let config_manager = ConfigManager::new(&CONFIG_SIGNAL);
+pub fn create_config_manager_task(producer: ConfigProducer) -> SpawnToken<impl Sized> {
+    let config_manager = ConfigManager::new(producer);
 
     config_manager_task(CONFIG_MANAGER_TASK_STATE.init(ConfigManagerTaskState::new(config_manager)))
 }

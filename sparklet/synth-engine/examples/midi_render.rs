@@ -1,7 +1,8 @@
+use amity::triple::TripleBuffer;
 use clap::Parser;
 use cmsis_rust::CmsisRustOperations as Ops;
 use config::Config;
-use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel, signal::Signal};
+use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel};
 use hound::{WavSpec, WavWriter};
 use midi::MidiEvent;
 use midly::{MetaMessage, MidiMessage, Smf, TrackEventKind};
@@ -12,7 +13,7 @@ use synth_engine::wavetable::{
     saw_wavetable::SAW_WAVETABLE, sine_wavetable::SINE_WAVETABLE,
     square_wavetable::SQUARE_WAVETABLE,
 };
-use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
+use synth_engine::{SynthEngine, Q15, SAMPLE_RATE, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
 const PAGE_AMOUNT: usize = 4;
@@ -220,8 +221,6 @@ fn render_audio<const VOICE_COUNT: usize>(
     let sender = channel.sender();
     let receiver = channel.receiver();
 
-    let config_signal = Signal::<NoopRawMutex, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>::new();
-
     let osc_type = if std::ptr::eq(wavetable, &SINE_WAVETABLE) {
         0
     } else if std::ptr::eq(wavetable, &SAW_WAVETABLE) {
@@ -247,7 +246,9 @@ fn render_audio<const VOICE_COUNT: usize>(
             }, // Page 3: Octave filter bands 3-5
         ],
     };
-    config_signal.signal(config);
+
+    let mut config_buffer = TripleBuffer::new(config, config, config);
+    let (_producer, consumer) = config_buffer.split_mut();
 
     let mut synth_engine = SynthEngine::<
         '_,
@@ -260,7 +261,7 @@ fn render_audio<const VOICE_COUNT: usize>(
         PAGE_AMOUNT,
         ENCODER_AMOUNT,
         OCTAVE_FILTER_FIRST_PAGE,
-    >::new(receiver, &config_signal);
+    >::new(receiver, consumer);
 
     let mut output = Vec::with_capacity(total_samples as usize);
     let mut current_sample = 0u64;

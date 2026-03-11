@@ -15,8 +15,9 @@ pub const WINDOW_SIZE: usize = 128;
 /// Sample rate in Hz
 pub const SAMPLE_RATE: u32 = 48000;
 
+use amity::triple::{TripleBuffer, TripleBufferConsumer};
 use config::Config;
-use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver, signal::Signal};
+use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
 use midi::MidiEvent;
 
 pub use cmsis_interface::{CmsisOperations, Q15};
@@ -28,7 +29,7 @@ pub use voice_bank::{Note, PlayNoteResult, Velocity, VoiceBank, VoiceStage};
 pub struct SynthEngine<
     'ch,
     'wt,
-    'cfg,
+    'buf,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
     const VOICE_BANK_SIZE: usize,
@@ -40,7 +41,6 @@ pub struct SynthEngine<
     generator: Generator<
         'ch,
         'wt,
-        'cfg,
         M,
         CHANNEL_SIZE,
         VOICE_BANK_SIZE,
@@ -50,14 +50,16 @@ pub struct SynthEngine<
     >,
     #[cfg(feature = "octave-filter")]
     octave_filter: OctaveFilterBank,
-    #[cfg_attr(not(feature = "octave-filter"), allow(dead_code))]
-    config_signal: &'cfg Signal<M, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
+    config_consumer: TripleBufferConsumer<
+        Config<PAGE_AMOUNT, ENCODER_AMOUNT>,
+        &'buf TripleBuffer<Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
+    >,
 }
 
 impl<
     'ch,
     'wt,
-    'cfg,
+    'buf,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
     const VOICE_BANK_SIZE: usize,
@@ -69,7 +71,7 @@ impl<
     SynthEngine<
         'ch,
         'wt,
-        'cfg,
+        'buf,
         M,
         CHANNEL_SIZE,
         VOICE_BANK_SIZE,
@@ -81,13 +83,17 @@ impl<
 {
     pub fn new(
         receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
-        config_signal: &'cfg Signal<M, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
+        config_consumer: TripleBufferConsumer<
+            Config<PAGE_AMOUNT, ENCODER_AMOUNT>,
+            &'buf TripleBuffer<Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
+        >,
     ) -> Self {
+        let initial_config = config_consumer.get();
         Self {
-            generator: Generator::new(receiver, config_signal),
+            generator: Generator::new(receiver, initial_config),
             #[cfg(feature = "octave-filter")]
             octave_filter: OctaveFilterBank::new(),
-            config_signal,
+            config_consumer,
         }
     }
 
@@ -95,23 +101,17 @@ impl<
         self.generator.get_voice_bank()
     }
 
-    #[cfg(feature = "octave-filter")]
-    fn update_octave_filter_config(&mut self) {
-        if let Some(config) = self.config_signal.try_take() {
-            for band in 0..6 {
-                let page_idx = OCTAVE_FILTER_FIRST_PAGE + (band / 3);
-                let encoder_idx = band % 3;
-                if page_idx < PAGE_AMOUNT && encoder_idx < ENCODER_AMOUNT {
-                    let gain_value = config.pages[page_idx].values[encoder_idx];
-                    self.octave_filter.set_band_gain(band, gain_value);
-                }
-            }
-        }
-    }
-
     pub fn render_samples<T: CmsisOperations>(&mut self, output_samples: &mut [Q15; WINDOW_SIZE]) {
+        if self.config_consumer.published() {
+            self.config_consumer.consume();
+        }
+        let config = self.config_consumer.get();
+
+        self.generator.apply_config(config);
+
         #[cfg(feature = "octave-filter")]
-        self.update_octave_filter_config();
+        self.octave_filter
+            .set_band_gains_from_config::<_, _, OCTAVE_FILTER_FIRST_PAGE>(config);
 
         let mut buffer = [Q15::ZERO; WINDOW_SIZE];
         self.generator.render_samples::<T>(&mut buffer);

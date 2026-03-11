@@ -1,7 +1,7 @@
 use defmt::Format;
 use midi::MidiEvent;
 
-use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
+use crate::{adsr::ADSR, wavetable::WavetableOscillator, SAMPLE_RATE};
 
 /// A MIDI note number (0-127)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,13 +1,14 @@
+use amity::triple::TripleBuffer;
 use clap::Parser;
 use cmsis_rust::CmsisRustOperations as Ops;
 use config::{Config, ConfigEvent, ConfigManager};
-use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel, signal::Signal};
+use embassy_sync::{blocking_mutex::raw::NoopRawMutex, channel::Channel};
 use hound::{WavSpec, WavWriter};
 use midi::MidiEvent;
 use rand::{RngExt, SeedableRng};
 use std::f64::consts::PI;
 use std::path::PathBuf;
-use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
+use synth_engine::{SynthEngine, Q15, SAMPLE_RATE, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
 const PAGE_AMOUNT: usize = 4; // Pages 0-1: ADSR/oscillator, Pages 2-3: Octave filter
@@ -42,8 +43,23 @@ fn render_audio<const VOICE_COUNT: usize>(duration_sec: u32, seed: u64) -> Vec<i
     let sender = channel.sender();
     let receiver = channel.receiver();
 
-    let config_signal = Signal::<NoopRawMutex, Config<PAGE_AMOUNT, ENCODER_AMOUNT>>::new();
-    let mut config_manager = ConfigManager::new(&config_signal);
+    let initial_config = Config {
+        pages: [
+            config::Page {
+                values: [127, 127, 127],
+            }, // Page 0: ADSR defaults
+            config::Page { values: [0, 0, 0] }, // Page 1: Oscillator type = 0 (sine)
+            config::Page {
+                values: [127, 127, 127],
+            }, // Page 2: Octave filter bands 0-2
+            config::Page {
+                values: [127, 127, 127],
+            }, // Page 3: Octave filter bands 3-5
+        ],
+    };
+    let mut config_buffer = TripleBuffer::new(initial_config, initial_config, initial_config);
+    let (producer, consumer) = config_buffer.split_mut();
+    let mut config_manager = ConfigManager::new(producer);
 
     let mut synth_engine = SynthEngine::<
         '_,
@@ -56,7 +72,7 @@ fn render_audio<const VOICE_COUNT: usize>(duration_sec: u32, seed: u64) -> Vec<i
         PAGE_AMOUNT,
         ENCODER_AMOUNT,
         OCTAVE_FILTER_FIRST_PAGE,
-    >::new(receiver, &config_signal);
+    >::new(receiver, consumer);
 
     let total_samples = duration_sec as usize * SAMPLE_RATE as usize;
     let mut output = Vec::with_capacity(total_samples);
