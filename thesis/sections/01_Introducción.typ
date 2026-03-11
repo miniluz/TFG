@@ -15,3 +15,6 @@ Soluciones existentes, hueco en el mercado
 
 == Objetivos
 <sec_objetivos>
+
+Hay que decir que el control explícito del hardware (MIDI, USB) no es un objetivo tan grande en comparación a aprender
+del audio.
