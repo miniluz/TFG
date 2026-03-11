@@ -56,6 +56,7 @@
             prek
             typstyle
             cspell
+            cargo-nextest
           ];
         in
         {
@@ -65,12 +66,13 @@
           };
 
           default = pkgs.mkShell {
+            allowSubstitutes = false;
+
             nativeBuildInputs =
               ciPackages
               ++ (with pkgs; [
                 cargo-binutils
                 cargo-expand
-                cargo-nextest
                 cargo-bloat
                 bacon
 
