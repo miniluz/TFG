@@ -84,6 +84,7 @@
 
                 wrappedTypst
                 typstLive
+                drawio
                 entr
               ]);
             buildInputs = [ ];

@@ -24,3 +24,6 @@ reqs
 adsr
 ADSR
 apropiativo
+muestreada
+# Unknown words
+cmsis
