@@ -29,7 +29,6 @@
         "x86_64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      wrapTypst = pkgs: typst-wrapper.lib.${pkgs.stdenv.hostPlatform.system}.wrapTypst { };
     in
     {
       devShells = forAllSystems (
@@ -38,17 +37,7 @@
           overlays = [ (import rust-overlay) ];
           pkgs = import nixpkgs { inherit system overlays; };
 
-          wrappedTypst = wrapTypst pkgs;
-          typstLive = pkgs.symlinkJoin {
-            name = "typst-live";
-            paths = [ pkgs.typst-live ];
-            buildInputs = [ pkgs.makeWrapper ];
-            postBuild = ''
-              wrapProgram $out/bin/typst-live \
-                --suffix PATH : ${pkgs.lib.makeBinPath [ wrappedTypst ]}
-            '';
-            meta.mainProgram = "typst-live";
-          };
+          typst = typst-wrapper.lib.${pkgs.stdenv.hostPlatform.system}.wrapTypst { };
 
           ciPackages = with pkgs; [
             (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
@@ -82,8 +71,7 @@
                 usbutils
                 probe-rs-tools
 
-                wrappedTypst
-                typstLive
+                typst
                 drawio
                 entr
               ]);

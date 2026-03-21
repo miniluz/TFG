@@ -44,5 +44,6 @@
 #include "sections/06_Implementación.typ"
 #include "sections/07_Manuales.typ"
 #include "sections/08_Conclusiones.typ"
+#include "sections/09_Anexos.typ"
 
 #bibliography("/bibliografía.bib") // cspell:disable-line
