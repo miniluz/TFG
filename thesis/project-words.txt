@@ -25,5 +25,7 @@ adsr
 ADSR
 apropiativo
 muestreada
-# Unknown words
 cmsis
+powf
+Redmon
+urldate

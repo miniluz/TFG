@@ -3,4 +3,4 @@
 = Anexos
 <sec_anexos>
 
-#include "09_anexos/09_01_derivación_matemática_ASDR.typ"
+#include "09_anexos/09_01_derivación_matemática_ADSR.typ"

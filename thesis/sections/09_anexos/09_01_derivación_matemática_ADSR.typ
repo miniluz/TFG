@@ -2,8 +2,8 @@
 
 #show math.equation.where(block: true): set text(14pt)
 
-== Derivación matemática de las fórmulas de ASDR
-<sec_derivación_asdr>
+== Derivación matemática de las fórmulas de ADSR
+<sec_derivación_ADSR>
 
 Se buscan derivar las siguientes tres ecuaciones en base al comportamiento de un condensador:
 

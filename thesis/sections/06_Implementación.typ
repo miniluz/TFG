@@ -8,7 +8,7 @@
 
 #include "06_implementación/06_01_Oscilador.typ"
 
-#include "06_implementación/06_02_ASDR.typ"
+#include "06_implementación/06_02_ADSR.typ"
 
 == Key banks
 

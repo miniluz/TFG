@@ -43,7 +43,7 @@ inicial $y_0$, el valor objetivo $T_0$, la cantidad de muestras que toma la tran
 _target ratio_ $r$ que controla qué tan lineal o exponencial es el decaimiento, como se muestra en
 @eq_base_coefficient_t_r. Además, pueden ser almacenados en un Q15 ya que su valor absoluto nunca es mayor a 1 en los
 casos que necesitamos, como se muestra en @eq_b_c_range. La derivación en detalle se encuentra en un anexo bajo la
-@sec_derivación_asdr.
+@sec_derivación_ADSR.
 
 $
   y_n = B + y_(n-1) times C
