@@ -12,9 +12,16 @@ instantáneamente al máximo volumen, y cuando se deja de tocar, para instantán
 escuchar como clics, y no tienen un carácter musical.
 
 El envolvente de ataque, decaimiento, sostenimiento y relajación (_attack, decay, sustain, release_ o ADSR) suaviza esta
-transición. Es una señal que modula la amplitud de la onda que devuelve el oscilador. Se divide en cuatro etapas, como
-se puede ver en la /* TODO */. Estas son configurables para dar forma al sonido, generalmente para conseguir imitar un
-instrumento o dar el carácter buscado a la nota. Son:
+transición. Es una señal que modula la amplitud de la onda que devuelve el oscilador, como se ve en la
+@eq_adsr_modulación.
+
+$
+  "salida"[n] = "salida_oscilador"[n] times "salida_adsr"[n]
+$
+<eq_adsr_modulación>
+
+Se divide en cuatro etapas, como se puede ver en la /* TODO */. Estas son configurables para dar forma al sonido,
+generalmente para conseguir imitar un instrumento o dar el carácter buscado a la nota. Son:
 
 /* TODO: insertar imagen de curva ADSR */
 
@@ -102,6 +109,8 @@ La máquina de estados `ADSRState` tiene los siguientes estados:
 - `Release`, que pone a 0 hasta que llega a `ReachedTarget`, pasando al estado idle.
 - `QuickRelease`, que activa el `quick_discharge` de `Capacitor` hasta que llega a `ReachedTarget`, pasando al estado
   idle.
+
+/* TODO diagrama máquina de estados */
 
 `ADSRState` expone un método `progress` que progresa el estado una muestra y devuelve su amplitud, aparte de los métodos
 `play`, `stop_playing` y `quick_release`.

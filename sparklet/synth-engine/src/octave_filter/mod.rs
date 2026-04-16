@@ -66,7 +66,6 @@ impl OctaveFilterBank {
         let mut filtered = [Q15::ZERO; WINDOW_SIZE];
         let mut scaled = [Q15::ZERO; WINDOW_SIZE];
         let mut temp_output = [Q15::ZERO; WINDOW_SIZE];
-        output.copy_from_slice(&temp_output);
 
         for band_index in 0..6 {
             self.process_one_band::<T, WINDOW_SIZE>(input, &mut filtered, band_index);
@@ -76,18 +75,16 @@ impl OctaveFilterBank {
 
             // Accumulate to output using saturating addition
             if band_index.is_multiple_of(2) {
-                // First time, we copy to temp output
-                T::add_q15(output, &scaled, &mut temp_output);
-            } else {
-                // Every other time, we copy back to output
+                // First time, we write to output, overwriting it
                 T::add_q15(&temp_output, &scaled, output);
+            } else {
+                // Every other time, we write to temp_output
+                T::add_q15(output, &scaled, &mut temp_output);
             }
         }
 
-        if !self.band_gains.len().is_multiple_of(2) {
-            // If we did it an odd amount of times, the final result is in temp_output.
-            output.copy_from_slice(&temp_output);
-        }
+        // Since we did it an even amount of times, the final result is in temp_output.
+        output.copy_from_slice(&temp_output);
     }
 }
 

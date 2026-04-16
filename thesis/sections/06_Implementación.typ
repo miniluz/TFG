@@ -12,9 +12,11 @@
 
 #include "06_implementación/06_02_ADSR.typ"
 
-== Key banks
+#include "06_implementación/06_03_Banco_de_voces.typ"
 
-== MIDI
+#include "06_implementación/06_04_Generador.typ"
+
+#include "06_implementación/06_05_MIDI.typ"
 
 == Lectura de USB
 

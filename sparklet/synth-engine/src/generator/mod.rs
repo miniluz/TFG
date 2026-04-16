@@ -32,16 +32,15 @@ pub struct Generator<
 }
 
 impl<
-        'ch,
-        'wt,
-        M: RawMutex,
-        const CHANNEL_SIZE: usize,
-        const VOICE_BANK_SIZE: usize,
-        const WINDOW_SIZE: usize,
-        const PAGE_AMOUNT: usize,
-        const ENCODER_AMOUNT: usize,
-    >
-    Generator<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE, PAGE_AMOUNT, ENCODER_AMOUNT>
+    'ch,
+    'wt,
+    M: RawMutex,
+    const CHANNEL_SIZE: usize,
+    const VOICE_BANK_SIZE: usize,
+    const WINDOW_SIZE: usize,
+    const PAGE_AMOUNT: usize,
+    const ENCODER_AMOUNT: usize,
+> Generator<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE, PAGE_AMOUNT, ENCODER_AMOUNT>
 {
     const VOICE_BIT_SHIFT_SIZE: i8 = -((if VOICE_BANK_SIZE == 1 {
         0
@@ -137,18 +136,18 @@ impl<
                     let queue_count = self.note_queue.len();
                     let quick_release_count = self.voice_bank.count_voices_in_quick_release();
 
-                    if queue_count > quick_release_count {
+                    for _ in 0..(queue_count - quick_release_count) {
                         self.voice_bank.quick_release();
                     }
+
                     break;
                 }
             }
         }
 
-        // Zero the output buffer using CMSIS
-        let zero_buf = [Q15::ZERO; WINDOW_SIZE];
         let mut output_buf = [Q15::ZERO; WINDOW_SIZE];
-        sample_buffer.copy_from_slice(&zero_buf);
+
+        let mut i: usize = 0;
 
         for voice in self.voice_bank.voices.iter_mut() {
             if voice.adsr.is_idle() {
@@ -173,11 +172,22 @@ impl<
 
             T::shift_in_place_q15(&mut mixed_buf, Self::VOICE_BIT_SHIFT_SIZE);
 
-            // Accumulate into output buffer using CMSIS add
-            output_buf.copy_from_slice(sample_buffer);
-            let mut result_buf = [Q15::ZERO; WINDOW_SIZE];
-            T::add_q15(&output_buf, &mixed_buf, &mut result_buf);
-            sample_buffer.copy_from_slice(&result_buf);
+            if i.is_multiple_of(2) {
+                // The first time we copy to sample_buffer, so it doesn't matter what it had inside
+                T::add_q15(&output_buf, &mixed_buf, sample_buffer);
+            } else {
+                // Then we write to output_buf
+                T::add_q15(sample_buffer, &mixed_buf, &mut output_buf);
+            }
+
+            i += 1;
+        }
+
+        if i.is_multiple_of(2) {
+            // If it's a multiple of two, that means the last time it was odd and copied to
+            // output_buf (then we added one, which is why it's even). It means the latest value is
+            // at output_buf and we need to copy it.
+            sample_buffer.copy_from_slice(&output_buf);
         }
     }
 
