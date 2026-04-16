@@ -76,7 +76,14 @@ impl ADSRStage {
                 }
                 capacitor.get_level()
             }
-            Self::Sustain => capacitor.get_level(),
+            Self::Sustain => {
+                let decay_target = adsr_config
+                    .sustain_level
+                    .saturating_mul(adsr_config.velocity_amplitude);
+                capacitor.set_target(decay_target);
+                capacitor.step();
+                capacitor.get_level()
+            }
             Self::Release => {
                 capacitor.set_target(I1F31::ZERO);
                 let status = capacitor.step();
@@ -101,22 +108,13 @@ impl ADSRStage {
 pub(crate) struct ADSRConfig {
     sustain_level: I1F31,
     velocity_amplitude: I1F31,
-    rise_base_and_coefficient: BaseAndCoefficient,
-    fall_base_and_coefficient: BaseAndCoefficient,
 }
 
 impl ADSRConfig {
-    pub(crate) fn new(
-        sustain_config: u8,
-        attack_config: u8,
-        decay_release_config: u8,
-        velocity: u8,
-    ) -> Self {
+    pub(crate) fn new(sustain_config: u8, velocity: u8) -> Self {
         Self {
             sustain_level: DB_LINEAR_AMPLITUDE_TABLE[sustain_config as usize],
             velocity_amplitude: DB_LINEAR_AMPLITUDE_TABLE[(velocity * 2) as usize],
-            rise_base_and_coefficient: RISE_BASE_COEFFICIENT_TABLE[attack_config as usize],
-            fall_base_and_coefficient: FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize],
         }
     }
 
@@ -126,14 +124,6 @@ impl ADSRConfig {
 
     pub(crate) fn set_sustain(&mut self, sustain_config: u8) {
         self.sustain_level = DB_LINEAR_AMPLITUDE_TABLE[sustain_config as usize];
-    }
-
-    pub(crate) fn set_rise(&mut self, attack_config: u8) {
-        self.rise_base_and_coefficient = RISE_BASE_COEFFICIENT_TABLE[attack_config as usize];
-    }
-
-    pub(crate) fn set_fall(&mut self, decay_release_config: u8) {
-        self.fall_base_and_coefficient = FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
     }
 }
 
@@ -157,18 +147,12 @@ impl ADSR {
         decay_release_config: u8,
         velocity: u8,
     ) -> ADSR {
-        let config = ADSRConfig::new(
-            sustain_config,
-            attack_config,
-            decay_release_config,
-            velocity,
-        );
+        let config = ADSRConfig::new(sustain_config, velocity);
+        let rise_base_and_coefficient = RISE_BASE_COEFFICIENT_TABLE[attack_config as usize];
+        let fall_base_and_coefficient = FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
         ADSR {
             stage: ADSRStage::Idle,
-            capacitor: Capacitor::new(
-                config.rise_base_and_coefficient,
-                config.fall_base_and_coefficient,
-            ),
+            capacitor: Capacitor::new(rise_base_and_coefficient, fall_base_and_coefficient),
             config,
         }
     }
@@ -209,15 +193,13 @@ impl ADSR {
     }
 
     pub fn set_attack(&mut self, attack_config: u8) {
-        self.config.set_rise(attack_config);
-        self.capacitor
-            .set_rise_coeff(self.config.rise_base_and_coefficient);
+        let rise_base_and_coefficient = RISE_BASE_COEFFICIENT_TABLE[attack_config as usize];
+        self.capacitor.set_rise_coeff(rise_base_and_coefficient);
     }
 
     pub fn set_decay_release(&mut self, decay_release_config: u8) {
-        self.config.set_fall(decay_release_config);
-        self.capacitor
-            .set_fall_coeff(self.config.fall_base_and_coefficient);
+        let fall_base_and_coefficient = FALL_BASE_COEFFICIENT_TABLE[decay_release_config as usize];
+        self.capacitor.set_fall_coeff(fall_base_and_coefficient);
     }
 
     pub fn is_idle(&self) -> bool {

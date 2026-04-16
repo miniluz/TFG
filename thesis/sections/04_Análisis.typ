@@ -23,7 +23,7 @@ Análisis de la competencia, por qué elegí estos requisitos.
 #req("rf_waveforms", "F")[Generación de ondas][
   El sintetizador ha de poder generar ondas sinusoidales, cuadradas, de diente de sierra y triangulares.]
 #req("rf_adsr", "F")[ADSR][
-  El sintetizador ha de usar un envelope ADSR para obtener audio musical.]
+  El sintetizador ha de modular la amplitud de la onda con un envolvente ADSR configurable.]
 #req("rf_eq", "F")[Ecualización][
   El sintetizador ha de ser configurable en compilación para poder ecualizar la señal.]
 #req("rf_polyphony", "F")[Polifonía][

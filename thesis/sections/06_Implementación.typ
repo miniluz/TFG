@@ -6,6 +6,8 @@
 = Implementación
 <sec_implementación>
 
+#include "06_implementación/06_00_Configuración.typ"
+
 #include "06_implementación/06_01_Oscilador.typ"
 
 #include "06_implementación/06_02_ADSR.typ"

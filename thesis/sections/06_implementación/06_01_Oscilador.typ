@@ -60,3 +60,5 @@ bits cada una (en formato Q15), por lo que ocupan 512 bytes cada una y 2 KiB en 
 utilidades que se ejecutan en la computadora de desarrollo con la arquitectura `x86_64` antes del desarrollo. Se
 encuentran en la carpeta `sparklet/table_generators/src/bin` #fn. Calculan el valor de cada muestra en la tabla usando
 números de coma flotante, los convierten a Q15 y generan archivos de código Rust que definen las tablas.
+
+// TODO: Insertar código
