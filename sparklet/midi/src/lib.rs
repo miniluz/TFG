@@ -51,7 +51,10 @@ impl<'ch, M: RawMutex, const N: usize> MidiListener<'ch, M, N> {
 
             info!("Adding event: {:#?}", event_to_add);
 
-            // only fails if full. if full, the message should be discareded anyways
+            // Only fails if full. if full, the message is discarded.
+            // In practice the channel has length 16 and is processed
+            // once a millisecond, which means 16000 events would need
+            // to be sent per second to overflow it.
             sender.try_send(event_to_add).ok();
         }
     }

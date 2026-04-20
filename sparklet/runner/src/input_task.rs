@@ -45,10 +45,7 @@ pub struct ButtonTaskState<'a> {
 
 impl<'a> ButtonTaskState<'a> {
     pub fn new(button: Button<'a>, page_delta: i8) -> Self {
-        Self {
-            button,
-            page_delta,
-        }
+        Self { button, page_delta }
     }
 }
 
@@ -213,12 +210,12 @@ pub async fn encoder2_task(state: &'static mut EncoderTaskState<'static>) {
     let sender = CONFIG_EVENT_CHANNEL.sender();
 
     loop {
-        state.encoder_exti.wait_for_any_edge().await;
+        state.encoder_exti.wait_for_rising_edge().await;
 
-        let a_state = state.encoder_exti.is_high();
+        // let a_state = state.encoder_exti.is_high();
         let b_state = state.encoder_input.is_high();
 
-        let amount = if a_state != b_state { 1 } else { -1 };
+        let amount = if b_state { 1 } else { -1 };
 
         sender
             .send(ConfigEvent::EncoderChange {

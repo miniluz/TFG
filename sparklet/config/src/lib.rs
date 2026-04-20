@@ -83,6 +83,12 @@ impl<'buf, const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize>
                 self.publish_config();
             }
         }
+        defmt::info!("Event triggered: {}", event);
+        defmt::info!(
+            "Current page: {}\nConfig: {}",
+            self.current_page,
+            self.config
+        );
     }
 }
 

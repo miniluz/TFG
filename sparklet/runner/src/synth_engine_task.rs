@@ -52,14 +52,10 @@ const SUSTAIN_CONFIG: u8 = 200;
 
 // Type aliases for the triple buffer halves
 type ConfigBuffer = TripleBuffer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>>;
-pub type ConfigProducer = TripleBufferProducer<
-    Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
-    &'static ConfigBuffer,
->;
-pub type ConfigConsumer = TripleBufferConsumer<
-    Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
-    &'static ConfigBuffer,
->;
+pub type ConfigProducer =
+    TripleBufferProducer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>, &'static ConfigBuffer>;
+pub type ConfigConsumer =
+    TripleBufferConsumer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>, &'static ConfigBuffer>;
 
 // Static triple buffer for config transport
 static CONFIG_TRIPLE_BUFFER: StaticCell<ConfigBuffer> = StaticCell::new();
@@ -163,7 +159,6 @@ pub async fn synth_engine_task(
     state: &'static mut SynthEngineTaskState<'static, 'static, 'static>,
     mut audio_sender: zerocopy_channel::Sender<'static, NoopRawMutex, SampleBlock>,
 ) {
-    let mut buffer = [Q15::ZERO; WINDOW_SIZE];
     let mut counter: u32 = 0;
 
     info!("Synth Engine: Task starting, rendering at USB audio rate");
@@ -177,11 +172,10 @@ pub async fn synth_engine_task(
 
         state
             .synth_engine
-            .render_samples::<CmsisNativeOperations>(&mut buffer);
-
-        audio_buffer.copy_from_slice(&bytemuck::cast::<[Q15; WINDOW_SIZE], [i16; WINDOW_SIZE]>(
-            buffer,
-        ));
+            .render_samples::<CmsisNativeOperations>(bytemuck::cast_mut::<
+                [i16; WINDOW_SIZE],
+                [Q15; WINDOW_SIZE],
+            >(audio_buffer));
 
         audio_sender.send_done();
 

@@ -31,7 +31,7 @@ información del volumen de cada nota para poder decidir cuáles dejar de tocar.
 
 La configuración, sin embargo, no depende del estado del motor de síntesis, por lo que se extrae a una tarea separada de
 menor prioridad. Una cola la conecta con las tareas que leen el hardware, generalmente una tarea por cada pulsador y
-encoder rotativo, que también descarta si se llena. Cada vez que se ejecuta, procesa todos los eventos en orden y
+codificador rotatorio, que también descarta si se llena. Cada vez que se ejecuta, procesa todos los eventos en orden y
 actualiza el estado de la configuración. Finalmente, la escribe a un triple buffer. El triple buffer permite permite que
 el motor de síntesis siempre vea la última versión de la configuración que haya sido escrita en su totalidad sin que se
 bloquee ni la lectura ni la escritura.
@@ -43,6 +43,7 @@ bloquee ni la lectura ni la escritura.
 // TODO: medir el rendimiento en otro chip
 
 === Instrucciones DSP
+<sec_inst_dsp>
 
 #figure(
   image("/figures/CMSIS Interface.drawio.pdf", width: 50%),

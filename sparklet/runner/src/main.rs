@@ -30,16 +30,16 @@ fn main() -> ! {
     info!("Setting up executor");
     let executor = EXECUTOR.init(embassy_executor::Executor::new());
 
-    #[cfg(any(feature = "midi-din", feature = "midi-usb"))]
-    let midi_task = {
-        info!("Creating MIDI task");
-        midi_task::create_midi_task(hardware.midi_hardware)
-    };
-
     #[cfg(feature = "usb")]
     let usb_device = {
         info!("Building USB device");
         hardware.usb_builder.build()
+    };
+
+    #[cfg(any(feature = "midi-din", feature = "midi-usb"))]
+    let midi_task = {
+        info!("Creating MIDI task");
+        midi_task::create_midi_task(hardware.midi_hardware)
     };
 
     #[cfg(feature = "audio-usb")]

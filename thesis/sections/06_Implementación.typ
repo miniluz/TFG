@@ -6,7 +6,6 @@
 = Implementación
 <sec_implementación>
 
-#include "06_implementación/06_00_Configuración.typ"
 
 #include "06_implementación/06_01_Oscilador.typ"
 
@@ -18,14 +17,18 @@
 
 #include "06_implementación/06_05_MIDI.typ"
 
+#include "06_implementación/06_06_Ecualización.typ"
+
+#include "06_implementación/06_07_Motor_de_síntesis.typ"
+
+#include "06_implementación/06_08_Configuración.typ"
+
+#include "06_implementación/06_09_Ejecutor.typ"
+
+#include "06_implementación/06_10_CMSIS.typ"
+
 == Lectura de USB
 
 == Lectura de UART
-
-== Filtros
-
-== Canales
-
-== CMSIS
 
 == Compilación condicional

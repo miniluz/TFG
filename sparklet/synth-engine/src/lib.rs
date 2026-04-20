@@ -101,30 +101,32 @@ impl<
         self.generator.get_voice_bank()
     }
 
-    pub fn render_samples<T: CmsisOperations>(&mut self, output_samples: &mut [Q15; WINDOW_SIZE]) {
+    pub fn check_and_apply_config(&mut self) {
         if self.config_consumer.published() {
             self.config_consumer.consume();
-        }
-        let config = self.config_consumer.get();
+            let config = self.config_consumer.get();
+            self.generator.apply_config(config);
 
-        self.generator.apply_config(config);
-
-        #[cfg(feature = "octave-filter")]
-        self.octave_filter
-            .set_band_gains_from_config::<_, _, OCTAVE_FILTER_FIRST_PAGE>(config);
-
-        let mut buffer = [Q15::ZERO; WINDOW_SIZE];
-        self.generator.render_samples::<T>(&mut buffer);
-
-        #[cfg(feature = "octave-filter")]
-        {
+            #[cfg(feature = "octave-filter")]
             self.octave_filter
-                .process::<T, WINDOW_SIZE>(&buffer, output_samples);
+                .set_band_gains_from_config::<_, _, OCTAVE_FILTER_FIRST_PAGE>(config);
         }
+    }
+
+    pub fn render_samples<T: CmsisOperations>(&mut self, output_samples: &mut [Q15; WINDOW_SIZE]) {
+        self.check_and_apply_config();
 
         #[cfg(not(feature = "octave-filter"))]
         {
-            output_samples.copy_from_slice(&buffer);
+            self.generator.render_samples::<T>(output_samples);
+        }
+
+        #[cfg(feature = "octave-filter")]
+        {
+            let mut buffer = [Q15::ZERO; WINDOW_SIZE];
+            self.generator.render_samples::<T>(&mut buffer);
+            self.octave_filter
+                .process::<T, WINDOW_SIZE>(&buffer, output_samples);
         }
     }
 }

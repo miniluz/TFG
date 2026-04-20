@@ -1,7 +1,7 @@
 use defmt::info;
+use embassy_stm32::Config;
 use embassy_stm32::exti::ExtiInput;
 use embassy_stm32::gpio::{Input, Pull};
-use embassy_stm32::Config;
 
 pub struct InputHardware<'a> {
     pub button_page_down: ExtiInput<'a>,
@@ -95,13 +95,21 @@ impl Hardware {
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
         let input_hardware = InputHardware {
+            // A0
             button_page_down: ExtiInput::new(peripherals.PA3, peripherals.EXTI3, Pull::Up),
+            // Internal
             button_page_up: ExtiInput::new(peripherals.PC13, peripherals.EXTI13, Pull::None),
+            // A3
             encoder0_exti: ExtiInput::new(peripherals.PB1, peripherals.EXTI1, Pull::Up),
+            // D72
             encoder0_input: Input::new(peripherals.PB2, Pull::Up),
+            // A4
             encoder1_exti: ExtiInput::new(peripherals.PC2, peripherals.EXTI2, Pull::Up),
+            // D71
             encoder1_input: Input::new(peripherals.PE9, Pull::Up),
+            // A5
             encoder2_exti: ExtiInput::new(peripherals.PF10, peripherals.EXTI10, Pull::Up),
+            // D70
             encoder2_input: Input::new(peripherals.PF2, Pull::Up),
         };
 
