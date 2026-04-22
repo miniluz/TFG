@@ -1,7 +1,7 @@
 use defmt::Format;
 use midi::MidiEvent;
 
-use crate::{adsr::ADSR, wavetable::WavetableOscillator, SAMPLE_RATE};
+use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
 
 /// A MIDI note number (0-127)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -160,20 +160,19 @@ pub struct VoiceBank<'a, const N: usize> {
 
 impl<'a, const N: usize> Format for VoiceBank<'a, N> {
     fn format(&self, fmt: defmt::Formatter) {
-        defmt::write!(fmt, "VoiceBank {{\n");
+        defmt::write!(fmt, "VoiceBank {{ ");
 
-        for (i, voice) in self.voices.iter().enumerate() {
+        for voice in self.voices.iter() {
             defmt::write!(
                 fmt,
-                "   Voice {}: {} ({}) ({})\n",
-                i,
+                "{} ({}) ({}),  ",
                 voice.note,
                 voice.velocity,
                 voice.adsr.stage
             )
         }
 
-        defmt::write!(fmt, "}}");
+        defmt::write!(fmt, " }}");
     }
 }
 

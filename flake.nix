@@ -74,6 +74,9 @@
                 typst
                 drawio
                 entr
+
+                vmpk
+                qpwgraph
               ]);
             buildInputs = [ ];
           };

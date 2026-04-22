@@ -4,12 +4,19 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["midi-usb", "audio-usb", "octave-filter"]
+default = ["midi-usb", "audio-usb", "octave-filter", "polyphony-16"]
 usb = ["dep:embassy-usb"]
 midi-din = []
 midi-usb = ["usb"]
 audio-usb = ["usb"]
 octave-filter = ["synth_engine/octave-filter"]
+polyphony-1 = []
+polyphony-2 = []
+polyphony-4 = []
+polyphony-6 = []
+polyphony-8 = []
+polyphony-12 = []
+polyphony-16 = []
 
 [profile.release]
 debug = 2

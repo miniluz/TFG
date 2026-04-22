@@ -16,6 +16,19 @@ use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 #[cfg(feature = "audio-usb")]
 use embassy_sync::zerocopy_channel;
 
+#[cfg(feature = "polyphony-1")]
+const VOICE_BANK_SIZE: usize = 1;
+#[cfg(feature = "polyphony-2")]
+const VOICE_BANK_SIZE: usize = 2;
+#[cfg(feature = "polyphony-4")]
+const VOICE_BANK_SIZE: usize = 4;
+#[cfg(feature = "polyphony-6")]
+const VOICE_BANK_SIZE: usize = 6;
+#[cfg(feature = "polyphony-8")]
+const VOICE_BANK_SIZE: usize = 8;
+#[cfg(feature = "polyphony-12")]
+const VOICE_BANK_SIZE: usize = 12;
+#[cfg(feature = "polyphony-16")]
 const VOICE_BANK_SIZE: usize = 16;
 
 #[cfg(not(feature = "audio-usb"))]
@@ -25,7 +38,7 @@ const RUN_RATE_HZ: u16 = 1000;
 const WINDOW_SIZE: usize = USB_MAX_SAMPLE_COUNT;
 
 #[cfg(not(feature = "audio-usb"))]
-const WINDOW_SIZE: usize = 128;
+const WINDOW_SIZE: usize = 48;
 
 // Config dimensions using additive pattern
 const BASE_PAGE_COUNT: usize = 2; // Pages 0-1: ADSR and Oscillator
