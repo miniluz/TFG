@@ -27,8 +27,10 @@
 
 #include "06_implementación/06_10_CMSIS.typ"
 
-== Lectura de USB
+#include "06_implementación/06_11_MIDI_UART.typ"
 
-== Lectura de UART
+#include "06_implementación/06_12_USB.typ"
 
 == Compilación condicional
+
+== Soporte de múltiples dispositivos

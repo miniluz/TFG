@@ -97,7 +97,11 @@ lo más rápido posible una voz sin generar ruido. Usa una $B$ y $C$ específica
 
 La configuración `ADSRConfig` almacena:
 - el nivel que se mantiene en la etapa de decaimiento (`sustain_level`),
-- la amplitud objetivo, determinada por la velocidad de la nota (`velocity_amplitude`),
+- la amplitud objetivo, determinada por la velocidad de la nota (`velocity_amplitude`) #footnote[La velocidad es lineal
+    entre 0 y 127, pero el volumen de un sonido tiene relación logarítmica con su amplitud. En situaciones como esta,
+    donde se necesita una amplitud con volumen lineal controlado por un valor lineal, se usa la tabla
+    `DB_LINEAR_AMPLITUDE_TABLE`.
+  ],
 
 La máquina de estados `ADSRState` tiene los siguientes estados:
 - `Idle`, que emite salida cero hasta que se activa con el método `play`, pasando al estado `Attack`,

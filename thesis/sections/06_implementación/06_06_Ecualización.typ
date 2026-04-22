@@ -7,9 +7,10 @@
 
 Para la ecualización, se usa un banco de filtros. Un banco de filtros de longitud $|F|$ aplica $|F|$ filtros de paso
 bajo, banda y alto en paralelo a una señal para separarla en componentes, cada uno correspondiendo al rango de
-frecuencia de su respectivo filtro. Estas componentes se escalan independientemente, por ejemplo reduciendo un rango de
-frecuencias en particular o aumentando las componentes agudas, antes de volverlas a añadir. Idealmente, si no se escala
-ningún filtro, el componente no afecta la señal.
+frecuencia de su respectivo filtro. Estas componentes se escalan independientemente, aumentando o reduciendo el volumen
+de cada banda antes de volverlas a añadir. #footnote[Usando la tabla `DB_LINEAR_AMLITUDE_TABLE.`] Ésto se usa, por
+ejemplo, para reducir un rango de frecuencias en particular o aumentar las componentes agudas. Idealmente, si no se
+escala ningún filtro, el componente no afecta la señal.
 
 La aplicación usa 6 filtros. El primero es de paso bajo, los intermedios son de paso banda y el último de paso alto,
 para repartir entre ellos todo el rango de frecuencia. Se usan filtros IIR de Butterworth en DF1; los coeficientes se

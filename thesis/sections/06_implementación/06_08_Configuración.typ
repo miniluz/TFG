@@ -6,6 +6,12 @@
 == Configuración
 <sec_configuración>
 
+=== Durante la compilación
+
+/* TODO Hablar de feature flags */
+
+=== Durante la ejecución
+
 Sparklet se configura con dos botones y tres codificadores rotatorios. Para permitir modificar más de tres parámetros,
 se usa paginación: los codificadores rotatorios modifican los valores de la página actual, mientras que los botones
 controlan la página. El módulo responsable de gestionarlo es `ConfigManager`, que mantiene el estado de los parámetros y
