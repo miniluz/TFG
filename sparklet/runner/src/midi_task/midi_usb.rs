@@ -1,5 +1,3 @@
-pub mod hardware;
-
 use defmt::trace;
 use embassy_executor::SpawnToken;
 use embassy_stm32::peripherals;
@@ -10,8 +8,8 @@ use embassy_usb::driver::EndpointError;
 use midi::MidiListener;
 use static_cell::StaticCell;
 
+use crate::hardware::midi_usb::MidiUsbHardware;
 use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
-use hardware::MidiUsbHardware;
 
 pub struct MidiTaskState<'a> {
     midi_listener: MidiListener<'a, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE>,

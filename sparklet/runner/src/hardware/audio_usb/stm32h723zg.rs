@@ -35,20 +35,25 @@ pub static STATE: StaticCell<microphone::State> = StaticCell::new();
 #[macro_export]
 macro_rules! get_audio_usb_hardware {
     ($builder:expr) => {{
-        let state = $crate::audio_task::audio_usb::hardware::STATE
-            .init(embassy_usb::class::uac1::microphone::State::new());
+        use embassy_usb::class::uac1::microphone::{Microphone, State};
+        use $crate::hardware::audio_usb::{
+            AUDIO_CHANNELS, AudioUsbHardware, SAMPLE_RATE_HZ, SAMPLE_WIDTH, STATE,
+            USB_MAX_PACKET_SIZE,
+        };
+
+        let state = STATE.init(State::new());
 
         // Create the UAC1 Microphone class components (synchronous mode)
-        let (stream, control_monitor) = embassy_usb::class::uac1::microphone::Microphone::new(
+        let (stream, control_monitor) = Microphone::new(
             $builder,
             state,
-            $crate::audio_task::audio_usb::hardware::USB_MAX_PACKET_SIZE as u16,
-            $crate::audio_task::audio_usb::hardware::SAMPLE_WIDTH,
-            &[$crate::audio_task::audio_usb::hardware::SAMPLE_RATE_HZ],
-            &$crate::audio_task::audio_usb::hardware::AUDIO_CHANNELS,
+            USB_MAX_PACKET_SIZE as u16,
+            SAMPLE_WIDTH,
+            &[SAMPLE_RATE_HZ],
+            &AUDIO_CHANNELS,
         );
 
-        $crate::audio_task::audio_usb::hardware::AudioUsbHardware {
+        AudioUsbHardware {
             stream,
             control_monitor,
         }

@@ -17,21 +17,25 @@ bind_interrupts!(pub struct Irqs {
 #[macro_export]
 macro_rules! get_midi_din_hardware {
     ($peripherals:ident) => {{
-        let mut config = embassy_stm32::usart::Config::default();
+        use embassy_stm32::usart::{Config, UartRx};
+        use $crate::hardware::midi_din::{
+            Irqs, MIDI_UART_BUFFER, MIDI_UART_BUFFER_SIZE, MidiDinHardware,
+        };
+
+        let mut config = Config::default();
         config.baudrate = 31250;
-        let midi_uart = embassy_stm32::usart::UartRx::new(
+        let midi_uart = UartRx::new(
             $peripherals.UART4,
-            $crate::midi_task::midi_din::hardware::Irqs,
+            Irqs,
             $peripherals.PA1,
             $peripherals.DMA1_CH0,
             config,
         );
 
-        let midi_uart_buffer = $crate::midi_task::midi_din::hardware::MIDI_UART_BUFFER
-            .init([0; $crate::midi_task::midi_din::hardware::MIDI_UART_BUFFER_SIZE]);
+        let midi_uart_buffer = MIDI_UART_BUFFER.init([0; MIDI_UART_BUFFER_SIZE]);
 
         let midi_uart_buffered = midi_uart.unwrap().into_ring_buffered(midi_uart_buffer);
 
-        $crate::midi_task::midi_din::hardware::MidiDinHardware { midi_uart_buffered }
+        MidiDinHardware { midi_uart_buffered }
     }};
 }

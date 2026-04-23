@@ -1,29 +1,30 @@
 use defmt::info;
 
 #[cfg(feature = "configurable")]
-use crate::hardware::input_hardware::InputHardware;
-
-#[cfg(feature = "configurable")]
 pub mod abstractions;
+#[cfg(feature = "audio-usb")]
+pub mod audio_usb;
 #[cfg(feature = "configurable")]
-pub mod input_hardware;
-#[cfg(feature = "configurable")]
-pub mod input_task;
+pub mod config;
+#[cfg(feature = "midi-din")]
+pub mod midi_din;
+#[cfg(feature = "midi-usb")]
+pub mod midi_usb;
 
 pub struct Hardware {
     #[cfg(feature = "midi-din")]
-    pub midi_hardware: crate::midi_task::midi_din::hardware::MidiDinHardware<'static>,
+    pub midi_hardware: midi_din::MidiDinHardware<'static>,
     #[cfg(feature = "midi-usb")]
-    pub midi_hardware: crate::midi_task::midi_usb::hardware::MidiUsbHardware<'static>,
+    pub midi_hardware: midi_usb::MidiUsbHardware<'static>,
     #[cfg(feature = "usb")]
     pub usb_builder: embassy_usb::Builder<
         'static,
         embassy_stm32::usb::Driver<'static, embassy_stm32::peripherals::USB_OTG_HS>,
     >,
     #[cfg(feature = "audio-usb")]
-    pub audio_hardware: crate::audio_task::audio_usb::hardware::AudioUsbHardware<'static>,
+    pub audio_hardware: audio_usb::AudioUsbHardware<'static>,
     #[cfg(feature = "configurable")]
-    pub input_hardware: InputHardware,
+    pub config_hardware: config::ConfigHardware,
 }
 
 impl Hardware {
@@ -92,21 +93,7 @@ impl Hardware {
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
         #[cfg(feature = "configurable")]
-        let input_hardware = {
-            InputHardware::new(
-                peripherals.PA3,
-                peripherals.PC13,
-                peripherals.TIM2,
-                peripherals.PA15,
-                peripherals.PB3,
-                peripherals.TIM3,
-                peripherals.PA6,
-                peripherals.PB5,
-                peripherals.TIM4,
-                peripherals.PB6,
-                peripherals.PB7,
-            )
-        };
+        let config_hardware = crate::get_config_hardware!(peripherals);
 
         Hardware {
             #[cfg(feature = "midi-din")]
@@ -118,7 +105,7 @@ impl Hardware {
             #[cfg(feature = "audio-usb")]
             audio_hardware,
             #[cfg(feature = "configurable")]
-            input_hardware,
+            config_hardware,
         }
     }
 }

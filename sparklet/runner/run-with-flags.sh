@@ -5,6 +5,8 @@ if [ $# -eq 0 ]; then
    exit 1
 fi
 
+model=$(tomlq '.chip.model' Config.toml)
+model=${model#\"}; model=${model%\"}
 midi=$(tomlq '.connections.midi' Config.toml)
 audio=$(tomlq '.connections.audio' Config.toml)
 octave=$(tomlq '.features["octave_filter"]' Config.toml)
@@ -12,6 +14,7 @@ config=$(tomlq '.features["configurable"]' Config.toml)
 
 flags=(--no-default-features)
 
+flags+=(--features $model)
 [ "$midi" = '"usb"' ] && flags+=(--features midi-usb)
 [ "$midi" = '"din"' ] && flags+=(--features midi-din)
 [ "$audio" = '"usb"' ] && flags+=(--features audio-usb)

@@ -1,14 +1,18 @@
-use config::ConfigEvent;
+use config::{ConfigEvent, ConfigManager};
 use defmt::info;
 use embassy_time::{Duration, Ticker};
 use static_cell::StaticCell;
 
 use crate::{
-    config_task::CONFIG_EVENT_CHANNEL,
-    hardware::abstractions::{Button, QeiExt},
+    config::{CONFIG_ENCODER_COUNT, CONFIG_PAGE_COUNT, ConfigProducer, INITIAL_CONFIG},
+    hardware::{
+        abstractions::{Button, QeiExt},
+        config::ConfigHardware,
+    },
 };
 
 const DEBOUNCE_TICKS: u8 = 5;
+const UPDATE_TICKS: u16 = 4;
 
 pub struct ButtonState<'a> {
     button: &'a dyn Button,
@@ -81,6 +85,9 @@ pub struct InputTaskState<'a> {
     encoder0: EncoderState<'a>,
     encoder1: EncoderState<'a>,
     encoder2: EncoderState<'a>,
+    config_manager: ConfigManager<'a, CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>,
+    need_to_update: bool,
+    counter: u16,
 }
 
 impl<'a> InputTaskState<'a> {
@@ -90,6 +97,7 @@ impl<'a> InputTaskState<'a> {
         encoder0: &'a dyn QeiExt,
         encoder1: &'a dyn QeiExt,
         encoder2: &'a dyn QeiExt,
+        producer: ConfigProducer,
     ) -> Self {
         Self {
             button_next_page: ButtonState::new(button_next_page),
@@ -97,6 +105,9 @@ impl<'a> InputTaskState<'a> {
             encoder0: EncoderState::new(encoder0),
             encoder1: EncoderState::new(encoder1),
             encoder2: EncoderState::new(encoder2),
+            config_manager: ConfigManager::from_config(producer, INITIAL_CONFIG),
+            need_to_update: false,
+            counter: 0,
         }
     }
 }
@@ -105,24 +116,30 @@ static INPUT_STATE: StaticCell<InputTaskState> = StaticCell::new();
 
 pub fn spawn_config_hardware_tasks(
     spawner: &embassy_executor::Spawner,
-    input_hardware: crate::hardware::input_hardware::InputHardware,
+    producer: ConfigProducer,
+    config_hardware: ConfigHardware,
 ) {
     spawner
         .spawn(input_task(INPUT_STATE.init(InputTaskState::new(
-            input_hardware.button_next_page,
-            input_hardware.button_prev_page,
-            input_hardware.encoder0,
-            input_hardware.encoder1,
-            input_hardware.encoder2,
+            config_hardware.button_next_page,
+            config_hardware.button_prev_page,
+            config_hardware.encoder0,
+            config_hardware.encoder1,
+            config_hardware.encoder2,
+            producer,
         ))))
         .unwrap();
+}
+
+pub fn handle_event<'a>(state: &mut InputTaskState<'a>, event: ConfigEvent) {
+    if state.config_manager.handle_event(event) {
+        state.need_to_update = true;
+    }
 }
 
 #[embassy_executor::task]
 pub async fn input_task(state: &'static mut InputTaskState<'static>) {
     info!("Input task started");
-
-    let sender = CONFIG_EVENT_CHANNEL.sender();
 
     let mut ticker = Ticker::every(Duration::from_millis(5));
 
@@ -130,38 +147,48 @@ pub async fn input_task(state: &'static mut InputTaskState<'static>) {
         ticker.next().await;
 
         if state.button_next_page.process() {
-            sender.try_send(ConfigEvent::PageChange { amount: 1 }).ok();
+            handle_event(state, ConfigEvent::PageChange { amount: 1 });
         }
 
         if state.button_prev_page.process() {
-            sender.try_send(ConfigEvent::PageChange { amount: -1 }).ok();
+            handle_event(state, ConfigEvent::PageChange { amount: -1 });
         }
 
         if let Some(diff) = state.encoder0.process() {
-            sender
-                .try_send(ConfigEvent::EncoderChange {
+            handle_event(
+                state,
+                ConfigEvent::EncoderChange {
                     encoder: 0,
                     amount: diff,
-                })
-                .ok();
+                },
+            )
         }
 
         if let Some(diff) = state.encoder1.process() {
-            sender
-                .try_send(ConfigEvent::EncoderChange {
+            handle_event(
+                state,
+                ConfigEvent::EncoderChange {
                     encoder: 1,
                     amount: diff,
-                })
-                .ok();
+                },
+            );
         }
 
         if let Some(diff) = state.encoder2.process() {
-            sender
-                .try_send(ConfigEvent::EncoderChange {
+            handle_event(
+                state,
+                ConfigEvent::EncoderChange {
                     encoder: 2,
                     amount: diff,
-                })
-                .ok();
+                },
+            );
         }
+
+        if state.need_to_update && state.counter.is_multiple_of(UPDATE_TICKS) {
+            state.config_manager.publish_config();
+            state.need_to_update = false;
+        }
+
+        state.counter = (state.counter + 1) % UPDATE_TICKS;
     }
 }

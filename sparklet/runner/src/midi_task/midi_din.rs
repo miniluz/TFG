@@ -5,10 +5,8 @@ use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use midi::MidiListener;
 use static_cell::StaticCell;
 
+use crate::hardware::midi_din::MidiDinHardware;
 use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
-use hardware::MidiDinHardware;
-
-pub mod hardware;
 
 pub struct MidiTaskState<'a> {
     midi_listener: MidiListener<'a, CriticalSectionRawMutex, MIDI_CHANNEL_SIZE>,

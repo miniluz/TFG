@@ -1,5 +1,3 @@
-pub mod hardware;
-
 use cmsis_native::CmsisNativeOperations;
 use core::sync::atomic::{AtomicI16, Ordering};
 use defmt::info;
@@ -15,9 +13,10 @@ use static_cell::StaticCell;
 use synth_engine::Q15;
 use synth_engine::adsr::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
 
-use hardware::AudioUsbHardware;
+use crate::hardware::audio_usb::{
+    AUDIO_CHANNELS, AudioUsbHardware, USB_MAX_PACKET_SIZE, USB_MAX_SAMPLE_COUNT,
+};
 
-pub use hardware::{AUDIO_CHANNELS, USB_MAX_PACKET_SIZE, USB_MAX_SAMPLE_COUNT};
 use synth_engine::CmsisOperations;
 
 /// Shared volume state accessible from both tasks

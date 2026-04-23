@@ -3,6 +3,9 @@ use amity::triple::{TripleBuffer, TripleBufferConsumer, TripleBufferProducer};
 use config::Config;
 use static_cell::StaticCell;
 
+#[cfg(feature = "configurable")]
+pub mod task;
+
 const BASE_PAGE_COUNT: usize = 2;
 
 #[cfg(feature = "octave-filter")]
