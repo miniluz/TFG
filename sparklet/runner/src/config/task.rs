@@ -4,6 +4,7 @@ use embassy_time::{Duration, Ticker};
 use static_cell::StaticCell;
 
 use crate::{
+    build_config::BUILD_CONFIG,
     config::{CONFIG_ENCODER_COUNT, CONFIG_PAGE_COUNT, ConfigProducer, INITIAL_CONFIG},
     hardware::{
         abstractions::{Button, QeiExt},
@@ -12,7 +13,9 @@ use crate::{
 };
 
 const DEBOUNCE_TICKS: u8 = 5;
-const UPDATE_TICKS: u16 = 4;
+const CONFIG_POLL_MILLIS: u16 = BUILD_CONFIG.parameters.config_poll_millis;
+const CONFIG_UPDATE_RATE: u16 = BUILD_CONFIG.parameters.config_update_millis / CONFIG_POLL_MILLIS;
+const ENCODER_MULTIPLIER: i8 = BUILD_CONFIG.parameters.encoder_multiplier;
 
 pub struct ButtonState<'a> {
     button: &'a dyn Button,
@@ -141,7 +144,7 @@ pub fn handle_event<'a>(state: &mut InputTaskState<'a>, event: ConfigEvent) {
 pub async fn input_task(state: &'static mut InputTaskState<'static>) {
     info!("Input task started");
 
-    let mut ticker = Ticker::every(Duration::from_millis(5));
+    let mut ticker = Ticker::every(Duration::from_millis(CONFIG_POLL_MILLIS.into()));
 
     loop {
         ticker.next().await;
@@ -159,7 +162,7 @@ pub async fn input_task(state: &'static mut InputTaskState<'static>) {
                 state,
                 ConfigEvent::EncoderChange {
                     encoder: 0,
-                    amount: diff,
+                    amount: diff * ENCODER_MULTIPLIER,
                 },
             )
         }
@@ -169,7 +172,7 @@ pub async fn input_task(state: &'static mut InputTaskState<'static>) {
                 state,
                 ConfigEvent::EncoderChange {
                     encoder: 1,
-                    amount: diff,
+                    amount: diff * ENCODER_MULTIPLIER,
                 },
             );
         }
@@ -179,16 +182,16 @@ pub async fn input_task(state: &'static mut InputTaskState<'static>) {
                 state,
                 ConfigEvent::EncoderChange {
                     encoder: 2,
-                    amount: diff,
+                    amount: diff * ENCODER_MULTIPLIER,
                 },
             );
         }
 
-        if state.need_to_update && state.counter.is_multiple_of(UPDATE_TICKS) {
+        if state.need_to_update && state.counter.is_multiple_of(CONFIG_UPDATE_RATE) {
             state.config_manager.publish_config();
             state.need_to_update = false;
         }
 
-        state.counter = (state.counter + 1) % UPDATE_TICKS;
+        state.counter = (state.counter + 1) % CONFIG_UPDATE_RATE;
     }
 }

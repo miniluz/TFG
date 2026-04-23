@@ -9,6 +9,13 @@ configurable = true
 
 [parameters]
 polyphony = 16
+# Increase it to make the encoders more responsive.
+# Make it negative to invert them.
+encoder_multiplier = 4
+# How often to poll peripherals for changes in milliseconds
+config_poll_millis = 5
+# How often to update the config in miliseconds
+config_update_millis = 100
 
 [initial_config]
 # All values in this section are in the range 0 to 255

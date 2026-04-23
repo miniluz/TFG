@@ -15,6 +15,21 @@ fn main() {
 
     let params = config.get("parameters").unwrap();
     let polyphony = params.get("polyphony").unwrap().as_integer().unwrap() as usize;
+    let encoder_multiplier = params
+        .get("encoder_multiplier")
+        .unwrap()
+        .as_integer()
+        .unwrap() as i8;
+    let config_poll_millis = params
+        .get("config_poll_millis")
+        .unwrap()
+        .as_integer()
+        .unwrap() as u16;
+    let config_update_millis = params
+        .get("config_update_millis")
+        .unwrap()
+        .as_integer()
+        .unwrap() as u16;
 
     let init = config.get("initial_config").unwrap();
     let get_u8 = |k| init.get(k).unwrap().as_integer().unwrap() as u8;
@@ -48,6 +63,9 @@ pub struct InitialConfig {{
 
 pub struct Parameters {{
     pub polyphony: usize,
+    pub encoder_multiplier: i8,
+    pub config_poll_millis: u16,
+    pub config_update_millis: u16,
 }}
 
 pub struct BuildConfig {{
@@ -70,6 +88,9 @@ pub const BUILD_CONFIG: BuildConfig = BuildConfig {{
     }},
     parameters: Parameters {{
         polyphony: {polyphony},
+        encoder_multiplier: {encoder_multiplier},
+        config_poll_millis: {config_poll_millis},
+        config_update_millis: {config_update_millis},
     }},
 }};
 "#
