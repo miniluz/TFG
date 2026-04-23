@@ -5,7 +5,7 @@ use static_cell::StaticCell;
 
 use crate::{
     config_task::CONFIG_EVENT_CHANNEL,
-    hardware_abstractions::{Button, QeiExt},
+    hardware::abstractions::{Button, QeiExt},
 };
 
 const DEBOUNCE_TICKS: u8 = 5;

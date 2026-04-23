@@ -8,10 +8,6 @@ mod config;
 #[cfg(feature = "configurable")]
 mod config_task;
 mod hardware;
-#[cfg(feature = "configurable")]
-mod hardware_abstractions;
-#[cfg(feature = "configurable")]
-mod input_task;
 mod midi_task;
 mod synth_engine_task;
 
@@ -86,7 +82,7 @@ fn main() -> ! {
             spawner.spawn(config_manager_task).unwrap();
 
             info!("Spawning input hardware tasks");
-            input_task::spawn_config_hardware_tasks(&spawner, hardware.input_hardware);
+            hardware::input_task::spawn_config_hardware_tasks(&spawner, hardware.input_hardware);
         }
 
         info!("Spawning Synth Engine task");

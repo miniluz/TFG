@@ -9,9 +9,14 @@ use embassy_stm32::timer::qei::{Qei, QeiPin};
 use static_cell::StaticCell;
 
 #[cfg(feature = "configurable")]
-use crate::hardware_abstractions::{ActiveLow, InputWithPolarity};
+use abstractions::{ActiveLow, InputWithPolarity};
 #[cfg(feature = "configurable")]
-use crate::hardware_abstractions::{Button, QeiExt};
+use abstractions::{Button, QeiExt};
+
+#[cfg(feature = "configurable")]
+pub mod abstractions;
+#[cfg(feature = "configurable")]
+pub mod input_task;
 
 #[cfg(feature = "configurable")]
 pub struct InputHardware {
