@@ -33,24 +33,32 @@ macro_rules! get_config_hardware {
 
         ConfigHardware {
             button_next_page: BUTTON_NEXT_PAGE.init(InputWithPolarity::<ActiveLow>::new(
+                // A0, left, left, first from top of split
                 Input::new($peripherals.PA3, Pull::Up),
             )),
             button_prev_page: BUTTON_PREV_PAGE.init(InputWithPolarity::<ActiveLow>::new(
+                // Internal
                 Input::new($peripherals.PC13, Pull::None),
             )),
             encoder0: ENCODER0_QEI.init(Qei::new(
                 $peripherals.TIM2,
+                // D20, right, left, fifth from top
                 QeiPin::new($peripherals.PA15),
+                // D23, right, left, eight from top
                 QeiPin::new($peripherals.PB3),
             )),
             encoder1: ENCODER1_QEI.init(Qei::new(
                 $peripherals.TIM3,
+                // D12, right, right, sixth from top
                 QeiPin::new($peripherals.PA6),
+                // D23, D11, right, right, seventh from top
                 QeiPin::new($peripherals.PB5),
             )),
             encoder2: ENCODER2_QEI.init(Qei::new(
                 $peripherals.TIM4,
+                // D1 right, right, seventh from top of split
                 QeiPin::new($peripherals.PB6),
+                // D0 right, right, eigth from top of split
                 QeiPin::new($peripherals.PB7),
             )),
         }
