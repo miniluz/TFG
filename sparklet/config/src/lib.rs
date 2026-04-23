@@ -15,23 +15,52 @@ pub struct Page<const ENCODER_AMOUNT: usize> {
 }
 
 impl<const ENCODER_AMOUNT: usize> Page<ENCODER_AMOUNT> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             values: [127; ENCODER_AMOUNT],
         }
     }
+
+    pub fn from_config(config: [u8; ENCODER_AMOUNT]) -> Self {
+        Self { values: config }
+    }
 }
 
+impl<const ENCODER_AMOUNT: usize> Default for Page<ENCODER_AMOUNT> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/* Schema:
+ *   First page: Attack, Sustain, Decay/Release
+ *   Second page: Oscilator, unused, unused
+ *   Third page and fourth page: Equalizer bank, from lowest to highest
+ */
 #[derive(Format, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Config<const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize> {
     pub pages: [Page<ENCODER_AMOUNT>; PAGE_AMOUNT],
 }
 
 impl<const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize> Config<PAGE_AMOUNT, ENCODER_AMOUNT> {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             pages: [Page::<ENCODER_AMOUNT>::new(); PAGE_AMOUNT],
         }
+    }
+
+    pub fn from_config(config: [[u8; ENCODER_AMOUNT]; PAGE_AMOUNT]) -> Self {
+        Self {
+            pages: config.map(Page::from_config),
+        }
+    }
+}
+
+impl<const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize> Default
+    for Config<PAGE_AMOUNT, ENCODER_AMOUNT>
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -61,6 +90,25 @@ impl<'buf, const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize>
         Self {
             producer,
             config: Config::new(),
+            current_page: 0,
+        }
+    }
+
+    pub fn from_config(
+        producer: TripleBufferProducer<
+            Config<PAGE_AMOUNT, ENCODER_AMOUNT>,
+            &'buf TripleBuffer<Config<PAGE_AMOUNT, ENCODER_AMOUNT>>,
+        >,
+        config: [[u8; ENCODER_AMOUNT]; PAGE_AMOUNT],
+    ) -> Self {
+        assert!(PAGE_AMOUNT > 0);
+        assert!(PAGE_AMOUNT <= 256);
+        assert!(ENCODER_AMOUNT > 0);
+        assert!(ENCODER_AMOUNT <= 256);
+
+        Self {
+            producer,
+            config: Config::from_config(config),
             current_page: 0,
         }
     }

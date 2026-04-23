@@ -1,12 +1,12 @@
-use amity::triple::{TripleBuffer, TripleBufferConsumer, TripleBufferProducer};
 use cmsis_native::CmsisNativeOperations;
-use config::Config;
 use defmt::info;
 use embassy_executor::SpawnToken;
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use static_cell::StaticCell;
 use synth_engine::{Q15, SynthEngine};
 
+use crate::build_config::BUILD_CONFIG;
+use crate::config::ConfigConsumer;
 use crate::midi_task::{MIDI_CHANNEL_SIZE, MIDI_TASK_CHANNEL};
 
 #[cfg(feature = "audio-usb")]
@@ -16,20 +16,7 @@ use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 #[cfg(feature = "audio-usb")]
 use embassy_sync::zerocopy_channel;
 
-#[cfg(feature = "polyphony-1")]
-const VOICE_BANK_SIZE: usize = 1;
-#[cfg(feature = "polyphony-2")]
-const VOICE_BANK_SIZE: usize = 2;
-#[cfg(feature = "polyphony-4")]
-const VOICE_BANK_SIZE: usize = 4;
-#[cfg(feature = "polyphony-6")]
-const VOICE_BANK_SIZE: usize = 6;
-#[cfg(feature = "polyphony-8")]
-const VOICE_BANK_SIZE: usize = 8;
-#[cfg(feature = "polyphony-12")]
-const VOICE_BANK_SIZE: usize = 12;
-#[cfg(feature = "polyphony-16")]
-const VOICE_BANK_SIZE: usize = 16;
+const VOICE_BANK_SIZE: usize = BUILD_CONFIG.parameters.polyphony;
 
 #[cfg(not(feature = "audio-usb"))]
 const RUN_RATE_HZ: u16 = 1000;
@@ -57,58 +44,6 @@ const OCTAVE_FILTER_FIRST_PAGE: usize = BASE_PAGE_COUNT; // Starts after base pa
 
 #[cfg(not(feature = "octave-filter"))]
 const OCTAVE_FILTER_FIRST_PAGE: usize = 0; // Unused but needed for type signature
-
-// Default ADSR configuration
-const ATTACK_CONFIG: u8 = 40;
-const DECAY_RELEASE_CONFIG: u8 = 127;
-const SUSTAIN_CONFIG: u8 = 200;
-
-// Type aliases for the triple buffer halves
-type ConfigBuffer = TripleBuffer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>>;
-pub type ConfigProducer =
-    TripleBufferProducer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>, &'static ConfigBuffer>;
-pub type ConfigConsumer =
-    TripleBufferConsumer<Config<CONFIG_PAGE_COUNT, CONFIG_ENCODER_COUNT>, &'static ConfigBuffer>;
-
-// Static triple buffer for config transport
-static CONFIG_TRIPLE_BUFFER: StaticCell<ConfigBuffer> = StaticCell::new();
-
-/// Initialise the config triple buffer and return the producer/consumer halves.
-/// Must be called exactly once before creating the config manager or synth engine tasks.
-pub fn init_config_transport() -> (ConfigProducer, ConfigConsumer) {
-    #[cfg(feature = "octave-filter")]
-    let initial_config = Config {
-        pages: [
-            config::Page {
-                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
-            }, // Page 0: ADSR
-            config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
-            config::Page {
-                values: [200, 200, 200],
-            }, // Page 2: Octave filter bands 0-2 (default gain)
-            config::Page {
-                values: [200, 200, 200],
-            }, // Page 3: Octave filter bands 3-5 (default gain)
-        ],
-    };
-
-    #[cfg(not(feature = "octave-filter"))]
-    let initial_config = Config {
-        pages: [
-            config::Page {
-                values: [ATTACK_CONFIG, SUSTAIN_CONFIG, DECAY_RELEASE_CONFIG],
-            }, // Page 0: ADSR
-            config::Page { values: [1, 0, 0] }, // Page 1: Oscillator type = 1 (sawtooth)
-        ],
-    };
-
-    let buf = CONFIG_TRIPLE_BUFFER.init(TripleBuffer::new(
-        initial_config,
-        initial_config,
-        initial_config,
-    ));
-    buf.split_mut()
-}
 
 pub struct SynthEngineTaskState<'ch, 'wt, 'buf> {
     synth_engine: SynthEngine<

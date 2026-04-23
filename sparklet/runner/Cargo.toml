@@ -4,19 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["midi-usb", "audio-usb", "octave-filter", "polyphony-16"]
+default = ["configurable", "midi-usb", "audio-usb", "octave-filter"]
+configurable = []
 usb = ["dep:embassy-usb"]
 midi-din = []
 midi-usb = ["usb"]
 audio-usb = ["usb"]
 octave-filter = ["synth_engine/octave-filter"]
-polyphony-1 = []
-polyphony-2 = []
-polyphony-4 = []
-polyphony-6 = []
-polyphony-8 = []
-polyphony-12 = []
-polyphony-16 = []
 
 [profile.release]
 debug = 2
@@ -42,3 +36,6 @@ midi = { path = "../midi" }
 synth_engine = { path = "../synth-engine", default-features = false }
 cmsis-native = { path = "../cmsis-native" }
 config = { path = "../config" }
+
+[build-dependencies]
+toml = "0.8"

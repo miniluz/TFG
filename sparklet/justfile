@@ -1,6 +1,3 @@
-# Justfile for synth-engine table generation
-# Usage: just <recipe>
-
 # Default recipe - show available commands
 default:
     @just --list

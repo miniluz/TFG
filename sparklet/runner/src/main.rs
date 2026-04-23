@@ -1,8 +1,14 @@
 #![no_std]
 #![no_main]
 
+mod build_config {
+    include!(concat!(env!("OUT_DIR"), "/build_config.rs"));
+}
+mod config;
+#[cfg(feature = "configurable")]
 mod config_task;
 mod hardware;
+#[cfg(feature = "configurable")]
 mod input_task;
 mod midi_task;
 mod synth_engine_task;
@@ -49,10 +55,13 @@ fn main() -> ! {
     };
 
     info!("Initialising config transport");
-    let (config_producer, config_consumer) = synth_engine_task::init_config_transport();
+    let (config_producer, config_consumer) = config::init_config_transport();
 
     info!("Creating config tasks");
+    #[cfg(feature = "configurable")]
     let config_manager_task = config_task::create_config_manager_task(config_producer);
+    #[cfg(not(feature = "configurable"))]
+    config::send_initial_config(config_producer);
 
     info!("Creating synth engine task");
     #[cfg(feature = "audio-usb")]
@@ -69,11 +78,14 @@ fn main() -> ! {
             spawner.spawn(midi_task).unwrap();
         }
 
-        info!("Spawning Config Manager task");
-        spawner.spawn(config_manager_task).unwrap();
+        #[cfg(feature = "configurable")]
+        {
+            info!("Spawning Config Manager task");
+            spawner.spawn(config_manager_task).unwrap();
 
-        info!("Spawning input hardware tasks");
-        input_task::spawn_config_hardware_tasks(&spawner, hardware.input_hardware);
+            info!("Spawning input hardware tasks");
+            input_task::spawn_config_hardware_tasks(&spawner, hardware.input_hardware);
+        }
 
         info!("Spawning Synth Engine task");
         spawner.spawn(synth_engine_task).unwrap();

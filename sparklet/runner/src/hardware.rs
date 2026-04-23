@@ -1,8 +1,11 @@
 use defmt::info;
 use embassy_stm32::Config;
+#[cfg(feature = "configurable")]
 use embassy_stm32::exti::ExtiInput;
+#[cfg(feature = "configurable")]
 use embassy_stm32::gpio::{Input, Pull};
 
+#[cfg(feature = "configurable")]
 pub struct InputHardware<'a> {
     pub button_page_down: ExtiInput<'a>,
     pub button_page_up: ExtiInput<'a>,
@@ -26,6 +29,7 @@ pub struct Hardware {
     >,
     #[cfg(feature = "audio-usb")]
     pub audio_hardware: crate::audio_task::audio_usb::hardware::AudioUsbHardware<'static>,
+    #[cfg(feature = "configurable")]
     pub input_hardware: InputHardware<'static>,
 }
 
@@ -94,6 +98,7 @@ impl Hardware {
         #[cfg(feature = "audio-usb")]
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
+        #[cfg(feature = "configurable")]
         let input_hardware = InputHardware {
             // A0
             button_page_down: ExtiInput::new(peripherals.PA3, peripherals.EXTI3, Pull::Up),
@@ -122,6 +127,7 @@ impl Hardware {
             usb_builder,
             #[cfg(feature = "audio-usb")]
             audio_hardware,
+            #[cfg(feature = "configurable")]
             input_hardware,
         }
     }

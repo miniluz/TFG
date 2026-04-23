@@ -1,0 +1,18 @@
+default:
+    @just --list
+
+build:
+    @./run-with-flags.sh cargo build --release
+
+run:
+    @./run-with-flags.sh cargo run --release
+
+run-info:
+    @DEFMT_LOG=info ./run-with-flags.sh cargo run --release
+
+run-trace:
+    @DEFMT_LOG=trace ./run-with-flags.sh cargo run --release
+
+test:
+    @vmpk &
+    @qpwgraph &

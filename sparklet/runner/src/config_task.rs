@@ -4,17 +4,7 @@ use embassy_executor::SpawnToken;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel};
 use static_cell::StaticCell;
 
-use crate::synth_engine_task::ConfigProducer;
-
-const BASE_PAGE_COUNT: usize = 2;
-
-#[cfg(feature = "octave-filter")]
-const OCTAVE_FILTER_PAGE_COUNT: usize = 2;
-#[cfg(not(feature = "octave-filter"))]
-const OCTAVE_FILTER_PAGE_COUNT: usize = 0;
-
-const CONFIG_PAGE_COUNT: usize = BASE_PAGE_COUNT + OCTAVE_FILTER_PAGE_COUNT;
-const CONFIG_ENCODER_COUNT: usize = 3;
+use crate::config::{CONFIG_ENCODER_COUNT, CONFIG_PAGE_COUNT, ConfigProducer, INITIAL_CONFIG};
 
 const CONFIG_CHANNEL_SIZE: usize = 32;
 pub static CONFIG_EVENT_CHANNEL: Channel<
@@ -38,7 +28,7 @@ impl<'buf> ConfigManagerTaskState<'buf> {
 pub static CONFIG_MANAGER_TASK_STATE: StaticCell<ConfigManagerTaskState> = StaticCell::new();
 
 pub fn create_config_manager_task(producer: ConfigProducer) -> SpawnToken<impl Sized> {
-    let config_manager = ConfigManager::new(producer);
+    let config_manager = ConfigManager::from_config(producer, INITIAL_CONFIG);
 
     config_manager_task(CONFIG_MANAGER_TASK_STATE.init(ConfigManagerTaskState::new(config_manager)))
 }
