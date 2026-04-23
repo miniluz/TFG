@@ -105,7 +105,7 @@ static INPUT_STATE: StaticCell<InputTaskState> = StaticCell::new();
 
 pub fn spawn_config_hardware_tasks(
     spawner: &embassy_executor::Spawner,
-    input_hardware: crate::hardware::InputHardware,
+    input_hardware: crate::hardware::input_hardware::InputHardware,
 ) {
     spawner
         .spawn(input_task(INPUT_STATE.init(InputTaskState::new(
