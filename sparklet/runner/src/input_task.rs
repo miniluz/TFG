@@ -1,221 +1,167 @@
 use config::ConfigEvent;
 use defmt::info;
-use embassy_stm32::exti::ExtiInput;
-use embassy_stm32::gpio::Input;
-use embassy_time::Timer;
+use embassy_time::{Duration, Ticker};
 use static_cell::StaticCell;
 
-use crate::config_task::CONFIG_EVENT_CHANNEL;
+use crate::{
+    config_task::CONFIG_EVENT_CHANNEL,
+    hardware_abstractions::{Button, QeiExt},
+};
 
-#[allow(dead_code)]
-pub enum Polarity {
-    ActiveLow,
-    ActiveHigh,
+const DEBOUNCE_TICKS: u8 = 5;
+
+pub struct ButtonState<'a> {
+    button: &'a dyn Button,
+    last_raw: bool,
+    stable: bool,
+    counter: u8,
 }
 
-pub struct Button<'a> {
-    button: ExtiInput<'a>,
-    polarity: Polarity,
-}
-
-impl<'a> Button<'a> {
-    pub fn new(button: ExtiInput<'a>, polarity: Polarity) -> Button<'a> {
-        Button { button, polarity }
-    }
-
-    pub async fn wait_for_pressed(&mut self) {
-        match self.polarity {
-            Polarity::ActiveHigh => self.button.wait_for_high().await,
-            Polarity::ActiveLow => self.button.wait_for_low().await,
-        }
-    }
-
-    pub async fn wait_for_released(&mut self) {
-        match self.polarity {
-            Polarity::ActiveHigh => self.button.wait_for_low().await,
-            Polarity::ActiveLow => self.button.wait_for_high().await,
-        }
-    }
-}
-
-pub struct ButtonTaskState<'a> {
-    button: Button<'a>,
-    page_delta: i8,
-}
-
-impl<'a> ButtonTaskState<'a> {
-    pub fn new(button: Button<'a>, page_delta: i8) -> Self {
-        Self { button, page_delta }
-    }
-}
-
-pub struct EncoderTaskState<'a> {
-    encoder_exti: ExtiInput<'a>,
-    encoder_input: Input<'a>,
-    encoder_index: u8,
-}
-
-impl<'a> EncoderTaskState<'a> {
-    pub fn new(encoder_exti: ExtiInput<'a>, encoder_input: Input<'a>, encoder_index: u8) -> Self {
+impl<'a> ButtonState<'a> {
+    pub fn new(button: &'a dyn Button) -> Self {
         Self {
-            encoder_exti,
-            encoder_input,
-            encoder_index,
+            button,
+            last_raw: false,
+            stable: false,
+            counter: 0,
+        }
+    }
+
+    pub fn process(&mut self) -> bool {
+        let mut just_pressed = false;
+
+        let raw = self.button.is_pressed();
+
+        if raw == self.last_raw {
+            if self.counter < DEBOUNCE_TICKS {
+                // Count how many ticks the button has been stable
+                self.counter += 1;
+            } else if self.stable != raw {
+                // If it's been stable long enough and it's changed, we update
+                self.stable = raw;
+
+                if raw {
+                    just_pressed = true;
+                }
+            }
+        } else {
+            self.counter = 0;
+        }
+
+        self.last_raw = raw;
+
+        just_pressed
+    }
+}
+
+pub struct EncoderState<'a> {
+    qei: &'a dyn QeiExt,
+    last: u16,
+}
+
+impl<'a> EncoderState<'a> {
+    pub fn new(qei: &'a dyn QeiExt) -> Self {
+        Self { qei, last: 0 }
+    }
+
+    pub fn process(&mut self) -> Option<i8> {
+        let current = self.qei.count();
+
+        let diff = (current.wrapping_sub(self.last) as i16).clamp(-128, 127) as i8;
+
+        self.last = current;
+
+        if diff == 0 { None } else { Some(diff) }
+    }
+}
+
+pub struct InputTaskState<'a> {
+    button_next_page: ButtonState<'a>,
+    button_prev_page: ButtonState<'a>,
+    encoder0: EncoderState<'a>,
+    encoder1: EncoderState<'a>,
+    encoder2: EncoderState<'a>,
+}
+
+impl<'a> InputTaskState<'a> {
+    pub fn new(
+        button_next_page: &'a dyn Button,
+        button_prev_page: &'a dyn Button,
+        encoder0: &'a dyn QeiExt,
+        encoder1: &'a dyn QeiExt,
+        encoder2: &'a dyn QeiExt,
+    ) -> Self {
+        Self {
+            button_next_page: ButtonState::new(button_next_page),
+            button_prev_page: ButtonState::new(button_prev_page),
+            encoder0: EncoderState::new(encoder0),
+            encoder1: EncoderState::new(encoder1),
+            encoder2: EncoderState::new(encoder2),
         }
     }
 }
 
-static BUTTON_PAGE_DOWN_STATE: StaticCell<ButtonTaskState> = StaticCell::new();
-static BUTTON_PAGE_UP_STATE: StaticCell<ButtonTaskState> = StaticCell::new();
-static ENCODER0_STATE: StaticCell<EncoderTaskState> = StaticCell::new();
-static ENCODER1_STATE: StaticCell<EncoderTaskState> = StaticCell::new();
-static ENCODER2_STATE: StaticCell<EncoderTaskState> = StaticCell::new();
+static INPUT_STATE: StaticCell<InputTaskState> = StaticCell::new();
 
 pub fn spawn_config_hardware_tasks(
     spawner: &embassy_executor::Spawner,
-    input_hardware: crate::hardware::InputHardware<'static>,
+    input_hardware: crate::hardware::InputHardware,
 ) {
-    let button_page_down = Button::new(input_hardware.button_page_down, Polarity::ActiveLow);
-    let button_page_up = Button::new(input_hardware.button_page_up, Polarity::ActiveLow);
-
     spawner
-        .spawn(button_page_down_task(
-            BUTTON_PAGE_DOWN_STATE.init(ButtonTaskState::new(button_page_down, -1)),
-        ))
-        .unwrap();
-
-    spawner
-        .spawn(button_page_up_task(
-            BUTTON_PAGE_UP_STATE.init(ButtonTaskState::new(button_page_up, 1)),
-        ))
-        .unwrap();
-
-    spawner
-        .spawn(encoder0_task(ENCODER0_STATE.init(EncoderTaskState::new(
-            input_hardware.encoder0_exti,
-            input_hardware.encoder0_input,
-            0,
-        ))))
-        .unwrap();
-
-    spawner
-        .spawn(encoder1_task(ENCODER1_STATE.init(EncoderTaskState::new(
-            input_hardware.encoder1_exti,
-            input_hardware.encoder1_input,
-            1,
-        ))))
-        .unwrap();
-
-    spawner
-        .spawn(encoder2_task(ENCODER2_STATE.init(EncoderTaskState::new(
-            input_hardware.encoder2_exti,
-            input_hardware.encoder2_input,
-            2,
+        .spawn(input_task(INPUT_STATE.init(InputTaskState::new(
+            input_hardware.button_next_page,
+            input_hardware.button_prev_page,
+            input_hardware.encoder0,
+            input_hardware.encoder1,
+            input_hardware.encoder2,
         ))))
         .unwrap();
 }
 
 #[embassy_executor::task]
-pub async fn button_page_down_task(state: &'static mut ButtonTaskState<'static>) {
-    info!("Button task started (page delta: {})", state.page_delta);
+pub async fn input_task(state: &'static mut InputTaskState<'static>) {
+    info!("Input task started");
 
     let sender = CONFIG_EVENT_CHANNEL.sender();
 
-    loop {
-        state.button.wait_for_pressed().await;
-        info!("Button pressed! Sending page change: {}", state.page_delta);
-
-        sender
-            .send(ConfigEvent::PageChange {
-                amount: state.page_delta,
-            })
-            .await;
-
-        Timer::after_millis(200).await;
-        state.button.wait_for_released().await;
-    }
-}
-
-#[embassy_executor::task]
-pub async fn button_page_up_task(state: &'static mut ButtonTaskState<'static>) {
-    info!("Button task started (page delta: {})", state.page_delta);
-
-    let sender = CONFIG_EVENT_CHANNEL.sender();
+    let mut ticker = Ticker::every(Duration::from_millis(5));
 
     loop {
-        state.button.wait_for_pressed().await;
-        info!("Button pressed! Sending page change: {}", state.page_delta);
+        ticker.next().await;
 
-        sender
-            .send(ConfigEvent::PageChange {
-                amount: state.page_delta,
-            })
-            .await;
+        if state.button_next_page.process() {
+            sender.try_send(ConfigEvent::PageChange { amount: 1 }).ok();
+        }
 
-        Timer::after_millis(200).await;
-        state.button.wait_for_released().await;
-    }
-}
+        if state.button_prev_page.process() {
+            sender.try_send(ConfigEvent::PageChange { amount: -1 }).ok();
+        }
 
-#[embassy_executor::task]
-pub async fn encoder0_task(state: &'static mut EncoderTaskState<'static>) {
-    info!("Encoder {} task started", state.encoder_index);
+        if let Some(diff) = state.encoder0.process() {
+            sender
+                .try_send(ConfigEvent::EncoderChange {
+                    encoder: 0,
+                    amount: diff,
+                })
+                .ok();
+        }
 
-    let sender = CONFIG_EVENT_CHANNEL.sender();
+        if let Some(diff) = state.encoder1.process() {
+            sender
+                .try_send(ConfigEvent::EncoderChange {
+                    encoder: 1,
+                    amount: diff,
+                })
+                .ok();
+        }
 
-    loop {
-        state.encoder_exti.wait_for_rising_edge().await;
-
-        let b_state = state.encoder_input.is_high();
-        let amount = if b_state { 1 } else { -1 };
-
-        sender
-            .send(ConfigEvent::EncoderChange {
-                encoder: state.encoder_index,
-                amount,
-            })
-            .await;
-    }
-}
-
-#[embassy_executor::task]
-pub async fn encoder1_task(state: &'static mut EncoderTaskState<'static>) {
-    info!("Encoder {} task started", state.encoder_index);
-
-    let sender = CONFIG_EVENT_CHANNEL.sender();
-
-    loop {
-        state.encoder_exti.wait_for_rising_edge().await;
-
-        let b_state = state.encoder_input.is_high();
-        let amount = if b_state { 1 } else { -1 };
-
-        sender
-            .send(ConfigEvent::EncoderChange {
-                encoder: state.encoder_index,
-                amount,
-            })
-            .await;
-    }
-}
-
-#[embassy_executor::task]
-pub async fn encoder2_task(state: &'static mut EncoderTaskState<'static>) {
-    info!("Encoder {} task started", state.encoder_index);
-
-    let sender = CONFIG_EVENT_CHANNEL.sender();
-
-    loop {
-        state.encoder_exti.wait_for_rising_edge().await;
-
-        let b_state = state.encoder_input.is_high();
-        let amount = if b_state { 1 } else { -1 };
-
-        sender
-            .send(ConfigEvent::EncoderChange {
-                encoder: state.encoder_index,
-                amount,
-            })
-            .await;
+        if let Some(diff) = state.encoder2.process() {
+            sender
+                .try_send(ConfigEvent::EncoderChange {
+                    encoder: 2,
+                    amount: diff,
+                })
+                .ok();
+        }
     }
 }

@@ -1,20 +1,55 @@
 use defmt::info;
-use embassy_stm32::Config;
-#[cfg(feature = "configurable")]
-use embassy_stm32::exti::ExtiInput;
 #[cfg(feature = "configurable")]
 use embassy_stm32::gpio::{Input, Pull};
+#[cfg(feature = "configurable")]
+use embassy_stm32::peripherals::{TIM2, TIM3, TIM4};
+#[cfg(feature = "configurable")]
+use embassy_stm32::timer::qei::{Qei, QeiPin};
+#[cfg(feature = "configurable")]
+use static_cell::StaticCell;
 
 #[cfg(feature = "configurable")]
-pub struct InputHardware<'a> {
-    pub button_page_down: ExtiInput<'a>,
-    pub button_page_up: ExtiInput<'a>,
-    pub encoder0_exti: ExtiInput<'a>,
-    pub encoder0_input: Input<'a>,
-    pub encoder1_exti: ExtiInput<'a>,
-    pub encoder1_input: Input<'a>,
-    pub encoder2_exti: ExtiInput<'a>,
-    pub encoder2_input: Input<'a>,
+use crate::hardware_abstractions::{ActiveLow, InputWithPolarity};
+#[cfg(feature = "configurable")]
+use crate::hardware_abstractions::{Button, QeiExt};
+
+#[cfg(feature = "configurable")]
+pub struct InputHardware {
+    pub button_next_page: &'static dyn Button,
+    pub button_prev_page: &'static dyn Button,
+    pub encoder0: &'static dyn QeiExt,
+    pub encoder1: &'static dyn QeiExt,
+    pub encoder2: &'static dyn QeiExt,
+}
+
+#[cfg(feature = "configurable")]
+pub static BUTTON_NEXT_PAGE: StaticCell<InputWithPolarity<ActiveLow>> = StaticCell::new();
+#[cfg(feature = "configurable")]
+pub static BUTTON_PREV_PAGE: StaticCell<InputWithPolarity<ActiveLow>> = StaticCell::new();
+#[cfg(feature = "configurable")]
+pub static ENCODER0_QEI: StaticCell<Qei<TIM2>> = StaticCell::new();
+#[cfg(feature = "configurable")]
+pub static ENCODER1_QEI: StaticCell<Qei<TIM3>> = StaticCell::new();
+#[cfg(feature = "configurable")]
+pub static ENCODER2_QEI: StaticCell<Qei<TIM4>> = StaticCell::new();
+
+#[cfg(feature = "configurable")]
+impl InputHardware {
+    pub fn new(
+        button_next_page: &'static mut InputWithPolarity<'static, ActiveLow>,
+        button_prev_page: &'static mut InputWithPolarity<'static, ActiveLow>,
+        encoder0: &'static mut Qei<'static, TIM2>,
+        encoder1: &'static mut Qei<'static, TIM3>,
+        encoder2: &'static mut Qei<'static, TIM4>,
+    ) -> Self {
+        Self {
+            button_next_page,
+            button_prev_page,
+            encoder0,
+            encoder1,
+            encoder2,
+        }
+    }
 }
 
 pub struct Hardware {
@@ -30,14 +65,14 @@ pub struct Hardware {
     #[cfg(feature = "audio-usb")]
     pub audio_hardware: crate::audio_task::audio_usb::hardware::AudioUsbHardware<'static>,
     #[cfg(feature = "configurable")]
-    pub input_hardware: InputHardware<'static>,
+    pub input_hardware: InputHardware,
 }
 
 impl Hardware {
     pub fn get() -> Hardware {
         info!("Initializing");
 
-        let mut config = Config::default();
+        let mut config = embassy_stm32::Config::default();
         #[cfg(feature = "usb")]
         {
             info!("USB config being added...");
@@ -99,23 +134,40 @@ impl Hardware {
         let audio_hardware = crate::get_audio_usb_hardware!(&mut usb_builder);
 
         #[cfg(feature = "configurable")]
-        let input_hardware = InputHardware {
-            // A0
-            button_page_down: ExtiInput::new(peripherals.PA3, peripherals.EXTI3, Pull::Up),
-            // Internal
-            button_page_up: ExtiInput::new(peripherals.PC13, peripherals.EXTI13, Pull::None),
-            // A3
-            encoder0_exti: ExtiInput::new(peripherals.PB1, peripherals.EXTI1, Pull::Up),
-            // D72
-            encoder0_input: Input::new(peripherals.PB2, Pull::Up),
-            // A4
-            encoder1_exti: ExtiInput::new(peripherals.PC2, peripherals.EXTI2, Pull::Up),
-            // D71
-            encoder1_input: Input::new(peripherals.PE9, Pull::Up),
-            // A5
-            encoder2_exti: ExtiInput::new(peripherals.PF10, peripherals.EXTI10, Pull::Up),
-            // D70
-            encoder2_input: Input::new(peripherals.PF2, Pull::Up),
+        let input_hardware = {
+            InputHardware::new(
+                // A0, left, left, first from top of split
+                BUTTON_NEXT_PAGE.init(InputWithPolarity::<ActiveLow>::new(Input::new(
+                    peripherals.PA3,
+                    Pull::Up,
+                ))),
+                // Internal
+                BUTTON_PREV_PAGE.init(InputWithPolarity::<ActiveLow>::new(Input::new(
+                    peripherals.PC13,
+                    Pull::None,
+                ))),
+                ENCODER0_QEI.init(Qei::new(
+                    peripherals.TIM2,
+                    // D20, right, left, fifth from top
+                    QeiPin::new(peripherals.PA15),
+                    // D23, right, left, eight from top
+                    QeiPin::new(peripherals.PB3),
+                )),
+                ENCODER1_QEI.init(Qei::new(
+                    peripherals.TIM3,
+                    // D12, right, right, sixth from top
+                    QeiPin::new(peripherals.PA6),
+                    // D23, D11, right, right, seventh from top
+                    QeiPin::new(peripherals.PB5),
+                )),
+                ENCODER2_QEI.init(Qei::new(
+                    peripherals.TIM4,
+                    // D1 right, right, seventh from top of split
+                    QeiPin::new(peripherals.PB6),
+                    // D0 right, right, eigth from top of split
+                    QeiPin::new(peripherals.PB7),
+                )),
+            )
         };
 
         Hardware {

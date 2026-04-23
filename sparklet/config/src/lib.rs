@@ -113,12 +113,13 @@ impl<'buf, const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize>
         }
     }
 
-    fn publish_config(&mut self) {
+    pub fn publish_config(&mut self) {
         *self.producer.get_mut() = self.config;
         self.producer.publish();
     }
 
-    pub fn handle_event(&mut self, event: ConfigEvent) {
+    pub fn handle_event(&mut self, event: ConfigEvent) -> bool {
+        let mut need_to_publish = false;
         match event {
             ConfigEvent::PageChange { amount } => {
                 self.current_page = (self.current_page as isize + amount as isize)
@@ -128,7 +129,8 @@ impl<'buf, const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize>
                 let encoder = &mut self.config.pages[self.current_page % PAGE_AMOUNT].values
                     [(encoder % ENCODER_AMOUNT as u8) as usize];
                 *encoder = (*encoder).saturating_add_signed(amount);
-                self.publish_config();
+
+                need_to_publish = true;
             }
         }
         defmt::info!("Event triggered: {}", event);
@@ -137,6 +139,8 @@ impl<'buf, const PAGE_AMOUNT: usize, const ENCODER_AMOUNT: usize>
             self.current_page,
             self.config
         );
+
+        need_to_publish
     }
 }
 

@@ -9,6 +9,8 @@ mod config;
 mod config_task;
 mod hardware;
 #[cfg(feature = "configurable")]
+mod hardware_abstractions;
+#[cfg(feature = "configurable")]
 mod input_task;
 mod midi_task;
 mod synth_engine_task;

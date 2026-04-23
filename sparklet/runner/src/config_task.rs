@@ -41,6 +41,20 @@ pub async fn config_manager_task(state: &'static mut ConfigManagerTaskState<'sta
 
     loop {
         let event = receiver.receive().await;
-        state.config_manager.handle_event(event);
+
+        let mut need_to_publish = false;
+        if state.config_manager.handle_event(event) {
+            need_to_publish = true
+        };
+
+        while let Ok(event) = receiver.try_receive() {
+            if state.config_manager.handle_event(event) {
+                need_to_publish = true
+            };
+        }
+
+        if need_to_publish {
+            state.config_manager.publish_config()
+        };
     }
 }
