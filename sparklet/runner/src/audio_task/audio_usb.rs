@@ -71,9 +71,9 @@ async fn stream_handler<'d, T: usb::Instance + 'd>(
             ),
         );
 
-        receiver.receive_done();
-
         stream.write_packet(&usb_data).await?;
+
+        receiver.receive_done();
 
         packet_count += 1;
         if packet_count.is_multiple_of(1000) {
