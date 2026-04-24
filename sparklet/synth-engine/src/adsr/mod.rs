@@ -2,14 +2,10 @@ use cmsis_interface::Q15;
 use defmt::Format;
 use fixed::types::I1F31;
 
-use crate::adsr::{
-    config_table::{FALL_BASE_COEFFICIENT_TABLE, RISE_BASE_COEFFICIENT_TABLE},
-    db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE,
-};
+use crate::adsr::config_table::{FALL_BASE_COEFFICIENT_TABLE, RISE_BASE_COEFFICIENT_TABLE};
 use crate::capacitor::{Capacitor, CapacitorStatus};
 
 pub mod config_table;
-pub mod db_linear_amplitude_table;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BaseAndCoefficient {
@@ -113,17 +109,27 @@ pub(crate) struct ADSRConfig {
 impl ADSRConfig {
     pub(crate) fn new(sustain_config: u8, velocity: u8) -> Self {
         Self {
-            sustain_level: DB_LINEAR_AMPLITUDE_TABLE[sustain_config as usize],
-            velocity_amplitude: DB_LINEAR_AMPLITUDE_TABLE[(velocity * 2) as usize],
+            velocity_amplitude: Self::amplitude_for_velocity(velocity),
+            sustain_level: Self::amplitude_for_sustain_config(sustain_config),
         }
     }
 
+    pub(crate) fn amplitude_for_velocity(velocity: u8) -> I1F31 {
+        bytemuck::cast::<i32, I1F31>((velocity as i32) << 24)
+    }
+
+    pub(crate) fn amplitude_for_sustain_config(sustain_config: u8) -> I1F31 {
+        bytemuck::cast::<i32, I1F31>((sustain_config as i32) << 23)
+    }
+
     pub(crate) fn set_velocity(&mut self, velocity: u8) {
-        self.velocity_amplitude = DB_LINEAR_AMPLITUDE_TABLE[(velocity * 2) as usize];
+        // We shift 24 because velocity is actually a u7
+        self.velocity_amplitude = Self::amplitude_for_velocity(velocity);
     }
 
     pub(crate) fn set_sustain(&mut self, sustain_config: u8) {
-        self.sustain_level = DB_LINEAR_AMPLITUDE_TABLE[sustain_config as usize];
+        // We shift 23 because first bit is for sign
+        self.sustain_level = Self::amplitude_for_sustain_config(sustain_config);
     }
 }
 
@@ -155,10 +161,6 @@ impl ADSR {
             capacitor: Capacitor::new(rise_base_and_coefficient, fall_base_and_coefficient),
             config,
         }
-    }
-
-    pub fn set_velocity(&mut self, velocity: u8) {
-        self.config.set_velocity(velocity);
     }
 
     pub fn play(&mut self, velocity: u8) {
@@ -634,8 +636,8 @@ mod tests {
 
     #[test]
     fn test_sustain_level_affects_decay_target() {
-        let mut adsr_high_sustain = ADSR::new(255, 50, 100, 100); // High sustain
-        let mut adsr_low_sustain = ADSR::new(50, 50, 100, 100); // Low sustain
+        let mut adsr_high_sustain = ADSR::new(255, 50, 50, 100); // High sustain
+        let mut adsr_low_sustain = ADSR::new(50, 50, 50, 100); // Low sustain
 
         adsr_high_sustain.play(100);
         adsr_low_sustain.play(100);
@@ -663,7 +665,7 @@ mod tests {
 
     #[test]
     fn test_sustain_zero_decays_to_zero() {
-        let mut adsr = ADSR::new(0, 50, 100, 100); // Zero sustain
+        let mut adsr = ADSR::new(0, 50, 50, 100); // Zero sustain
         adsr.play(100);
 
         // Advance to sustain
@@ -730,10 +732,9 @@ mod tests {
         let final_level = get_envelope_level(&adsr);
 
         // Verify it reached the new sustain target (approximately)
-        // Since sustain config 100 maps to a specific amplitude via the table
-        let expected = db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE[100];
-        let velocity_amplitude = db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE[200];
-        let expected_sustain = expected.saturating_mul(velocity_amplitude);
+        let sustain_amplitude = ADSRConfig::amplitude_for_sustain_config(100);
+        let velocity_amplitude = ADSRConfig::amplitude_for_velocity(100);
+        let expected_sustain = sustain_amplitude.saturating_mul(velocity_amplitude);
 
         // Allow some tolerance due to rounding
         let diff = if final_level > expected_sustain {

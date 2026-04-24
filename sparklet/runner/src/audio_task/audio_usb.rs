@@ -11,7 +11,7 @@ use embassy_usb::driver::EndpointError;
 use fixed::traits::LossyInto;
 use static_cell::StaticCell;
 use synth_engine::Q15;
-use synth_engine::adsr::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
+use synth_engine::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
 
 use crate::hardware::audio_usb::{
     AUDIO_CHANNELS, AudioUsbHardware, USB_MAX_PACKET_SIZE, USB_MAX_SAMPLE_COUNT,

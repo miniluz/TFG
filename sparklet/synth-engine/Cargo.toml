@@ -12,6 +12,7 @@ required-features = ["octave-filter"]
 
 [dependencies]
 amity = { version = "0.6.3", default-features = false, features = ["triple"] }
+bytemuck = "1.24.0"
 embassy-sync = "0.7.2"
 fixed = "1.29.0"
 defmt = "1.0.1"

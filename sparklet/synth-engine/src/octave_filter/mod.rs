@@ -1,6 +1,6 @@
 pub mod filter_coefficients;
 
-use crate::adsr::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
+use crate::db_linear_amplitude_table::DB_LINEAR_AMPLITUDE_TABLE;
 use cmsis_interface::{BiquadCascadeDf1StateQ15, CmsisOperations, Q15};
 use config::Config;
 use filter_coefficients::{OCTAVE_FILTER_COEFFS, OCTAVE_FILTER_POST_SHIFT};

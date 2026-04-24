@@ -2,6 +2,7 @@
 
 pub mod adsr;
 pub mod capacitor;
+pub mod db_linear_amplitude_table;
 pub mod generator;
 #[cfg(feature = "octave-filter")]
 pub mod octave_filter;

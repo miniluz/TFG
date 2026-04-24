@@ -230,7 +230,7 @@ fn test_velocity_scaling() {
     let mut buffer2 = [Q15::ZERO; WINDOW_SIZE];
 
     // Render multiple cycles to let the ADSR envelope progress
-    for _ in 0..10 {
+    for _ in 0..100 {
         se1.render_samples::<TestOps>(&mut buffer1);
         se2.render_samples::<TestOps>(&mut buffer2);
     }
