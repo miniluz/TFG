@@ -29,4 +29,5 @@ jobs:
 
     - name: Run prek checks
       run: |
+        cp sparklet/runner/Config.example.toml sparklet/runner/Config.toml && \
         nix develop .#ci --command prek run --all-files
