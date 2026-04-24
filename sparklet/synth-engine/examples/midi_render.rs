@@ -13,7 +13,7 @@ use synth_engine::wavetable::{
     saw_wavetable::SAW_WAVETABLE, sine_wavetable::SINE_WAVETABLE,
     square_wavetable::SQUARE_WAVETABLE,
 };
-use synth_engine::{SynthEngine, Q15, SAMPLE_RATE, WINDOW_SIZE};
+use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
 const PAGE_AMOUNT: usize = 4;

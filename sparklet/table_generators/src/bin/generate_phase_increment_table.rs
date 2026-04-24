@@ -1,17 +1,12 @@
-use std::env;
-
 use fixed::types::U8F24;
 
+const SAMPLE_RATE: u32 = 48000;
+const TABLE_SIZE: usize = 256;
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let wavetable_size: u32 = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(256);
-
-    let sample_rate: u32 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(48000);
-
     eprintln!("Generating pitch table for:");
-    eprintln!("  WAVETABLE_SIZE: {}", wavetable_size);
-    eprintln!("  SAMPLE_RATE: {}", sample_rate);
+    eprintln!("  SAMPLE_RATE: {} Hz", SAMPLE_RATE);
+    eprintln!("  TABLE_SIZE: {}", TABLE_SIZE);
     eprintln!();
 
     println!("use fixed::types::U8F24;");
@@ -28,7 +23,7 @@ fn main() {
         let f = 440.0 * 2_f64.powf((note as f64 - 69.0) / 12.0);
 
         // Calculate phase increment
-        let phase_increment = (wavetable_size as f64) * f / (sample_rate as f64);
+        let phase_increment = (TABLE_SIZE as f64) * f / (SAMPLE_RATE as f64);
 
         // Convert to U8F24 fixed-point format (8 integer bits, 24 fractional bits)
         // This is equivalent to multiplying by 2^24 and converting to u32
@@ -50,6 +45,6 @@ fn main() {
     eprintln!("  Note 69 (A4): {}", a4);
     eprintln!(
         "  Validate that {} / ({} / {}) = 440",
-        sample_rate, wavetable_size, a4,
+        TABLE_SIZE, SAMPLE_RATE, a4,
     )
 }

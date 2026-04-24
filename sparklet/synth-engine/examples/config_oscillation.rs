@@ -8,7 +8,7 @@ use midi::MidiEvent;
 use rand::{RngExt, SeedableRng};
 use std::f64::consts::PI;
 use std::path::PathBuf;
-use synth_engine::{SynthEngine, Q15, SAMPLE_RATE, WINDOW_SIZE};
+use synth_engine::{Q15, SAMPLE_RATE, SynthEngine, WINDOW_SIZE};
 
 const CHANNEL_SIZE: usize = 256;
 const PAGE_AMOUNT: usize = 4; // Pages 0-1: ADSR/oscillator, Pages 2-3: Octave filter

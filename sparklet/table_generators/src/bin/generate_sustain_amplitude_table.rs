@@ -1,22 +1,17 @@
-use std::env;
-
 use fixed::{
     traits::{FromFixed, ToFixed},
     types::I1F31,
 };
 
+const TABLE_SIZE: usize = 256;
+const STARTING_LEVEL: f64 = -40.;
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let starting_level = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(-40.);
-    assert!(starting_level < 0.);
-
     eprintln!("Generating perecptually linear sustain table:");
-    eprintln!("  STARTING_LEVEL: {} db", starting_level);
+    eprintln!("  TABLE_SIZE: {}", TABLE_SIZE);
+    eprintln!("  STARTING_LEVEL: {} db", STARTING_LEVEL);
 
-    const SIZE: usize = 256;
-
-    let mut sustain_amplitude_table: [I1F31; SIZE] = [Default::default(); SIZE];
+    let mut sustain_amplitude_table: [I1F31; TABLE_SIZE] = [Default::default(); TABLE_SIZE];
 
     let mut sanity_check_data = vec![];
 
@@ -28,8 +23,9 @@ fn main() {
 
         // A\left(c\right)=10^{\frac{N+\frac{-N}{l}c}{20}}
 
-        let amplitude = (10_f64)
-            .powf((starting_level - starting_level / (SIZE as f64 - 1.) * index as f64) / 20.);
+        let amplitude = (10_f64).powf(
+            (STARTING_LEVEL - STARTING_LEVEL / (TABLE_SIZE as f64 - 1.) * index as f64) / 20.,
+        );
         if amplitude > f64::from_fixed(I1F31::MAX) {
             *sustain_amplitude = I1F31::MAX;
         } else {
@@ -54,7 +50,7 @@ pub static DB_LINEAR_AMPLITUDE_TABLE: [I1F31; {}] = [
     {}
 ];
 ",
-        SIZE,
+        TABLE_SIZE,
         i1f31_table_to_string(&sustain_amplitude_table),
     );
 

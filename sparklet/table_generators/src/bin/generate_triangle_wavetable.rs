@@ -1,29 +1,22 @@
-use std::env;
-
 use cmsis_interface::Q15;
 
+const TABLE_SIZE: usize = 256;
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let wavetable_size: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(256);
-
     eprintln!("Generating triangle wavetable:");
-    eprintln!("  WAVETABLE_SIZE: {}", wavetable_size);
+    eprintln!("  TABLE_SIZE: {}", TABLE_SIZE);
     eprintln!();
 
     println!("use cmsis_interface::Q15;");
     println!();
-    print!(
-        "pub static TRIANGLE_WAVETABLE: [Q15; {}] = [",
-        wavetable_size
-    );
+    print!("pub static TRIANGLE_WAVETABLE: [Q15; {}] = [", TABLE_SIZE);
 
     let mut samples = Vec::new();
 
-    for i in 0..wavetable_size {
+    for i in 0..TABLE_SIZE {
         // Calculate triangle value
         // Starts at 0, rises to 1 at quarter point, falls to -1 at 3/4 point, returns to 0
-        let phase = (i as f64) / (wavetable_size as f64);
+        let phase = (i as f64) / (TABLE_SIZE as f64);
 
         let value = if phase < 0.25 {
             4.0 * phase
@@ -54,17 +47,17 @@ fn main() {
     eprintln!("  Sample at 0° (i=0): {} (expected: 0.0)", samples[0]);
     eprintln!(
         "  Sample at 90° (i={}): {} (expected: ~1.0)",
-        wavetable_size / 4,
-        samples[wavetable_size / 4]
+        TABLE_SIZE / 4,
+        samples[TABLE_SIZE / 4]
     );
     eprintln!(
         "  Sample at 180° (i={}): {} (expected: ~0.0)",
-        wavetable_size / 2,
-        samples[wavetable_size / 2]
+        TABLE_SIZE / 2,
+        samples[TABLE_SIZE / 2]
     );
     eprintln!(
         "  Sample at 270° (i={}): {} (expected: ~-1.0)",
-        wavetable_size * 3 / 4,
-        samples[wavetable_size * 3 / 4]
+        TABLE_SIZE * 3 / 4,
+        samples[TABLE_SIZE * 3 / 4]
     );
 }

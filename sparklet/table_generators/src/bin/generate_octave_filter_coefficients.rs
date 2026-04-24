@@ -1,11 +1,10 @@
-use std::env;
-
 use fixed::types::I1F15 as Q15;
 use std::f64::consts::SQRT_2;
 use std::process::Command;
 
 const SAMPLE_RATE: f64 = 48000.0;
 const BAND_AMOUNT: usize = 6;
+const COEFF_SHIFT: i8 = 1;
 
 #[allow(clippy::enum_variant_names)]
 enum FilterType {
@@ -23,14 +22,10 @@ struct FilterCoefficients {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let coeff_shift: i8 = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
-    assert!(coeff_shift >= 0);
-
     eprintln!("Generating octave filter coefficients for:");
     eprintln!("  SAMPLE_RATE: {} Hz", SAMPLE_RATE);
-    eprintln!("  COEFF_SHIFT: {} bits", coeff_shift);
+    eprintln!("  BAND_AMOUNT: {}", BAND_AMOUNT);
+    eprintln!("  COEFF_SHIFT: {} bits", COEFF_SHIFT);
 
     let center_freqs = [250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0];
 
@@ -52,7 +47,7 @@ fn main() {
 
     for filter in bands.iter() {
         let f64_coeffs = get_octave_filter_coefficients(filter);
-        let (q15_coeffs, max_coeff, saturated) = convert_to_q15(&f64_coeffs, coeff_shift);
+        let (q15_coeffs, max_coeff, saturated) = convert_to_q15(&f64_coeffs);
 
         filter_coeffs.push(FilterCoefficients {
             filter_type: match filter {
@@ -67,7 +62,7 @@ fn main() {
         });
     }
 
-    let contents = generate_output(&filter_coeffs, coeff_shift);
+    let contents = generate_output(&filter_coeffs);
     println!("{}", contents);
 
     eprintln!();
@@ -198,7 +193,7 @@ fn get_octave_filter_coefficients(filter: &FilterType) -> [f64; 5] {
     }
 }
 
-fn convert_to_q15(coeffs: &[f64; 5], coeff_shift: i8) -> ([Q15; 6], f64, bool) {
+fn convert_to_q15(coeffs: &[f64; 5]) -> ([Q15; 6], f64, bool) {
     let b0 = coeffs[0];
     let b1 = coeffs[1];
     let b2 = coeffs[2];
@@ -206,7 +201,7 @@ fn convert_to_q15(coeffs: &[f64; 5], coeff_shift: i8) -> ([Q15; 6], f64, bool) {
     let a2 = coeffs[4];
 
     // Pre-shift coefficients right to prevent overflow during fixed-point computation
-    let shift_factor = 2.0_f64.powi(coeff_shift as i32);
+    let shift_factor = 2.0_f64.powi(COEFF_SHIFT as i32);
     let b0_shifted = b0 / shift_factor;
     let b1_shifted = b1 / shift_factor;
     let b2_shifted = b2 / shift_factor;
@@ -237,7 +232,7 @@ fn convert_to_q15(coeffs: &[f64; 5], coeff_shift: i8) -> ([Q15; 6], f64, bool) {
     (q15_coeffs, max_coeff, saturated)
 }
 
-fn generate_output(filter_coeffs: &[FilterCoefficients], coeff_shift: i8) -> String {
+fn generate_output(filter_coeffs: &[FilterCoefficients]) -> String {
     let mut coeffs_array = String::new();
 
     for (band_idx, fc) in filter_coeffs.iter().enumerate() {
@@ -274,7 +269,7 @@ pub const OCTAVE_FILTER_POST_SHIFT: i8 = {};
 pub static OCTAVE_FILTER_COEFFS: [[Q15; 6]; {}] = [
 {}];
 ",
-        coeff_shift, coeff_shift, coeff_shift, BAND_AMOUNT, coeff_shift, BAND_AMOUNT, coeffs_array
+        COEFF_SHIFT, COEFF_SHIFT, COEFF_SHIFT, BAND_AMOUNT, COEFF_SHIFT, BAND_AMOUNT, coeffs_array
     )
 }
 

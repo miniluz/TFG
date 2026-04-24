@@ -1,25 +1,21 @@
-use std::env;
-
 use cmsis_interface::Q15;
 
+const TABLE_SIZE: usize = 256;
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let wavetable_size: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(256);
-
     eprintln!("Generating square wavetable:");
-    eprintln!("  WAVETABLE_SIZE: {}", wavetable_size);
+    eprintln!("  TABLE_SIZE: {}", TABLE_SIZE);
     eprintln!();
 
     println!("use cmsis_interface::Q15;");
     println!();
-    print!("pub static SQUARE_WAVETABLE: [Q15; {}] = [", wavetable_size);
+    print!("pub static SQUARE_WAVETABLE: [Q15; {}] = [", TABLE_SIZE);
 
     let mut samples = Vec::new();
 
-    for i in 0..wavetable_size {
+    for i in 0..TABLE_SIZE {
         // Calculate square value: 1 for first half, -1 for second half
-        let value: f64 = if i < wavetable_size / 2 { 1.0 } else { -1.0 };
+        let value: f64 = if i < TABLE_SIZE / 2 { 1.0 } else { -1.0 };
 
         // Convert to Q15 fixed-point format (1 sign bit, 15 fractional bits)
         // Range: [-1.0, 1.0) maps to [-32768, 32767]
@@ -42,17 +38,17 @@ fn main() {
     eprintln!("  Sample at start (i=0): {} (expected: 1.0)", samples[0]);
     eprintln!(
         "  Sample at quarter (i={}): {} (expected: 1.0)",
-        wavetable_size / 4,
-        samples[wavetable_size / 4]
+        TABLE_SIZE / 4,
+        samples[TABLE_SIZE / 4]
     );
     eprintln!(
         "  Sample at middle (i={}): {} (expected: -1.0)",
-        wavetable_size / 2,
-        samples[wavetable_size / 2]
+        TABLE_SIZE / 2,
+        samples[TABLE_SIZE / 2]
     );
     eprintln!(
         "  Sample at 3/4 (i={}): {} (expected: -1.0)",
-        wavetable_size * 3 / 4,
-        samples[wavetable_size * 3 / 4]
+        TABLE_SIZE * 3 / 4,
+        samples[TABLE_SIZE * 3 / 4]
     );
 }

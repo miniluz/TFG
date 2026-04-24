@@ -1,5 +1,3 @@
-use std::env;
-
 use fixed::types::I1F31;
 use table_generators::adsr_utils::{
     BaseAndCoefficient, ParamConfig, TimeConfig, get_base_and_coefficient_for_index,
@@ -7,43 +5,40 @@ use table_generators::adsr_utils::{
 };
 
 const SAMPLE_RATE: u32 = 48000;
+const TARGET_RATIO: f64 = 1.5;
+// Controls how linear/exponential the time adjustment is
+const TIME_CONTROL_TARGET_RATIO: f64 = -4.8;
+const TABLE_SIZE: usize = 256;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let target_ratio = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(1.5);
-    assert!(target_ratio > 0.);
-    // Controls how linear/exponential the time adjustment is
-    let time_control_target_ratio = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(-4.8);
-
     eprintln!("Generating attack base and coefficient table for:");
-    eprintln!("  TARGET_RATIO: {}", target_ratio);
-    eprintln!("  TIME_CONTROL_TARGET_RATIO: {}", time_control_target_ratio);
+    eprintln!("  SAMPLE_RATE: {} Hz", SAMPLE_RATE);
+    eprintln!("  TARGET_RATIO: {}", TARGET_RATIO);
+    eprintln!("  TIME_CONTROL_TARGET_RATIO: {}", TIME_CONTROL_TARGET_RATIO);
 
-    const SIZE: usize = 256;
-
-    let mut attack_table: [BaseAndCoefficient; SIZE] = [Default::default(); SIZE];
+    let mut attack_table: [BaseAndCoefficient; TABLE_SIZE] = [Default::default(); TABLE_SIZE];
 
     let attack_config = ParamConfig {
-        target_ratio,
+        target_ratio: TARGET_RATIO,
         initial: 0.,
         target: 1.,
         time_config: TimeConfig {
-            rate: SIZE as f64 - 1.,
-            ratio: time_control_target_ratio,
+            rate: TABLE_SIZE as f64 - 1.,
+            ratio: TIME_CONTROL_TARGET_RATIO,
             initial: 0.01,
             target: 5.,
         },
     };
 
-    let mut decay_release_table: [BaseAndCoefficient; SIZE] = [Default::default(); SIZE];
+    let mut decay_release_table: [BaseAndCoefficient; TABLE_SIZE] =
+        [Default::default(); TABLE_SIZE];
 
     let decay_release_config = ParamConfig {
-        target_ratio,
+        target_ratio: TARGET_RATIO,
         initial: 1.,
         target: 0.,
         time_config: TimeConfig {
-            rate: SIZE as f64 - 1.,
+            rate: TABLE_SIZE as f64 - 1.,
             ratio: -5.9,
             initial: 0.01,
             target: 10.,
@@ -116,9 +111,9 @@ pub static FALL_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
 ];
 ",
         base_coefficient_to_string(&decay_release_table[0]),
-        SIZE,
+        TABLE_SIZE,
         base_coefficient_table_to_string(&attack_table),
-        SIZE,
+        TABLE_SIZE,
         base_coefficient_table_to_string(&decay_release_table)
     );
 

@@ -1,6 +1,6 @@
 use fixed::types::I1F31;
 
-use crate::adsr::{config_table::QUICK_FALL_BASE_COEFFICIENT, BaseAndCoefficient};
+use crate::adsr::{BaseAndCoefficient, config_table::QUICK_FALL_BASE_COEFFICIENT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapacitorStatus {
