@@ -5,26 +5,22 @@ use table_generators::adsr_utils::{
 };
 
 const SAMPLE_RATE: u32 = 48000;
-const TARGET_RATIO: f64 = 1.5;
-// Controls how linear/exponential the time adjustment is
-const TIME_CONTROL_TARGET_RATIO: f64 = -4.8;
 const TABLE_SIZE: usize = 256;
 
 fn main() {
     eprintln!("Generating attack base and coefficient table for:");
     eprintln!("  SAMPLE_RATE: {} Hz", SAMPLE_RATE);
-    eprintln!("  TARGET_RATIO: {}", TARGET_RATIO);
-    eprintln!("  TIME_CONTROL_TARGET_RATIO: {}", TIME_CONTROL_TARGET_RATIO);
+    eprintln!("  TABLE_SIZE: {}", TABLE_SIZE);
 
     let mut attack_table: [BaseAndCoefficient; TABLE_SIZE] = [Default::default(); TABLE_SIZE];
 
     let attack_config = ParamConfig {
-        target_ratio: TARGET_RATIO,
+        target_ratio: 1.5,
         initial: 0.,
         target: 1.,
         time_config: TimeConfig {
             rate: TABLE_SIZE as f64 - 1.,
-            ratio: TIME_CONTROL_TARGET_RATIO,
+            ratio: -4.8,
             initial: 0.01,
             target: 5.,
         },
@@ -34,7 +30,7 @@ fn main() {
         [Default::default(); TABLE_SIZE];
 
     let decay_release_config = ParamConfig {
-        target_ratio: TARGET_RATIO,
+        target_ratio: 1.5,
         initial: 1.,
         target: 0.,
         time_config: TimeConfig {
