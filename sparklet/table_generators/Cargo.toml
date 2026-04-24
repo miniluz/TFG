@@ -29,8 +29,8 @@ name = "generate_adsr_coefficient_tables"
 path = "src/bin/generate_adsr_coefficient_tables.rs"
 
 [[bin]]
-name = "generate_sustain_amplitude_table"
-path = "src/bin/generate_sustain_amplitude_table.rs"
+name = "generate_db_linear_amplitude_table"
+path = "src/bin/generate_db_linear_amplitude_table.rs"
 
 [[bin]]
 name = "generate_octave_filter_coefficients"
