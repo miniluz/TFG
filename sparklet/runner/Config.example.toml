@@ -1,8 +1,12 @@
+[chip]
+model = "stm32h723zg"
+
 [connections]
 # valid values: "usb", "din" or "none"
 midi = "usb"
 # valid values: "usb", "none"
 audio = "usb"
+
 [features]
 octave_filter = true
 configurable = true

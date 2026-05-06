@@ -119,27 +119,6 @@ fn voice_bank_release_note_non_existent_does_nothing() {
 }
 
 #[test]
-fn voice_bank_process_midi_event_handles_note_on_and_off() {
-    setup_voice_bank!(vb);
-
-    let note = 60;
-    let vel = 100;
-
-    // NoteOn
-    vb.process_midi_event(MidiEvent::NoteOn { key: note, vel });
-    assert_eq!(vb.count_active_voices(), 1);
-    assert_eq!(vb.get_voice_note(0), note.into());
-    assert_eq!(vb.get_voice_velocity(0), vel.into());
-    assert_eq!(vb.get_voice_stage(0), VoiceStage::Held);
-
-    // NoteOff
-    vb.process_midi_event(MidiEvent::NoteOff { key: note, vel: 0 });
-    // Voice enters Release state, still active until envelope completes
-    assert_eq!(vb.count_active_voices(), 1);
-    assert_eq!(vb.get_voice_stage(0), VoiceStage::Held); // Still non-idle (in Release)
-}
-
-#[test]
 fn voice_bank_quick_release_selects_quietest_in_release() {
     setup_voice_bank!(vb);
 

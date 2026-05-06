@@ -1,0 +1,28 @@
+[chip]
+model = "stm32h723zg"
+
+[connections]
+midi = "usb"
+audio = "usb"
+
+[features]
+octave_filter = true
+configurable = true
+
+[parameters]
+polyphony = 16
+encoder_multiplier = 4
+config_poll_millis = 5
+config_update_millis = 100
+
+[initial_config]
+attack = 40
+sustain = 127
+decay_release = 200
+oscilator_type = 1
+f250hz = 200
+f500hz = 200
+f1000hz = 200
+f2000hz = 200
+f4000hz = 200
+f8000hz = 200

@@ -1,5 +1,4 @@
 use defmt::Format;
-use midi::MidiEvent;
 
 use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
 
@@ -192,17 +191,6 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
                 wavetable_osc: WavetableOscillator::new(wavetable),
             }; N],
             timestamp_counter: 0,
-        }
-    }
-
-    pub fn process_midi_event(&mut self, event: MidiEvent) {
-        match event {
-            MidiEvent::NoteOn { key, vel } => {
-                let _ = self.play_note(key.into(), vel.into());
-            }
-            MidiEvent::NoteOff { key, vel: _ } => {
-                self.release_note(key.into());
-            }
         }
     }
 

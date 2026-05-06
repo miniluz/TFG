@@ -16,8 +16,8 @@ Análisis de la competencia, por qué elegí estos requisitos.
 
 #req("rf_midi_usb", "F")[MIDI USB][
   El sintetizador ha de ser configurable en compilación para conectarse a MIDI por USB.]
-#req("rf_midi_wire", "F")[MIDI cable][
-  El sintetizador ha de ser configurable en compilación para conectarse a MIDI por cable.]
+#req("rf_midi_din", "F")[MIDI DIN][
+  El sintetizador ha de ser configurable en compilación para conectarse a MIDI por un puerto DIN.]
 #req("rf_audio_usb", "F")[Audio USB][
   El sintetizador ha de ser configurable en compilación para conectarse al audio por USB.]
 #req("rf_waveforms", "F")[Generación de ondas][
@@ -41,11 +41,12 @@ Análisis de la competencia, por qué elegí estos requisitos.
 #req("rnf_speed", "NF")[Velocidad][
   El sintetizador ha de acabar de producir cada bloque de audio antes de que el siguiente se solicite.]
 #req("rnf_reliability", "NF")[Fiabilidad][
-  El sintetizador ha de operar continuamente sin necesitar un reinicio con uso normal.]
+  El sintetizador ha de operar continuamente sin necesitar un reinicio.]
 #req("rnf_audio_quality", "NF")[Calidad de audio][
-  El sintetizador ha de producir audio libre de distorsiones audibles con uso normal.]
+  El sintetizador ha de producir audio libre de distorsiones perceptibles.]
 #req("rnf_tests", "NF")[Pruebas][
-  El sintetizador ha de tener pruebas que validen su funcionalidad ejecutables en CI.
+  El sintetizador ha de tener pruebas que validen su funcionalidad ejecutadas automáticamente durante el desarrollo de
+  forma visible.
 ]
 
 == Análisis de los requisitos
@@ -68,7 +69,7 @@ argumento similar aplica a C++ y a Zig.
 Si lo que se busca es garantizar el @rnf_reliability, Ada o incluso SPARK serían una buenas opciones. SPARK es un
 lenguaje que permite realizar verificación formal de los programas. Sin embargo, tienen ecosistemas muy pequeños, en
 particular con relación al audio, por lo que se tendría que implementar mucha lógica desde cero. La fricción de esta
-opción no permitiría realizar el proyecto en el tiempo evaluado.
+opción no permitiría realizar el proyecto a tiempo.
 
 Rust consigue dar garantías de fiabilidad suficientes para el proyecto y proveer un ecosistema suficiente para el
 proyecto. Usando el _borrow checker_, garantiza la seguridad de memoria en tiempo de ejecución. Además, un programa que

@@ -14,8 +14,6 @@ Como se mencionó en la @sec_inst_dsp, Sparklet usa una interfaz llamada `CmsisO
 basada en Rust (que puede ejecutarse en cualquier plataforma compatible, incluyendo `x86_64`) y una basada en
 `cmsis_dsp` (que únicamente puede ejecutarse en un chip ARM).
 
-Gracias a las optimizaciones del compilador,
-
 === Pruebas
 
 Para validar que ambas implementaciones son iguales, se ejecuta la misma batería de pruebas en ambas. En `CmsisRust`,
@@ -31,5 +29,6 @@ GitHub Actions. El único código que ha de ser probado en un sistema empotrado 
 Los tipos genéricos en Rust no tienen un coste de rendimiento al ejecutar un programa. Esto es debido a que Rust
 _monomorfiza_ los tipos genéricos: dada una función `f<T>(arg: T)`, con el tipo genérico `T`, si se llama con los tipos
 concretos `A` y `B` se generan dos implementaciones de la función: `f(arg: A)` y `f(arg: B)`. En este caso, si se define
-una función `f<CmsisOperations>()`, el ejecutable de Sparklet únicamente las llama con `CmsisNativeOperations`, por lo
-que se genera una función `f()` equivalente que usa `CmsisNativeOperations` sin coste.
+una función `f<CmsisOperations>()`, ya que el ejecutable de Sparklet únicamente las llama con `CmsisNativeOperations`,
+únicamente se genera la función `f()` equivalente que usa `CmsisNativeOperations`, sin coste en ejecución en comparación
+a llamar las funciones directamente.

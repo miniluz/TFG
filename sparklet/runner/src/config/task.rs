@@ -187,7 +187,7 @@ pub async fn input_task(state: &'static mut InputTaskState<'static>) {
             );
         }
 
-        if state.need_to_update && state.counter.is_multiple_of(CONFIG_UPDATE_RATE) {
+        if state.counter.is_multiple_of(CONFIG_UPDATE_RATE) && state.need_to_update {
             state.config_manager.publish_config();
             state.need_to_update = false;
         }

@@ -29,3 +29,4 @@ cmsis
 powf
 Redmon
 urldate
+ecualizador

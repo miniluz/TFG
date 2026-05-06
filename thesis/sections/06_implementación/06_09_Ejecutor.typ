@@ -32,6 +32,5 @@ tareas que llaman al resto de componentes. En la práctica, hace lo siguiente:
 + Inicialización de la tarea MIDI, de configuración, de los botones y encoders rotativos, del motor de sínstesis, y de
   la salida de audio.
 
-Una vez acaba, el funcionamiento del sistema está únicamente gobernado por sus tareas, que a su vez dependen únicamente
-de interrupciones externas. La configuración se ejecuta únicamente cuando se presiona un botón o mueve un codificador, y
-el audio se genera únicamente cuando se sondea, envía, y libera un espacio en el canal.
+Una vez acaba, las tareas toman control del chip. La configuración se ejecuta cada cierto tiempo, y la generación de
+audio se ejecuta únicamente cuando se pide una salida de audio.

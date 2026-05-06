@@ -15,13 +15,14 @@ La arquitectura de Sparklet se puede ver en el @fig_diagrama_arquitectura. Consi
 síntesis, el gestor de configuración, las entradas hardware de configuración, la entrada MIDI, y la salida de audio,
 conectados con primitivas asíncronas.
 
-La salida de audio es pasiva: es muestreada por el sistema periódicamente (en USB, cada $1000 "Hz"$). Esto garantiza la
-sincronización de la frecuencia de muestreo. Cuando Sparklet recibe un muestreo, tiene que dar una respuesta casi
-inmediata, por lo que el bloque de audio tiene que estar listo para que únicamente tenga que ser transmitido. Debido a
-esto, decidí extraer la generación del bloque de audio a otra tarea que lo prepara de antemano: el motor de síntesis.
-Son conectadas con una cola de 2 bloques de audio completos con _back-pressure_, lo que significa que la cola bloquea al
-escritor hasta que hay un espacio libre. Cuando se envía el bloque, se consume el mensaje y libera un espacio,
-despertando el motor de síntesis para que genera el siguiente bloque.
+La salida de audio es muestreada por el sistema periódicamente (en USB, cada $1000 "Hz"$). Esto garantiza la
+sincronización de la frecuencia de muestreo, y evita tener que mantener un reloj interno y sincronizarlo con el del
+ordenador. Cuando Sparklet recibe un muestreo, tiene que dar una respuesta casi inmediata, por lo que el bloque de audio
+tiene que estar listo para que únicamente tenga que ser transmitido. Debido a esto, decidí extraer la generación del
+bloque de audio a otra tarea que lo prepara de antemano: el motor de síntesis. Son conectadas con una cola de 2 bloques
+de audio completos con _back-pressure_, lo que significa que la cola bloquea al escritor hasta que hay un espacio libre.
+Cuando se envía el bloque, se consume el mensaje y libera un espacio, despertando el motor de síntesis para que genera
+el siguiente bloque.
 
 El motor de audio recibe una cola de eventos MIDI que han llegado desde la generación del último bloques de audio. Esta
 cola la llena la tarea de entrada MIDI, que lee un _stream_ de bytes que procesa y convierte en eventos MIDI,
@@ -30,12 +31,9 @@ procesamiento de estos eventos MIDI. Es necesario que lo realice el motor de aud
 información del volumen de cada nota para poder decidir cuáles dejar de tocar.
 
 La configuración, sin embargo, no depende del estado del motor de síntesis, por lo que se extrae a una tarea separada de
-menor prioridad. Una cola la conecta con las tareas que leen el hardware, generalmente una tarea por cada pulsador y
-codificador rotatorio, que también descarta si se llena. Cada vez que se ejecuta, procesa todos los eventos en orden y
-actualiza el estado de la configuración. Finalmente, la escribe a un triple buffer. El triple buffer permite permite que
-el motor de síntesis siempre vea la última versión de la configuración que haya sido escrita en su totalidad sin que se
-bloquee ni la lectura ni la escritura.
-
+menor prioridad. La tarea de configuración lee el hardware usando polling, por defecto cada $5 "ms"$, y procesa con el
+gestor de configuración los datos. Cada cierto tiempo, por defecto cada $100 "ms"$, envía la nueva configuración por un
+triple buffer al motor de síntesis.
 
 == Rendimiento
 
