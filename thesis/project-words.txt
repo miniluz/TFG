@@ -30,3 +30,9 @@ powf
 Redmon
 urldate
 ecualizador
+Moumine
+Tiemoko
+Samek
+Bartel
+classiccmp
+println

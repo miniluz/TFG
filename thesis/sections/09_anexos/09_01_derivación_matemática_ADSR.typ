@@ -25,8 +25,6 @@ $
 
 Cuando el condensador cambia de un valor inicial $y_0$ a un valor objetivo $T$, sigue la @eq_decay_to_T:
 
-/* TODO: Replace -t/tau with (-t)/tau, -1/tau with (-1)/tau, -2/tau with (-2)/tau */
-
 $
   y(t) = T + (y_0 - T) times e^inline((-t)/tau)
 $
