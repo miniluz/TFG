@@ -5,21 +5,24 @@
 
 == MIDI
 
-Para gestionar la entrada MIDI, existe el struct `MidiListener`. Este expone un método `process_bytes` que recibe una
-matriz de bytes y los procesa usando la biblioteca `midly`. Ésta permite identificar mensajes MIDI recibiendo un byte a
-la vez, lo que la hace compatible con usar MIDI con UART. Además, su resistencia a los errores fue validada: es capaz de
-procesar mensajes después de ser alimentada mil bytes de datos aleatorios. Cuando `midly` identifica un evento MIDI,
-`MidiListener` lo filtra y únicamente lo comunica a la cola de eventos MIDI (que recibe `Generator`) si es uno de los
-que `Sparklet` puede procesar.
+Para gestionar la entrada MIDI, existe el struct `MidiListener`. Expone un método `process_bytes` que recibe un vector
+de bytes y lo procesa usando la biblioteca `midly`. `midly` permite identificar mensajes MIDI recibiendo un byte a la
+vez, lo que la hace compatible con leer MIDI usando UART.
 
-`Sparklet` únicamente soporta los eventos MIDI `NoteOn` and `NoteOff`. Ya que MIDI puede tener mensajes de longitud
-arbitraria debido a su extensibilidad /* TODO cita */, y ya que ambos eventos caben en 4 bytes, se usa un buffer de 4
-bytes para `midly`, para ahorrar memoria. Los mensajes más largos son ignorados. Las pruebas unitarias validan este
-comportamiento.
+Cuando `midly` identifica un evento MIDI, `MidiListener` lo envía por el canal de eventos. El canal es un
+`embassy_sync::Channel`, _single-sender single-consumer_. Si la cola está llena, el mensaje se descarta. Es fácil
+demostrar que la cola de 16 eventos que usa Sparklet es suficiente. Ya que los mensajes se procesan cada milisegundo,
+Sparklet puede procesar hasta $16.000$ eventos por segundo; MIDI por UART transmite $31.250$ bits por segundo, y ya que
+los mensajes que soporta Sparklet ocupan como mínimo 3 bytes, sólo puede producir $31.250 div 24 approx 1302$ mensajes
+por segundo.
+#footnote[MIDI por USB puede usar velocidades de transmisión superiores, pero bajo un uso normal no es un problema.]
 
-La cola de eventos MIDI que recibe `Generator` se implementa usando `embassy_sync::Channel`, un canal single-sender
-single-consumer. Si la cola está llena, el mensaje se descarta. Sparklet usa una cola de 16 eventos y los procesa cada
-milisegundo, por lo que puede procesar $16.000$ eventos por segundo. MIDI por UART transmite $31.250$ bits por segundo,
-y ya que los mensajes que soporta Sparklet ocupan como mínimo 3 bytes, sólo puede generar $31.250 div 24 approx 1302$
-mensajes por segundo, por lo que nunca se desbordará la cola. MIDI por USB puede usar velocidades de transmisión
-superiores, pero bajo un uso normal no es un problema.
+`Sparklet` únicamente soporta los eventos MIDI `NoteOn` y `NoteOff`. El resto de eventos son descartados por
+`MidiListener` antes de enviarlos por el canal. Ambos eventos caben en 3 bytes @ref_web_midi, pero se asigna a `midly`
+un buffer de 4 bytes al no tener coste adicional por alineación de memoria. Los mensajes más largos son ignorados al no
+caber en el buffer, lo que es conveniente pues MIDI acepta mensajes de longitud arbitraria /* TODO cita */.
+
+La fiabilidad del módulo de `midly` es fundamental, pues es el único módulo expuesto a datos externos que ha de ser
+escrito a mano. Se puede encontrar con mensajes erróneos, con ruido, o en el peor caso malicioso. Por lo tanto, éste fue
+el módulo más probado. Su resistencia a errores y mensajes largos fue validada: es capaz de procesar mensajes después de
+ser alimentada mil bytes de datos aleatorios

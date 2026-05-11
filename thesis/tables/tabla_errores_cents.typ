@@ -32,4 +32,5 @@
     [ C4 ], [ La nota central del piano ], [ $261.6 "Hz"$ ], [ $4.8 "cents"$ ],
   ),
   caption: "Errores en cents para algunas notas usando un incremento de 16 bits",
+  placement: auto,
 )<tabla_errores_cents>

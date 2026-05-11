@@ -58,11 +58,11 @@
 En cuanto a la selección del lenguaje, se evaluaron C, C++, Zig, SPARK y Rust, por ser lenguajes populares para el
 desarrollo empotrado.
 
-C es quizá la opción más usada en el desarrollo empotrado. El @rnf_speed urge la integración de CMSIS-DSP, una librería
-de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C, C++ o Zig permitiría
-integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero que tenga suficiente
-experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del hardware, para cumplir
-el @rnf_reliability. Un argumento similar aplica a C++ y a Zig.
+C es quizá la opción más usada en el desarrollo empotrado. El @rnf_speed urge la integración de CMSIS-DSP, una
+biblioteca de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C, C++ o Zig
+permitiría integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero que tenga
+suficiente experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del hardware,
+para cumplir el @rnf_reliability. Un argumento similar aplica a C++ y a Zig.
 
 SPARK es una opción apropiada para conseguir el @rnf_reliability, ya que permite verificar formalmente los programas
 @ref_web_ada_formal_proof. Sin embargo, tiene un ecosistema pequeño, en particular en lo que respecta al audio, por lo
@@ -125,43 +125,53 @@ una sintaxis que parece secuencial con `async` y `await`, de manera similar al d
 en el @cod_maquina_estado_async. Estas funciones son transformadas en máquinas de estados automáticamente, que
 implementa la interfaz `Future`. Embassy provee un ejecutor cooperativo ligero para plataformas empotradas basada en los
 `Future` de Rust.
-
 #figure(
-  ```rust
-  enum State { A, B }
+  grid(
+    columns: 1,
+    inset: 0.5em,
+    [
+      #figure(
+        ```rust
+        enum State { A, B }
 
-  fn step(state: &mut State, ready: bool) {
-      match state {
-          State::A => {
+        fn step(state: &mut State, ready: bool) {
+            match state {
+                State::A => {
+                    println!("A");
+                    *state = State::B;
+                }
+
+                State::B => {
+                    if ready {
+                        println!("B");
+                        *state = State::A;
+                    }
+                }
+            }
+        }
+        ```,
+        caption: "Una tarea cooperativa que alterna entre el estado A y B implementada como una máquina de estados manualmente",
+      )<cod_maquina_estado_manual>
+    ],
+    [
+      #figure(
+        ```rust
+        async fn task() {
+          loop {
               println!("A");
-              *state = State::B;
+              wait().await;
+              println!("B");
           }
-
-          State::B => {
-              if ready {
-                  println!("B");
-                  *state = State::A;
-              }
-          }
-      }
-  }
-  ```,
-  caption: "Una tarea cooperativa que alterna entre el estado A y B implementada como una máquina de estados manualmente",
-)<cod_maquina_estado_manual>
-
-#figure(
-  ```rust
-  async fn task() {
-    loop {
-        println!("A");
-        wait().await;
-        println!("B");
-    }
-  }
-  ```,
-  caption: [Una tarea cooperativa que alterna entre el estado A y B implementada con la sintaxis `async`],
+        }
+        ```,
+        caption: [Una tarea cooperativa que alterna entre el estado A y B implementada con la sintaxis `async`],
+      )
+      <cod_maquina_estado_async>
+    ],
+  ),
+  numbering: none,
+  placement: auto,
 )
-<cod_maquina_estado_async>
 
 Debido a la popularidad de Embassy, su ecosistema es bastante maduro. Ofrece _hardware abstraction layers_, APIs de Rust
 que abstraen las características del hardware (p. ej. entrada, salida, _pull-ups_). Usan el sistema de tipos de Rust
@@ -197,8 +207,7 @@ binario, que no se envían al microcontrolador. Un ejemplo de su uso se puede ve
 
 `fixed` provee tipos para operar con números de coma fija en Rust sin un coste de rendimiento @ref_web_fixed. `bytemuck`
 a su vez permite hacer conversiones de tipo que no conllevan modificar la representación en bits de los datos, como
-convertir un `Q15` a un `i16` o convertir una matriz de `Q15` a la matriz de `u8` que forman sus bytes
-@ref_web_bytemuck.
+convertir un `Q15` a un `i16` o convertir un vector de `Q15` al vector de `u8` que forman sus bytes @ref_web_bytemuck.
 
 
 === Utilidades

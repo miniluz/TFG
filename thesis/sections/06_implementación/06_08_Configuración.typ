@@ -14,16 +14,15 @@ en la @cod_config_toml:
 #figure(
   raw(read("/code/Config.toml"), block: true, lang: "toml"),
   caption: [`Config.toml` por defecto],
+  placement: auto,
 )<cod_config_toml>
 
 Con éste archivo se puede:
-- Activar y desactivar fácilmente las características del sistema, como si activar el
-ecualizador.
+- Activar y desactivar fácilmente las características del sistema, como si activar el ecualizador.
 - Modificar los parámetros de la aplicación, como la cantidad de voces a usar por el motor de síntesis.
 - Establecer la configuración inicial del dispositivo cuando se enciende, como el ataque, sostenimiento, etc.
 
-A continuación se explica cómo éste archivo afecta el código durante la complicación para aplicar la configuración que
-especifica.
+A continuación se explica los mecanismos que usan éste archivo para aplicar la configuración que especifica.
 
 === Durante la compilación
 <sec_configuración_compilación>
@@ -33,9 +32,9 @@ ejecutarse en controladores menos capaces, ya sea por ocupar demasiados ciclos d
 características, no es ideal desactivarlas en ejecución con un `if`, porque su código sigue ocupando memoria. Por lo
 tanto, se da la opción de no incluir el código en el programa compilado.
 
-Rust permite usar _feature flags_ para controlar la inclusión o exclusión de secciones de código, librerías, etc.
-dependiendo de si cierta feature flag está activa, de si no está activa, o de si cierta combinación está activa. Usando
-feature flags, las siguientes características son configurables:
+Rust permite usar _feature flags_ para controlar la inclusión o exclusión de secciones de código, bibliotecas, etc. Se
+puede hacer que dependan de si cierta feature flag está activa, de si no está activa, o de si cierta combinación está
+activa. Usando feature flags, las siguientes características son configurables:
 
 - El chip a usar: qué hardware abstraction layer y qué pines usar.
 - La entrada de MIDI: por un pin usando el formato DIN, por USB, o desactivada.

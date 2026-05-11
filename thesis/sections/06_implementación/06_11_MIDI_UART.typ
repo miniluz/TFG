@@ -4,3 +4,5 @@
 #show: setup-reqs
 
 == Lectura de MIDI por UART
+
+/* TODO */

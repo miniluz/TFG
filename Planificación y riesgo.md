@@ -46,17 +46,17 @@ no usado, y en última instancia de la configurabilidad o el filtrado básico.
 
 El mayor riesgo al proyecto es que sea imposible usar Rust, ya que es el
 lenguaje con el que soy más familiar y el proyecto tiene investigadas muchas
-librerías de Rust que serían más complicadas de encontrar y trabajar en C.
+bibliotecas de Rust que serían más complicadas de encontrar y trabajar en C.
 Además que creo que la compilación configurable de manera fácil y accesible a
 distintos dispositivos se puede dificultar bastante.
 
 Considero esta posibilidad muy remota, ya que Rust tiene una comunidad de
-desarrollo embedido muy amplia y he encontrado librerías que ya implementan los
+desarrollo embedido muy amplia y he encontrado bibliotecas que ya implementan los
 mayores riesgos que he identificado (no poder usar las instrucciones DSP, el uso
 de los pines, la lectura de MIDI, etc.)
 
 Pero, por si acaso, la primera fase verifica si Rust puede ser usado. En caso de
-completarse, garantiza el pode usar las librerías identificadas, o al menos la
+completarse, garantiza el pode usar las bibliotecas identificadas, o al menos la
 posibilidad de copiar las que no son críticas (por ejemplo, copiar una de
 filtrado para que use las instrucciones DSP).
 
@@ -92,9 +92,9 @@ Herramientas útiles:
 - El libro de Rust embedido
   ([https://docs.rust-embedded.org/book/](https://docs.rust-embedded.org/book/ "https://docs.rust-embedded.org/book/"))
   que parece detallar la mayoría de este proceso
-- La librería CMSIS-DSP
+- La biblioteca CMSIS-DSP
   [https://docs.rs/cmsis_dsp/latest/cmsis_dsp/](https://docs.rs/cmsis_dsp/latest/cmsis_dsp/ "https://docs.rs/cmsis_dsp/latest/cmsis_dsp/"),
-  que provee bindings de Rust para la librería
+  que provee bindings de Rust para la biblioteca
   [https://arm-software.github.io/CMSIS_5/DSP/html/index.html](https://arm-software.github.io/CMSIS_5/DSP/html/index.html "https://arm-software.github.io/CMSIS_5/DSP/html/index.html"),
   que se usa para trabajar con los ARM Cortex
 - Los videos de
@@ -104,7 +104,7 @@ Herramientas útiles:
   que la asíncrona me haga falta, puede ser necesaria para realizar las tareas
   I/O de manera eficiente)
 - [https://embassy.dev/](https://embassy.dev/ "https://embassy.dev/") parece ser
-  una librería súper amplia que puede resolver muchos problemas, y el STM32
+  una biblioteca súper amplia que puede resolver muchos problemas, y el STM32
   tiene soporte de primera clase. Está diseñada para ser usada en real-time,
   tiene un bootloader y parece proveer USB.
   [https://lib.rs/crates/daisy-embassy](https://lib.rs/crates/daisy-embassy "https://lib.rs/crates/daisy-embassy") también
@@ -112,12 +112,12 @@ Herramientas útiles:
 
 Me parece poco probable que no se pueda usar Rust. Rust soporta assembly
 in-line, incluyendo la arquitectura ARM. Así que en el peor de los casos se
-pueden escribir abstracciones sobre eso. Pero parece que muchas librerías ya
+pueden escribir abstracciones sobre eso. Pero parece que muchas bibliotecas ya
 existen para manejarlo.
 
 En caso de que algunos de estos falle, el proyecto se puede realizar en C o en
 Arduino, pero prefiero C porque es el lenguaje con el que soy más familiar. Esto
-llevaría a un desarrollo menos ergonómico al dificultar integrar librerías de
+llevaría a un desarrollo menos ergonómico al dificultar integrar bibliotecas de
 terceros, y podría alargar el resto de fases. En este caso hacer un sintetizador
 funcional, o sólo con un filtro de low-pass, pero que tenga la compilación y el
 ensamblaje bien documentado, sería lo ideal.
@@ -140,7 +140,7 @@ Continuar con Rust sería lo mejor porque permite:
    de patrones como módulos, interfaces, etc, enumerados, programación
    funcional, etc. sin tener coste adicional sobre el código equivalente en C.
 6. Tiene un gestor de paquetes, lo que facilitaría mucho al usuario descargar
-   las librerías usadas. Además, su librería de paquetes provee mucha de la
+   las bibliotecas usadas. Además, su biblioteca de paquetes provee mucha de la
    funcionalidad necesaria para el proyecto (MIDI, USB audio, etc) con código
    abierto.
 7. Es un lenguaje que me interesa y el lenguaje de bajo nivel con el que soy más
@@ -220,7 +220,7 @@ Herramientas útiles:
 - [https://embassy.dev/](https://embassy.dev/ "https://embassy.dev/")
 
 No considero que esta etapa tenga un riesgo parcticular, ya que tengo proyectos
-de referencia. Incluso podría delegar la síntesis a una librería de ser
+de referencia. Incluso podría delegar la síntesis a una biblioteca de ser
 necesario, pero es una parte que preferiría escribir yo.
 
 **Fase de configuración**
@@ -342,8 +342,8 @@ Investigación necesaria:
 - Cómo acceder a archivos en tiempo de compilación y usarlos para determinar
   comportamiento
 - Cómo usar feature flags para hacer que parte del código sea opcional
-- Cómo usar feature flags para activar feature flags de otras librerías (por
-  ejemplo, la librería de instrucciones DSP requiere de una feature flag si
+- Cómo usar feature flags para activar feature flags de otras bibliotecas (por
+  ejemplo, la biblioteca de instrucciones DSP requiere de una feature flag si
   tienes un Arm Cortex M7)
 - Cómo compilar a varias arquitecturas con el mismo código de manera ergonómica
 - Cómo identificar el RAM y el espacio de código que usa el programa compilado.

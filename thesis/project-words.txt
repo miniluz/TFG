@@ -36,3 +36,5 @@ Samek
 Bartel
 classiccmp
 println
+descartándolo
+descartándolos
