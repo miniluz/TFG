@@ -18,7 +18,7 @@ tareas que llaman al resto de componentes. En la práctica, hace lo siguiente:
 
 + Inicialización del USB, si está activado.
 
-+ Creación, sin inicializar, de la tarea MIDI, ya sea recibido por un conector DIN por UART o por USB. Ésta tarea
++ Creación, sin inicializar, de la tarea MIDI, ya sea recibido por un conector DIN por UART o por USB. Esta tarea
   sencillamente lee los datos que se envían por la conexión serial y los envía a un `MidiListener` que contiene en su
   estado.
 

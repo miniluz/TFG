@@ -17,12 +17,12 @@ en la @cod_config_toml:
   placement: auto,
 )<cod_config_toml>
 
-Con éste archivo se puede:
+Con este archivo se puede:
 - Activar y desactivar fácilmente las características del sistema, como si activar el ecualizador.
 - Modificar los parámetros de la aplicación, como la cantidad de voces a usar por el motor de síntesis.
 - Establecer la configuración inicial del dispositivo cuando se enciende, como el ataque, sostenimiento, etc.
 
-A continuación se explica los mecanismos que usan éste archivo para aplicar la configuración que especifica.
+A continuación se explica los mecanismos que usan este archivo para aplicar la configuración que especifica.
 
 === Durante la compilación
 <sec_configuración_compilación>
@@ -44,12 +44,12 @@ activa. Usando feature flags, las siguientes características son configurables:
 /* Añadir ejemplo mínimo de feature flags */
 
 El script `run-with-flags.sh` lee los campos relevantes de `Config.toml` y activa las feature flags correspondientes,
-permitiendo que se configuren fácilmente. Éste toma como argumento el comando a ejecutar con las flags, de manera que
+permitiendo que se configuren fácilmente. Este toma como argumento el comando a ejecutar con las flags, de manera que
 para construir el código se puede ejecutar `./run-with-flags.sh cargo build --release`, y el script ejecutará a su vez
 `cargo build --release --no-default-features --features midi-usb audio-usb [...]`.
 
 `Config.rs` también contiene ciertos números constantes como los valores iniciales del ADSR y la cantidad de voces,
-llamados parámetros. Se configuran con un archivo `build.rs`, que se ejecuta antes de la compilación. Éste lee el
+llamados parámetros. Se configuran con un archivo `build.rs`, que se ejecuta antes de la compilación. Este lee el
 `Config.toml` y genera un archivo `build_config.rs` con un `struct` que contiene todos los parámetros. `build_config.rs`
 se incluye en el código en tiempo de compilación con la macro `include!()`.
 

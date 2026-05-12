@@ -182,7 +182,7 @@ función ```Typst #bibliography("/bibliografia.bib", style:...)``` del archivo p
 estilo.
 
 Observe cómo los elementos bibliográficos almacenados en `bibliografia.bib` tienen una etiqueta asociada, que es la que
-se usa al citarlos. *Añadir una referencia al fichero bibliográfico no hace que ésta aparezca automáticamente en la
+se usa al citarlos. *Añadir una referencia al fichero bibliográfico no hace que esta aparezca automáticamente en la
 sección de bibliografía del trabajo, es necesario citarla en algún lugar del mismo*.
 
 == Ecuaciones

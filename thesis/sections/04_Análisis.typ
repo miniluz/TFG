@@ -58,7 +58,7 @@
 En cuanto a la selección del lenguaje, se evaluaron C, C++, Zig, SPARK y Rust, por ser lenguajes populares para el
 desarrollo empotrado.
 
-C es quizá la opción más usada en el desarrollo empotrado. El @rnf_speed urge la integración de CMSIS-DSP, una
+C es una de los lenguajes más populares en el desarrollo empotrado. El @rnf_speed urge la integración de CMSIS-DSP, una
 biblioteca de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C, C++ o Zig
 permitiría integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero que tenga
 suficiente experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del hardware,
@@ -214,7 +214,7 @@ convertir un `Q15` a un `i16` o convertir un vector de `Q15` al vector de `u8` q
 <sec_otras_herramientas>
 
 Se usa Nix para proveer los programas necesarios para el proyecto de forma reproducible @ref_web_nix_main. Se usa para
-formar el entorno de desarrollo y el entorno de usado por GitHub Actions para ejecutar las pruebas automáticas. Éste
+formar el entorno de desarrollo y el entorno de usado por GitHub Actions para ejecutar las pruebas automáticas. Este
 provee todos los programas usadas en el desarrollo, incluyendo Rust, Octave, Typst y todas las utilidades, y fija sus
 versiones. Garantiza que el entorno de desarrollo es el mismo que el de ejecución de pruebas, para cumplir el
 @rnf_tests.

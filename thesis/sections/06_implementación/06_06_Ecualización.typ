@@ -13,8 +13,9 @@ en particular o para aumentar las frecuencias agudas, se puede bajar o subir el 
 correspondientes. Idealmente, si no se escala ningún filtro, el ecualizador no afecta la señal.
 
 Sparklet usa 6 filtros. El primero es de paso bajo, los intermedios son de paso banda y el último de paso alto, para
-repartir entre ellos todo el rango de frecuencias. Se usan filtros IIR de Butterworth en DF1, almacenando los
-coeficientes en formato Q15. Las frecuencias que corresponden a cada filtro son:
+repartir entre ellos todo el rango de frecuencias. Se usan filtros IIR de Butterworth en DF1 @ref_book_theory_music
+@ref_book_understanding_dsp, almacenando los coeficientes en formato Q15. Las frecuencias que corresponden a cada filtro
+son:
 
 - $250 "Hz"$ (paso bajo),
 - entre $500 div sqrt(2) "Hz"$ y $500 times sqrt(2) "Hz"$ (paso banda),

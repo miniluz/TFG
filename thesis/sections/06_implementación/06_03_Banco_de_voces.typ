@@ -6,10 +6,10 @@
 == Banco de voces
 <sec_banco_de_voces>
 
-Un sintetizador generalmente sólo puede reproducir una cierta cantidad de notas a la vez. Esto es lo que se conoce como
-un límite de polifonía $|V|$. Por ejemplo, si puede reproducir cuatro notas simultáneamente, se dice que tiene un límite
-de polifonía de cuatro, o que tiene cuatro voces. El componente de Sparklet que mantiene el estado de las voces y las
-gestiona se llama el banco de voices, `VoiceBank`.
+Un sintetizador generalmente es capaz de reproducir más de una nota a la vez, lo que se conoce como polifonía
+@ref_book_theory_music. Generalmente tienen un límite de polifonía $|V|$ . Por ejemplo, si puede reproducir cuatro notas
+simultáneamente, se dice que tiene un límite de polifonía de cuatro, o que tiene cuatro voces. El componente de Sparklet
+que mantiene el estado de las voces y las gestiona se llama el banco de voices, `VoiceBank`.
 
 Sparklet modela las voces `Voice` como máquinas de estado simples, con únicamente dos estados `VoiceStage`: libre
 (`Free`) y sostenida (`Held`). El comportamiento del banco de voces es simple si nunca se tocan más de $|V|$ notas
@@ -33,12 +33,14 @@ Un banco de voces `VoiceBank` sencillamente tiene:
 Un sintetizador útil para un músico ha de responder intuitivamente a sus acciones. Cuando un músico toca una nota,
 espera oírla, aún si supera el límite de voces; el sintetizador por lo tanto ha de liberar una voz para tocarla. La voz
 no puede parar su nota actual inmediatamente, pues se oiría un clic, pero ha de liberarse lo antes posible, ya que el
-músico espera oír la nota que tocó. Es por esto que el envolvente ADSR tiene un modo `QuickRelease`, para solar una nota
-inmediatamente incluso con un decaimiento alto.
+músico espera oír la nota que tocó. La lógica que determina qué voz liberar y cómo se llama el algoritmo de distribución
+de voces. Es por esto que el envolvente ADSR tiene un modo `QuickRelease`, para solar una nota inmediatamente incluso
+con un decaimiento alto.
 
-Aún con esto, hay una serie de situaciones límite que un banco de voces ha de manejar correctamente para resultar
-intuitivo a un músico. Realizar una implementación elegante y eficiente que maneje correctamente todas estas
-circunstancias fue una de las dificultades principales del desarrollo de Sparklet. Tómense los siguientes casos:
+#cite(<ref_book_theory_music>, form: "prose") propone las bases de un algoritmo simple, pero no es suficiente para
+resolver todas las situaciones límite que han de ser manejadas correctamente para que el sintetizador resulte intuitivo
+a un músico. Realizar una implementación elegante y eficiente que maneje correctamente todas estas circunstancias fue
+una de las dificultades principales del desarrollo de Sparklet. Tómense los siguientes casos:
 
 + Un músico toca una pieza con un límite de polifonía bajo. Arpegia rápidamente un acorde: do, mi, sol, mi, do; de forma
   que un decaimiento alto haría que cuando toque por segunda vez una nota, la primera voz que la contiene aún no haya
@@ -77,6 +79,7 @@ circunstancias fue una de las dificultades principales del desarrollo de Sparkle
 <sec_detalles_algoritmo_voice_bank>
 
 Tomando estos casos límite en cuenta, se implementó el siguiente algoritmo, que los gestiona todos de forma eficiente.
+El código de Rust que lo implementa se puede ver en el @cod_voice_steal_algorithm.
 
 El método `play_note` de `VoiceBank` nunca toca una nota si no quedan voces libres. Por voz libre, se entiende una voz
 en estado `Idle`, sin contar `Release` ni `QuickReleaes`. En su lugar, `play_note` devuelve `AllVoicesBusy`. La
@@ -93,7 +96,7 @@ Si no se encuentra ninguna, no se realiza ninguna operación, ya que significa q
 proporciona `count_vocies_in_quick_release`, para saber cuántas notas están siendo liberadas.
 
 Aunque el módulo que gestiona la liberación de voces, el generador `Generator`, se explicará en la siguiente sección,
-cabe explicar en ésta cómo lo hace. Cuando se pide al generador que calcule un bloque de audio, lo primero que hace es
+cabe explicar en esta cómo lo hace. Cuando se pide al generador que calcule un bloque de audio, lo primero que hace es
 procesar los eventos MIDI de tocar y soltar notas. En lugar de aplicarlos directamente, usa la cola de notas a tocar
 descrita anteriormente, que es de tipo FIFO y de longitud `|V|`. Por cada evento, en orden cronológico:
 
@@ -109,3 +112,12 @@ de voces que están ya en modo `QuickRelease`. Ya que `VoiceBank::quick_release`
 cada vez que se invoca, la llama $d$ veces, para así liberar las voces necesarias para vaciar la cola. En un evento de
 procesamiento futuro, estas voces habrán pasado al estado `Idle`, por lo que estarán libres. Hasta entonces, la cola de
 notas a tocar mantiene las notas más recientes que no han sido soltadas.
+
+#figure(
+  text(size: 11pt)[#raw(
+    read("/code/voice_steal_algorithm.rs"),
+    block: true,
+    lang: "rust",
+  )],
+  caption: [El algoritmo de procesado de eventos MIDI, extraído del método `Generator::render_samples`.],
+)<cod_voice_steal_algorithm>

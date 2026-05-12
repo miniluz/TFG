@@ -12,8 +12,10 @@ empieza repentinamente al máximo volumen, y cuando se deja de tocar, para insta
 escuchan como clics, y no tienen un carácter musical.
 
 El envolvente de ataque, decaimiento, sostenimiento y relajación (_attack, decay, sustain, release_ o ADSR) suaviza esta
-transición. Es una señal que modula la amplitud de la onda que genera el oscilador, y por lo tanto su volumen, como se
-ve en la @eq_adsr_modulación.
+transición. Se origina en los sintetizadores analógicos, y se ha convertido en el estándar para controlar la envolvente
+de amplitud de un sintetizador @ref_book_music_tutorial. Un envolvente de amplitud es una señal que controla la amplitud
+de una onda, y por lo tanto su volumen. En este caso, se usa el ADSR como envolvente de amplitud para la onda que genera
+el oscilador, como se ve en la @eq_adsr_modulación.
 
 $
   "salida"[n] = "salida_oscilador"[n] times "salida_adsr"[n]
@@ -21,7 +23,8 @@ $
 <eq_adsr_modulación>
 
 Se divide en cuatro etapas, como se puede ver en la /* TODO */. Estas son configurables para dar forma al sonido,
-generalmente para conseguir imitar un instrumento o dar el carácter buscado a la nota. Son:
+generalmente para conseguir imitar un instrumento o dar el carácter buscado a la nota de forma intuitiva (p. ej. "hacer
+el ataque más agresivo") @ref_book_music_tutorial. Son:
 
 /* TODO: insertar imagen de curva ADSR */
 
@@ -83,7 +86,7 @@ $<eq_b_c_range>
 
 === Implementación
 
-El coponente `ADSR` se compone de su máquina de estado, `ADSRState`, su configuración, `ADSRConfig`, y el estado de su
+El componente `ADSR` se compone de su máquina de estado, `ADSRState`, su configuración, `ADSRConfig`, y el estado de su
 condensador modelado, `Capacitor`.
 
 `Capacitor` sencillamente almacena:
@@ -111,12 +114,12 @@ La máquina de estados `ADSRState` tiene los siguientes estados:
 - `Attack`, que pone el objetivo de `Capacitor` a `velocity_amplitude` hasta que llega a `ReachedTarget`, pasando al
   estado `Decay` #footnote[Sobreescribir el objetivo cada muestra permite tocar otra nota con otra velocidad sin saltos
     repentinos en la amplitu en la amplitud. Por ejemplo, si se toca una nota con velocidad menor, el condensador decae
-    al valor correspondiente de forma suave, aún estando en la fase de ataque. Ésta es la ventaja de aislar el
+    al valor correspondiente de forma suave, aún estando en la fase de ataque. Esta es la ventaja de aislar el
     condensador a su propio `struct`.],
 - `Decay`, que pone de objetivo a `sustain_level * velocity_amplitude` hasta que llega a `ReachedTarget`, pasando al
   estado `Decay`,
 - `Sustain`, que devuelve `sustain_level * velocity_amplitude` indefinidamente. Para pasar a `Release`, se ha de llamar
-  el método `stop_playing` (éste pasa de cualquier etapa a `Release`).
+  el método `stop_playing` (este pasa de cualquier etapa a `Release`).
 - `Release`, que pone el objetivo a 0 hasta que llega a `ReachedTarget`, pasando al estado `Idle`.
 - `QuickRelease`, que activa el `quick_discharge` de `Capacitor` hasta que el volumen llega a 0, pasando al estado
   `Idle`.

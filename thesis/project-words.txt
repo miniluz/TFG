@@ -38,3 +38,9 @@ classiccmp
 println
 descartándolo
 descartándolos
+isbn
+pagetotal
+Puckette
+Repr
+Loeffler
+mastersthesis

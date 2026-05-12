@@ -29,14 +29,14 @@ implementan. El proyecto usa tres tipos de pruebas:
 
 + Los generadores de código imprimen a `stderr` comprobaciones de la validez del código que generan, que son revisadas
   manualmente al ejecutarlos. Por ejemplo, para validar la onda de seno, se muestran el nivel de algunas muestras junto
-  a sus valores esperados, como que el nivel de la primera muestra es 0. Éstas son revisadas manualmente al ejecutar la
+  a sus valores esperados, como que el nivel de la primera muestra es 0. Estas son revisadas manualmente al ejecutar la
   tabla.
 
 + La lógica de los módulos del proyecto se somete a pruebas unitarias y ocasionalmente de integración, dependiendo de la
   necesidad según el criterio del desarrollador. Se intenta generar la mínima cantidad de pruebas que garanticen la
   funcionalidad del sistema. Al momento de probar la salida de audio y otros componentes similares, se prueban las
   propiedades del sistema en lugar de la salida en sí misma. Por ejemplo, para validar el oscilador, se estima la
-  frecuencia con cruces por cero y se compara con la esperada. Éstas son ejecutadas automáticamente antes de hacer un
+  frecuencia con cruces por cero y se compara con la esperada. Estas son ejecutadas automáticamente antes de hacer un
   commit, además de en un workflow de GitHub Action cada vez que se hace push.
 
 + Desde que el código ha sido capaz de leer MIDI y transmitir audio por USB, ha sido ejecutado en la placa de desarrollo
