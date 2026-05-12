@@ -22,7 +22,7 @@ y lo llena de las siguientes $L$ muestras siguiendo los siguientes pasos:
 === Conexión con la salida de audio
 
 La salida de audio funciona por muestreo. Cuando el controlador de la salida recibe una solicitud de transmición de un
-bloque de audio, ha de responder de forma casi inmediata. Debido a ésto, la generación se ejecuta en otra tarea, y
+bloque de audio, ha de responder de forma casi inmediata. Debido a esto, la generación se ejecuta en otra tarea, y
 genera los siguientes dos bloques de antemano. De esta manera, para transmitirlos basta con copiarlos: no es necesario
 esperar a que se calculen. Se usan dos bloques ya que cada uno conlleva un retraso, puesto que se calculan de antemano y
 se mantiene lleno el buffer: si se muestrea una vez cada milisegundo, entonces se responde con un bloque generado hace

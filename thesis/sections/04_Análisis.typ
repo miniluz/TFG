@@ -86,7 +86,7 @@ reiniciar, cumpliendo el @rnf_reliability.
 Rust también permite realizar compilación cruzada @ref_web_rust_cross, permitiendo que el mismo código sea compilado
 tanto a `x86_64`, la arquitectura del ordenador, como a `thumbv7em` (_ARM Cortex M7_), la arquitectura del
 microcontrolador. El proyecto aprovecha esto moviendo todo el código posible a _crates_ (paquetes) que son
-independientes del hardware. Ésto permite desarrollar sin necesidad de tener el microcontrolador a mano, además de
+independientes del hardware. Esto permite desarrollar sin necesidad de tener el microcontrolador a mano, además de
 automatizar las pruebas en workflows de GitHub Actions para que sus resultados sean visibles, para cumplir el
 @rnf_tests.
 

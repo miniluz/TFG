@@ -11,31 +11,22 @@ Un sintetizador generalmente es capaz de reproducir más de una nota a la vez, l
 simultáneamente, se dice que tiene un límite de polifonía de cuatro, o que tiene cuatro voces. El componente de Sparklet
 que mantiene el estado de las voces y las gestiona se llama el banco de voices, `VoiceBank`.
 
-Sparklet modela las voces `Voice` como máquinas de estado simples, con únicamente dos estados `VoiceStage`: libre
-(`Free`) y sostenida (`Held`). El comportamiento del banco de voces es simple si nunca se tocan más de $|V|$ notas
-simultáneamente: cada vez que se toca una nota, se busca una voz libre, y cada vez que se deja de tocar una voz, se pone
-su `ADSR` respectivo en el estado `Release`, y una vez la amplitud llega a 0, se libera (se pasa a `Free`).
-
-Una voz `Voice` almacena:
-- el número de la muestra en el que fue tocada (`timestamp`),
-- la nota que fue tocada (`note`) y su velocidad (`velocity`),
-- el ADSR de dicha nota (`adsr`)
-- y su oscilador (`wavetable_osc`).
-
-Una voz es simple, sencillamente expone funciones para tocar una nota (`play_note`, `retrigger`).
-
-Un banco de voces `VoiceBank` sencillamente tiene:
-- un vector de `Voice` (`voices`) y
-- el contador de muestras global (`timestamp_counter`).
+Sparklet modela las voces `Voice` como máquinas de estado con únicamente dos estados (`VoiceStage`): libre (`Free`) y
+sostenida (`Held`). El comportamiento del banco de voces es simple si nunca se tocan más de $|V|$ notas simultáneamente:
+cada vez que se toca una nota, se busca una voz libre, y cada vez que se deja de tocar una voz, se pone su `ADSR`
+respectivo en el estado `Release`, y una vez la amplitud llega a 0, se libera (se pasa a `Free`). Almacenan cuándo
+fueron tocadas (`timestamp`) para poder priorizar su liberación si se supera el límite, y la nota que fue tocada para
+evitar que dos voces toquen la misma nota. Únicamente expone las funciones para tocar una nota: `play_note` y
+`retrigger`.
 
 === Casos límite de la superación del límite de polifonía
 
 Un sintetizador útil para un músico ha de responder intuitivamente a sus acciones. Cuando un músico toca una nota,
-espera oírla, aún si supera el límite de voces; el sintetizador por lo tanto ha de liberar una voz para tocarla. La voz
-no puede parar su nota actual inmediatamente, pues se oiría un clic, pero ha de liberarse lo antes posible, ya que el
-músico espera oír la nota que tocó. La lógica que determina qué voz liberar y cómo se llama el algoritmo de distribución
-de voces. Es por esto que el envolvente ADSR tiene un modo `QuickRelease`, para solar una nota inmediatamente incluso
-con un decaimiento alto.
+espera oírla, aún si supera el límite de voces; el sintetizador por lo tanto ha de liberar una voz para tocarla (_voice
+stealing_) @ref_book_theory_music. La voz no puede parar su nota actual inmediatamente, pues se oiría un clic, pero ha
+de liberarse lo antes posible, ya que el músico espera oír la nota que tocó. La lógica que determina qué voz liberar y
+cómo se llama el algoritmo de distribución de voces. Es por esto que el envolvente ADSR tiene un modo `QuickRelease`,
+para soltar una nota inmediatamente incluso con un decaimiento alto.
 
 #cite(<ref_book_theory_music>, form: "prose") propone las bases de un algoritmo simple, pero no es suficiente para
 resolver todas las situaciones límite que han de ser manejadas correctamente para que el sintetizador resulte intuitivo
@@ -64,7 +55,7 @@ una de las dificultades principales del desarrollo de Sparklet. Tómense los sig
   cantidad de voces total, $|V|$.
 
 + Similarmente, mientras el sistema aún está intentando tocar notas, un músico toca aún más. Con un límite de 2 notas,
-  hay ya dos siento ya soltadas, dos notas pendientes del último procesamiento, y dos que acaba de tocar el músico y no
+  hay ya dos siendo ya soltadas, dos notas pendientes del último procesamiento, y dos que acaba de tocar el músico y no
   han sido procesadas. Similarmente, un sistema que procese las notas en orden cronológico tocaría primero las dos
   pendientes para soltarlas al instante, retrasando las dos notas del músico. La misma cola intermediaria del paso
   anterior soluciona este problema.
@@ -82,18 +73,18 @@ Tomando estos casos límite en cuenta, se implementó el siguiente algoritmo, qu
 El código de Rust que lo implementa se puede ver en el @cod_voice_steal_algorithm.
 
 El método `play_note` de `VoiceBank` nunca toca una nota si no quedan voces libres. Por voz libre, se entiende una voz
-en estado `Idle`, sin contar `Release` ni `QuickReleaes`. En su lugar, `play_note` devuelve `AllVoicesBusy`. La
-responsabilidad de liberar una voz y volverlo a intentar más tarde recae en el módulo que llama al `VoiceBank`. Para
-liberarla, se usa el método `quick_release` de `VoiceBank`, que activa el modo `QuickRelease` del ADSR de una de sus
-notas, eligiendo con la siguiente prioridad:
+en estado `Idle`, sin contar `Release` ni `QuickRelease`. En su lugar, `play_note` devuelve `AllVoicesBusy`. La
+responsabilidad de liberar una voz y volverlo a intentar más tarde recae en `Generator`, el módulo que llama al
+`VoiceBank`. Se hace de esta forma, Para liberarla, se usa el método `quick_release` de `VoiceBank`, que activa el modo
+`QuickRelease` del ADSR de una de sus notas, eligiendo con la siguiente prioridad:
 
-+ La voz más callada cuyo ADSR esté en estado `Release`. Ésto da prioridad a las notas donde el cambio se notará menos
++ La voz más callada cuyo ADSR esté en estado `Release`. Esto da prioridad a las notas donde el cambio se notará menos
   (las que tienen volumen bajo y ya estaban siendo soltadas)
 + La voz tocando la nota más antigua que no esté ya en estado `QuickRelease` o esté `Idle`.
 
 Si no se encuentra ninguna, no se realiza ninguna operación, ya que significa que todas las voces tienen estado
 `QuickRelease` o `Idle`. Después de $n$ llamadas, habrán al menos $n$ notas en modo `QuickRelease` o `Idle`. También
-proporciona `count_vocies_in_quick_release`, para saber cuántas notas están siendo liberadas.
+proporciona `count_voices_in_quick_release`, para saber cuántas notas están siendo liberadas.
 
 Aunque el módulo que gestiona la liberación de voces, el generador `Generator`, se explicará en la siguiente sección,
 cabe explicar en esta cómo lo hace. Cuando se pide al generador que calcule un bloque de audio, lo primero que hace es

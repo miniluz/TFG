@@ -10,8 +10,9 @@
 
 Los osciladores son donde comienza la síntesis. Estos reciben una frecuencia y generan una señal de audio a dicha
 frecuencia. Hay diversos tipos de osciladores, pero uno de los más usados en entornos empotrados es el de tabla de onda
-(_wavetable_), debido a su eficiencia. La onda deseada se almacena en una tabla de longitud arbitraria $L$ como se ve en
-la /* TODO */, y se reproduce a la frecuencia deseada @ref_book_music_tutorial @ref_book_theory_music.
+(_wavetable_), debido a su eficiencia. Esta es la razón por la que Sparklet lo usa. La onda deseada se almacena en una
+tabla de longitud arbitraria $L$ como se ve en la /* TODO */, y se reproduce a la frecuencia deseada
+@ref_book_music_tutorial @ref_book_theory_music.
 
 // TODO: Ilustración de una wavetable.
 
@@ -44,7 +45,7 @@ $f_s / 2^"bits" = f_e$, hacen falta $log_2(f_s / f_e) = log_2((48.000 "Hz") / (0
 ya que la familia ARM Cortext M es de 32 bits, si se usan más de 16 bits lo mejor es usar 32 (en formato UQ8.24).
 
 Los 8 bits de la parte entera, $i$, se usan directamente para indexar la tabla $T$. De los 24 bits de la parte
-fraccionaria, se toman los primeros 15 y se interpretan como un Q15, $r$. Éstos se usan para interpolar la muestra $i$
+fraccionaria, se toman los primeros 15 y se interpretan como un Q15, $r$. Estos se usan para interpolar la muestra $i$
 con la siguiente, $i + 1 mod 256$. Interpolar evita el ruido que genera redondear del índice @ref_book_music_tutorial.
 Mientras mayor es $r$, más cerca se está de la siguiente muestra, por lo que se usa como el peso de la siguiente
 muestra. Por lo tanto, la salida se calcula con la @eq_salida_interpolada @ref_book_theory_music.

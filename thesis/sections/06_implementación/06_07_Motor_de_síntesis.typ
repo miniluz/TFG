@@ -6,8 +6,7 @@
 == Motor de síntesis
 
 El motor de síntesis es un componente simple que integra el generador con el banco de filtros. Es la capa exterior del
-sistema de audio, pero realmente es muy simple. Únicamente provee una interfaz sencilla que inicializa todos sus
-componentes y abstrae su funcionamiento.
+sistema de audio. Provee una interfaz sencilla que inicializa todos sus componentes y abstrae su funcionamiento.
 
 En el archivo `sparklet/synth-engine/examples/midi_render.rs` se puede encontrar una prueba que calcula las muestras
 para un archivo MIDI del dominio público (The Entertainer de Scott Joplin) y las guarda en un archivo de audio con
