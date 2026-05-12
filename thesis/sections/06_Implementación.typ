@@ -27,6 +27,4 @@
 
 #include "06_implementación/06_10_CMSIS.typ"
 
-#include "06_implementación/06_11_MIDI_UART.typ"
-
-#include "06_implementación/06_12_USB.typ"
+#include "06_implementación/06_11_USB.typ"

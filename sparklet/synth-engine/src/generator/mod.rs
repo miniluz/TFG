@@ -1,6 +1,5 @@
 use config::Config;
 use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
-use heapless::Deque;
 use midi::MidiEvent;
 
 pub use crate::voice_bank::{Note, PlayNoteResult, Velocity, VoiceBank, VoiceStage};
@@ -10,14 +9,8 @@ use crate::wavetable::{
 };
 pub use cmsis_interface::{CmsisOperations, Q15};
 
-#[derive(Debug, Clone, Copy)]
-struct PendingNote {
-    note: Note,
-    velocity: Velocity,
-}
-
 pub struct Generator<
-    'ch,
+    'ac,
     'wt,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
@@ -26,13 +19,11 @@ pub struct Generator<
     const PAGE_AMOUNT: usize,
     const ENCODER_AMOUNT: usize,
 > {
-    voice_bank: VoiceBank<'wt, VOICE_BANK_SIZE>,
-    receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
-    note_queue: Deque<PendingNote, VOICE_BANK_SIZE>,
+    voice_bank: VoiceBank<'wt, 'ac, M, VOICE_BANK_SIZE, CHANNEL_SIZE>,
 }
 
 impl<
-    'ch,
+    'ac,
     'wt,
     M: RawMutex,
     const CHANNEL_SIZE: usize,
@@ -40,7 +31,7 @@ impl<
     const WINDOW_SIZE: usize,
     const PAGE_AMOUNT: usize,
     const ENCODER_AMOUNT: usize,
-> Generator<'ch, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE, PAGE_AMOUNT, ENCODER_AMOUNT>
+> Generator<'ac, 'wt, M, CHANNEL_SIZE, VOICE_BANK_SIZE, WINDOW_SIZE, PAGE_AMOUNT, ENCODER_AMOUNT>
 {
     const VOICE_BIT_SHIFT_SIZE: i8 = -((if VOICE_BANK_SIZE == 1 {
         0
@@ -59,7 +50,7 @@ impl<
     }
 
     pub fn new(
-        receiver: Receiver<'ch, M, MidiEvent, CHANNEL_SIZE>,
+        receiver: Receiver<'ac, M, MidiEvent, CHANNEL_SIZE>,
         initial_config: &Config<PAGE_AMOUNT, ENCODER_AMOUNT>,
     ) -> Self {
         let attack = initial_config.pages[0].values[0];
@@ -74,13 +65,11 @@ impl<
         };
 
         Self {
-            voice_bank: VoiceBank::new(wavetable, sustain, attack, decay_release),
-            receiver,
-            note_queue: Deque::new(),
+            voice_bank: VoiceBank::new(wavetable, sustain, attack, decay_release, receiver),
         }
     }
 
-    pub fn get_voice_bank(&self) -> &VoiceBank<'wt, VOICE_BANK_SIZE> {
+    pub fn get_voice_bank(&self) -> &VoiceBank<'wt, 'ac, M, VOICE_BANK_SIZE, CHANNEL_SIZE> {
         &self.voice_bank
     }
 
@@ -103,47 +92,7 @@ impl<
             panic!();
         }
 
-        while let Ok(event) = self.receiver.try_receive() {
-            match event {
-                MidiEvent::NoteOff { key, vel: _ } => {
-                    self.voice_bank.release_note(key.into());
-                    self.note_queue
-                        .retain(|PendingNote { note, velocity: _ }| note.as_u8() != key);
-                }
-                MidiEvent::NoteOn { key, vel } => {
-                    let pending = PendingNote {
-                        note: key.into(),
-                        velocity: vel.into(),
-                    };
-                    // Add, dropping oldest
-                    if self
-                        .note_queue
-                        .iter()
-                        .all(|PendingNote { note, velocity: _ }| note.as_u8() != key)
-                    {
-                        let _ = self.note_queue.push_back(pending);
-                    }
-                }
-            }
-        }
-
-        while let Some(&pending) = self.note_queue.front() {
-            match self.voice_bank.play_note(pending.note, pending.velocity) {
-                PlayNoteResult::Success => {
-                    self.note_queue.pop_front();
-                }
-                PlayNoteResult::AllVoicesBusy => {
-                    let queue_count = self.note_queue.len();
-                    let quick_release_count = self.voice_bank.count_voices_in_quick_release();
-
-                    for _ in 0..(queue_count - quick_release_count) {
-                        self.voice_bank.quick_release();
-                    }
-
-                    break;
-                }
-            }
-        }
+        self.voice_bank.process_midi_events();
 
         let mut output_buf = [Q15::ZERO; WINDOW_SIZE];
 
@@ -193,7 +142,7 @@ impl<
 
     #[cfg(test)]
     #[allow(dead_code)]
-    pub(crate) fn get_voice_bank_mut(&mut self) -> &mut VoiceBank<'wt, VOICE_BANK_SIZE> {
+    pub(crate) fn get_voice_bank_mut(&mut self) -> &mut VoiceBank<'wt, 'ac, M, VOICE_BANK_SIZE, CHANNEL_SIZE> {
         &mut self.voice_bank
     }
 }

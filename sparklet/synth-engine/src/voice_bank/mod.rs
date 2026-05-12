@@ -1,4 +1,7 @@
 use defmt::Format;
+use embassy_sync::{blocking_mutex::raw::RawMutex, channel::Receiver};
+use heapless::Deque;
+use midi::MidiEvent;
 
 use crate::{SAMPLE_RATE, adsr::ADSR, wavetable::WavetableOscillator};
 
@@ -110,6 +113,12 @@ impl From<Velocity> for midi::u7 {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+struct PendingNote {
+    note: Note,
+    velocity: Velocity,
+}
+
 /// Result of attempting to play a note
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PlayNoteResult {
@@ -151,13 +160,21 @@ impl<'a> Voice<'a> {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct VoiceBank<'a, const N: usize> {
+#[derive(Debug, Clone)]
+pub struct VoiceBank<'a, 'ac, M, const N: usize, const CHANNEL_SIZE: usize>
+where
+    M: RawMutex,
+{
     pub(crate) voices: [Voice<'a>; N],
     pub(crate) timestamp_counter: u32,
+    receiver: Receiver<'ac, M, MidiEvent, CHANNEL_SIZE>,
+    note_queue: Deque<PendingNote, N>,
 }
 
-impl<'a, const N: usize> Format for VoiceBank<'a, N> {
+impl<'a, 'ac, M, const N: usize, const CHANNEL_SIZE: usize> Format for VoiceBank<'a, 'ac, M, N, CHANNEL_SIZE>
+where
+    M: RawMutex,
+{
     fn format(&self, fmt: defmt::Formatter) {
         defmt::write!(fmt, "VoiceBank {{ ");
 
@@ -175,12 +192,16 @@ impl<'a, const N: usize> Format for VoiceBank<'a, N> {
     }
 }
 
-impl<'a, const N: usize> VoiceBank<'a, N> {
+impl<'a, 'ac, M, const N: usize, const CHANNEL_SIZE: usize> VoiceBank<'a, 'ac, M, N, CHANNEL_SIZE>
+where
+    M: RawMutex,
+{
     pub fn new(
         wavetable: &'a [cmsis_interface::Q15; 256],
         sustain_config: u8,
         attack_config: u8,
         decay_release_config: u8,
+        receiver: Receiver<'ac, M, MidiEvent, CHANNEL_SIZE>,
     ) -> Self {
         Self {
             voices: [Voice {
@@ -191,6 +212,8 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
                 wavetable_osc: WavetableOscillator::new(wavetable),
             }; N],
             timestamp_counter: 0,
+            receiver,
+            note_queue: Deque::new(),
         }
     }
 
@@ -283,6 +306,50 @@ impl<'a, const N: usize> VoiceBank<'a, N> {
             voice.adsr.set_sustain(sustain);
             voice.adsr.set_attack(attack);
             voice.adsr.set_decay_release(decay_release);
+        }
+    }
+
+    pub fn process_midi_events(&mut self) {
+        while let Ok(event) = self.receiver.try_receive() {
+            match event {
+                MidiEvent::NoteOff { key, vel: _ } => {
+                    self.release_note(key.into());
+                    self.note_queue
+                        .retain(|PendingNote { note, velocity: _ }| note.as_u8() != key);
+                }
+                MidiEvent::NoteOn { key, vel } => {
+                    let pending = PendingNote {
+                        note: key.into(),
+                        velocity: vel.into(),
+                    };
+                    // Add, dropping oldest
+                    if self
+                        .note_queue
+                        .iter()
+                        .all(|PendingNote { note, velocity: _ }| note.as_u8() != key)
+                    {
+                        let _ = self.note_queue.push_back(pending);
+                    }
+                }
+            }
+        }
+
+        while let Some(&pending) = self.note_queue.front() {
+            match self.play_note(pending.note, pending.velocity) {
+                PlayNoteResult::Success => {
+                    self.note_queue.pop_front();
+                }
+                PlayNoteResult::AllVoicesBusy => {
+                    let queue_count = self.note_queue.len();
+                    let quick_release_count = self.count_voices_in_quick_release();
+
+                    for _ in 0..(queue_count - quick_release_count) {
+                        self.quick_release();
+                    }
+
+                    break;
+                }
+            }
         }
     }
 

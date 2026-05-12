@@ -11,6 +11,6 @@ sistema de audio. Provee una interfaz sencilla que inicializa todos sus componen
 En el archivo `sparklet/synth-engine/examples/midi_render.rs` se puede encontrar una prueba que calcula las muestras
 para un archivo MIDI del dominio público (The Entertainer de Scott Joplin) y las guarda en un archivo de audio con
 formato WAV. `sparklet/synth-engine/render_all.sh` la ejecuta con varias configuraciones para ver cómo estas afectan al
-audio. Por ejemplo, una vez ejecutado, en `sparklet/synth-engine/test-results/entertainer_sawtooth_mid_4v.wav` se puede
-ver cómo se escucharía con usando la onda de diente de sierra con cuatro voces y un ataque, decaimiento y relajación
-bajas.
+audio. Por ejemplo, una vez ejecutado, en `sparklet/synth-engine/test-results/entertainer_sawtooth_mid_16v.wav` se puede
+probar cómo se escucharía el motor de síntesis usando la onda de diente de sierra con dieciséis voces y una
+configuración de ataque, decaimiento y relajación intermedia.

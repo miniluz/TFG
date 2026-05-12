@@ -98,7 +98,7 @@ impl<
         }
     }
 
-    pub fn get_voice_bank(&self) -> &VoiceBank<'wt, VOICE_BANK_SIZE> {
+    pub fn get_voice_bank(&self) -> &VoiceBank<'wt, 'ch, M, VOICE_BANK_SIZE, CHANNEL_SIZE> {
         self.generator.get_voice_bank()
     }
 

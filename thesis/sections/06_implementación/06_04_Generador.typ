@@ -9,8 +9,8 @@ El generador es un componente simple que combina el ADSR, los osciladores y el b
 como una cola de eventos MIDI pendientes. Su método principal es `render_samples`, que recibe un buffer de longitud `L`
 y lo llena de las siguientes $L$ muestras siguiendo los siguientes pasos:
 
-+ Procesa los eventos MIDI que le han llegado desde el último `render_samples`, como se explica en la
-  @sec_detalles_algoritmo_voice_bank.
++ Hace que el `VoiceBank` procese los eventos MIDI que le han llegado desde el último `render_samples`, como se explica
+  en la @sec_detalles_algoritmo_voice_bank.
 + Por cada voz:
   + Calcula las muestras que genera el oscilador para ese periodo.
   + Calcula las muestras del envolvente ADSR para ese periodo.
