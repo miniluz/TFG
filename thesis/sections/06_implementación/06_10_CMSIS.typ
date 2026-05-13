@@ -5,8 +5,8 @@
 
 == CMSIS
 
-Para lidiar con CMSIS, se usa la biblioteca `cmsis_dsp` de Rust, que provee _bindings_ para la biblioteca CMSIS; es
-decir, por cada función de la biblioteca en C se provee una función en Rust que hace la misma operación. Se hizo un
+Para lidiar con CMSIS, se usa la biblioteca `cmsis_dsp` de Rust, que proporciona _bindings_ para la biblioteca CMSIS; es
+decir, por cada función de la biblioteca en C se proporciona una función en Rust que hace la misma operación. Se hizo un
 _fork_ de la biblioteca para poder implementar bindings a otras funciones necesarias, como la función
 `biquad_cascade_df1_q15` que usa el banco de filtros.
 

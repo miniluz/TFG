@@ -9,6 +9,7 @@
 #figure(
   image("/figures/Diagrama de la arquitectura.drawio.pdf", width: 70%),
   caption: "Diagrama de la arquitectura de Sparklet",
+  placement: bottom,
 )<fig_diagrama_arquitectura>
 
 La arquitectura de Sparklet se puede ver en el @fig_diagrama_arquitectura. Consiste en 4 grupos de tareas: el motor de
@@ -51,14 +52,14 @@ buffer al motor de síntesis.
 )<fig_cmsis_interface>
 
 Para poder realizar los cálculos necesarios con la velocidad suficiente, es necesario aprovechar las instrucciones del
-hardware. Para esto, se usa la biblioteca CMSIS-DSP. Sin embargo, esta biblioteca usa instrucciones de ensamblador que no
-están disponibles en `x86_64`, la arquitectura de la computadora de desarrollo, sino tan solo en ARM Cortex M7
+hardware. Para esto, se usa la biblioteca CMSIS-DSP. Sin embargo, esta biblioteca usa instrucciones de ensamblador que
+no están disponibles en `x86_64`, la arquitectura de la computadora de desarrollo, sino tan solo en ARM Cortex M7
 @ref_web_cmsis_dsp. Para poder ejecutar los mismos módulos tanto en el chip como en la computadora, las operaciones
 necesarias se abstraen detrás de una interfaz: CMSIS Interface.
 
 Hay dos implementaciones de esta interfaz, como se indica en la @fig_cmsis_interface. Una, CMSIS Rust, usa Rust puro y
-se puede compilar a `x86_64`, y se provee a los módulos en las pruebas automáticas. La otra, CMSIS Native, usa las
-funciones de la biblioteca CMSIS-DSP, y se provee en la ejecución.
+se puede compilar a `x86_64`, y se proporciona a los módulos en las pruebas automáticas. La otra, CMSIS Native, usa las
+funciones de la biblioteca CMSIS-DSP, y se proporciona en la ejecución.
 
 Tanto CMSIS Rust como CMSIS Native son probadas por la misma batería de pruebas, para garantizar que sus
 implementaciones son idénticas. Se usan macros definidas en el módulo CMSIS Interface para generar las pruebas de ambas

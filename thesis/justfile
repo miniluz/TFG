@@ -5,6 +5,11 @@
 default:
     @just --list
 
+generate-images:
+    @echo "Generating images"
+    @python ./scripts/adsr_diagrams.py
+    @python ./scripts/filter_bank_diagrams.py
+
 write:
     @echo "Compiling and watching for changes..."
     @typst watch main.typ

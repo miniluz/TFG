@@ -1,7 +1,7 @@
 use fixed::types::I1F31;
 use table_generators::adsr_utils::{
-    BaseAndCoefficient, ParamConfig, TimeConfig, get_base_and_coefficient_for_index,
-    get_time_for_index, iterate_envelope,
+    BaseAndCoefficient, DecayConfig, ParamConfig, TimeConfig, get_base_and_coefficient,
+    get_base_and_coefficient_for_index, get_time_for_index, iterate_envelope,
 };
 
 const SAMPLE_RATE: u32 = 48000;
@@ -15,7 +15,7 @@ fn main() {
     let mut attack_table: [BaseAndCoefficient; TABLE_SIZE] = [Default::default(); TABLE_SIZE];
 
     let attack_config = ParamConfig {
-        target_ratio: 1.5,
+        target_ratio: 0.1,
         initial: 0.,
         target: 1.,
         time_config: TimeConfig {
@@ -30,7 +30,7 @@ fn main() {
         [Default::default(); TABLE_SIZE];
 
     let decay_release_config = ParamConfig {
-        target_ratio: 1.5,
+        target_ratio: 0.2,
         initial: 1.,
         target: 0.,
         time_config: TimeConfig {
@@ -42,6 +42,13 @@ fn main() {
     };
 
     let mut sanity_check_data = vec![];
+
+    let quick_release_base_coefficient = get_base_and_coefficient::<SAMPLE_RATE>(DecayConfig {
+        target_ratio: 2.,
+        initial: 1.,
+        target: 0.,
+        rate: 0.01 * SAMPLE_RATE as f64,
+    });
 
     for (index, (attack_base_coefficient, decay_release_base_coefficient)) in attack_table
         .iter_mut()
@@ -59,8 +66,8 @@ fn main() {
 
         // Collect sanity check data for selected indices
         if index <= 3 || (126..=128).contains(&index) || 253 <= index {
-            let attack_iterations = (attack_time * SAMPLE_RATE as f64) as usize;
-            let decay_release_iterations = (decay_release_time * SAMPLE_RATE as f64) as usize;
+            let attack_iterations = (attack_time * SAMPLE_RATE as f64 * 1.5) as usize;
+            let decay_release_iterations = (decay_release_time * SAMPLE_RATE as f64 * 1.5) as usize;
 
             let (attack_iterations, attack_final) = iterate_envelope(
                 attack_base_coefficient.base,
@@ -106,7 +113,7 @@ pub static FALL_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; {}] = [
     {}
 ];
 ",
-        base_coefficient_to_string(&decay_release_table[0]),
+        base_coefficient_to_string(&quick_release_base_coefficient),
         TABLE_SIZE,
         base_coefficient_table_to_string(&attack_table),
         TABLE_SIZE,

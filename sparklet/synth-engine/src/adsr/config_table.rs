@@ -5,2061 +5,522 @@ use crate::adsr::BaseAndCoefficient;
 use fixed::types::I1F31;
 
 // The first element from the fall_base_coefficient table
-pub static QUICK_FALL_BASE_COEFFICIENT: BaseAndCoefficient = BaseAndCoefficient {
-    base: I1F31::from_bits(0xffcbb823_u32 as i32),
-    coefficient: I1F31::from_bits(0x7fdd256c_u32 as i32),
-};
+pub static QUICK_FALL_BASE_COEFFICIENT: BaseAndCoefficient = BaseAndCoefficient{ base: I1F31::from_bits(0xffc8a9f4_u32 as i32), coefficient: I1F31::from_bits(0x7fe454fa_u32 as i32) };
 
 pub static RISE_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; 256] = [
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00572271_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fdd256c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0050d200_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fdfac00_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x004b4339_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe1e51c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0046557c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe3ddcf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0041ef17_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe5a05d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x003dfb8d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe734fb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x003a6a4d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe8a247_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00372dd3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe9edac_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00343af6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7feb1b9e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00318871_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fec2fd3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x002f0e7a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fed2d69_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x002cc680_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fee1700_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x002aaae9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7feeeed6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0028b6eb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fefb6d5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0026e666_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff070a4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x002535c8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff11db0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0023a1f5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff1bf37_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00222836_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff25651_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0020c628_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff2e3f0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001f79b0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff368ed_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001e40f2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff3e605_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001d1a47_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff45be4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001c0434_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff4cb1f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001afd68_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff5343d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001a04b5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff597b8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0019190a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff5f5fc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00183972_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff64f6c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0017650f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff6a461_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00169b16_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff6f52a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0015dad2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff74212_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0015239b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff78b5c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001474d9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff7d143_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0013ce02_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff813ff_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00132e95_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff853c4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0012961e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff890c1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00120431_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff8cb20_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0011786b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff90309_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0010f26f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff938a0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x001071eb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff96c09_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000ff68e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff99d61_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000f8011_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff9ccc6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000f0e31_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff9fa53_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000ea0ae_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa2621_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000e374e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa5047_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000dd1db_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa78dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000d7022_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa9ff3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000d11f3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffac59f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000cb723_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffae9f2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000c5f88_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb0cfd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000c0afa_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb2ecf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000bb956_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb4f77_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000b6a79_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb6f03_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000b1e42_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb8d7f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000ad494_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbaaf8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000a8d52_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbc779_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000a4860_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbe30d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000a05a6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbfdbe_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0009c50b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc1795_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00098679_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc309c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000949da_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc48dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00090f1a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc605c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0008d625_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc7725_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00089ee9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc8d3c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00086955_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffca2ab_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00083559_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffcb776_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000802e5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffccba4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0007d1e9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffcdf3c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0007a259_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffcf243_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00077426_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd04be_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00074743_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd16b2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00071ba5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd2824_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0006f140_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd391a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0006c808_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd4996_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00069ff3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd599f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000678f7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd6937_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0006530a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd7862_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00062e24_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd8725_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00060a3a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd9582_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0005e745_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffda37e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0005c53d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdb11b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0005a419_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdbe5c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000583d3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdcb45_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00056463_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdd7d8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000545c2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffde419_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000527ea_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdf009_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00050ad5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdfbab_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0004ee7c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe0702_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0004d2d9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe120f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0004b7e8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe1cd6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00049da2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe2759_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00048402_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe3199_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00046b05_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe3b98_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000452a3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe4558_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00043ada_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe4edc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000423a4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe5825_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00040cfe_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe6134_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0003f6e3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe6a0c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0003e14f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe72ad_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0003cc3f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe7b1a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0003b7ae_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe8354_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0003a399_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe8b5c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00038ffd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe9335_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00037cd6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe9ade_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00036a21_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffea259_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000357db_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffea9a8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00034601_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeb0cc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00033491_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeb7c6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00032386_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffebe97_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000312df_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffec540_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00030299_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffecbc3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002f2b1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffed220_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002e325_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffed858_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002d3f2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffede6c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002c517_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffee45d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002b690_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeea2d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002a85c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeefdb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00029a79_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffef569_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00028ce5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffefad8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00027f9d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff0028_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000272a0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff055a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000265eb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff0a6f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0002597e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff0f67_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00024d56_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff1444_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00024171_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff1906_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000235ce_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff1dad_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00022a6c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff223b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00021f48_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff26b0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00021462_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff2b0c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000209b7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff2f50_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001ff47_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff337d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001f510_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff3793_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001eb10_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff3b93_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001e147_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff3f7d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001d7b2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4352_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001ce52_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4713_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001c523_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4abf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001bc27_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4e57_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001b35a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff51dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001aabd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff554e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001a24d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff58ae_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00019a0b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff5bfc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000191f4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff5f38_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00018a09_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6263_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00018247_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff657d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00017aaf_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6887_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0001733f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6b81_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00016bf5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6e6b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000164d3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7145_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00015dd5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7411_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000156fd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff76ce_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00015048_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff797d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000149b6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7c1e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00014346_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7eb1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00013cf8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8136_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000136cb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff83af_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000130be_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff861a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00012ad0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff887a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00012501_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8acc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00011f50_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8d13_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000119bc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8f4e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00011445_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff917e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00010eea_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff93a2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000109ab_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff95bc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00010486_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff97ca_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000ff7c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff99ce_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000fa8c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9bc8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000f5b5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9db8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000f0f7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9f9d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000ec51_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa179_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000e7c2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa34c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000e34b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa515_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000deea_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa6d6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000daa0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa88d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000d66b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffaa3c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000d24c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffabe2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000ce41_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffad7f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000ca4b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffaf15_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000c669_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb0a3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000c29b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb228_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000bee0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb3a7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000bb37_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb51d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000b7a1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb68c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000b41d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb7f4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000b0aa_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb955_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000ad49_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbab0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000a9f9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbc03_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000a6b9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbd4f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000a38a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbe96_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000a06b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbfd5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00009d5b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc10f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00009a5a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc242_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00009768_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc370_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00009485_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc497_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000091b1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc5b9_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00008eea_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc6d5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00008c32_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc7ec_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00008986_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc8fd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000086e8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffca09_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00008457_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcb10_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000081d3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcc12_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00007f5b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcd0f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00007cf0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffce07_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00007a90_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcefa_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000783c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcfe8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000075f4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd0d2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000073b7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd1b7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00007185_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd298_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006f5d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd374_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006d41_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd44c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006b2f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd521_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006927_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd5f1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006729_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd6bd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006534_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd785_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000634a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd849_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00006168_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd909_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005f90_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd9c6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005dc2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffda7f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005bfb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdb35_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005a3e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdbe7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005889_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdc96_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000056dd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdd41_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005538_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdde9_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000539c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffde8e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00005208_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdf30_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000507b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdfcf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004ef6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe06a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004d78_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe103_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004c02_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe199_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004a93_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe22c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000492b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe2bc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000047c9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe349_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000466f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe3d4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000451b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe45c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000043cd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe4e1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004286_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe564_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00004145_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe5e4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000400a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe662_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003ed5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe6de_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003da6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe757_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003c7d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe7ce_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003b59_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe843_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003a3b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe8b5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003922_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe925_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x0000380f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe994_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003701_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffea00_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000035f8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffea6a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000034f4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffead2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000033f5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeb38_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x000032fb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeb9c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003205_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffebfe_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003114_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffec5e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00003028_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffecbd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00002f40_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffed19_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00002e5d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffed74_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00002d7e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffedce_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0x00002ca3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffee25_u32 as i32),
-    },
+    BaseAndCoefficient{ base: I1F31::from_bits(0x00b39def_u32 as i32), coefficient: I1F31::from_bits(0x7f5cb63e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00a69feb_u32 as i32), coefficient: I1F31::from_bits(0x7f6885e4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x009b2f9a_u32 as i32), coefficient: I1F31::from_bits(0x7f72ec00_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00910a1c_u32 as i32), coefficient: I1F31::from_bits(0x7f7c255b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0087fac5_u32 as i32), coefficient: I1F31::from_bits(0x7f8461d8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x007fd786_u32 as i32), coefficient: I1F31::from_bits(0x7f8bc7b4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00787e64_u32 as i32), coefficient: I1F31::from_bits(0x7f9275d4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0071d39a_u32 as i32), coefficient: I1F31::from_bits(0x7f988574_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x006bc043_u32 as i32), coefficient: I1F31::from_bits(0x7f9e0b66_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00663150_u32 as i32), coefficient: I1F31::from_bits(0x7fa318fe_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x006116c2_u32 as i32), coefficient: I1F31::from_bits(0x7fa7bcc4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x005c6316_u32 as i32), coefficient: I1F31::from_bits(0x7fac0303_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00580acc_u32 as i32), coefficient: I1F31::from_bits(0x7faff630_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0054040a_u32 as i32), coefficient: I1F31::from_bits(0x7fb39f3d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00504654_u32 as i32), coefficient: I1F31::from_bits(0x7fb705e2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x004cca52_u32 as i32), coefficient: I1F31::from_bits(0x7fba30cc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x004989a0_u32 as i32), coefficient: I1F31::from_bits(0x7fbd25cc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00467ea5_u32 as i32), coefficient: I1F31::from_bits(0x7fbfe9f6_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0043a478_u32 as i32), coefficient: I1F31::from_bits(0x7fc281c1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0040f6c7_u32 as i32), coefficient: I1F31::from_bits(0x7fc4f11d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x003e71ba_u32 as i32), coefficient: I1F31::from_bits(0x7fc73b85_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x003c11eb_u32 as i32), coefficient: I1F31::from_bits(0x7fc96413_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0039d451_u32 as i32), coefficient: I1F31::from_bits(0x7fcb6d88_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0037b634_u32 as i32), coefficient: I1F31::from_bits(0x7fcd5a5c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0035b526_u32 as i32), coefficient: I1F31::from_bits(0x7fcf2cc7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0033cef4_u32 as i32), coefficient: I1F31::from_bits(0x7fd0e6c5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x003201a6_u32 as i32), coefficient: I1F31::from_bits(0x7fd28a23_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00304b72_u32 as i32), coefficient: I1F31::from_bits(0x7fd41881_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002eaab9_u32 as i32), coefficient: I1F31::from_bits(0x7fd59357_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002d1e02_u32 as i32), coefficient: I1F31::from_bits(0x7fd6fbfe_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002ba3f6_u32 as i32), coefficient: I1F31::from_bits(0x7fd853ac_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002a3b5a_u32 as i32), coefficient: I1F31::from_bits(0x7fd99b80_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0028e311_u32 as i32), coefficient: I1F31::from_bits(0x7fdad47c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00279a13_u32 as i32), coefficient: I1F31::from_bits(0x7fdbff92_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00265f70_u32 as i32), coefficient: I1F31::from_bits(0x7fdd1d9a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00253249_u32 as i32), coefficient: I1F31::from_bits(0x7fde2f61_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002411d2_u32 as i32), coefficient: I1F31::from_bits(0x7fdf359e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0022fd4e_u32 as i32), coefficient: I1F31::from_bits(0x7fe030ff_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0021f40f_u32 as i32), coefficient: I1F31::from_bits(0x7fe12221_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0020f574_u32 as i32), coefficient: I1F31::from_bits(0x7fe20997_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x002000e6_u32 as i32), coefficient: I1F31::from_bits(0x7fe2e7e9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001f15db_u32 as i32), coefficient: I1F31::from_bits(0x7fe3bd96_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001e33d1_u32 as i32), coefficient: I1F31::from_bits(0x7fe48b13_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001d5a50_u32 as i32), coefficient: I1F31::from_bits(0x7fe550ce_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001c88e9_u32 as i32), coefficient: I1F31::from_bits(0x7fe60f2c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001bbf32_u32 as i32), coefficient: I1F31::from_bits(0x7fe6c68d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001afcc9_u32 as i32), coefficient: I1F31::from_bits(0x7fe77749_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x001a4154_u32 as i32), coefficient: I1F31::from_bits(0x7fe821b4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00198c7c_u32 as i32), coefficient: I1F31::from_bits(0x7fe8c61b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0018ddf1_u32 as i32), coefficient: I1F31::from_bits(0x7fe964c8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00183569_u32 as i32), coefficient: I1F31::from_bits(0x7fe9fdfe_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0017929b_u32 as i32), coefficient: I1F31::from_bits(0x7fea91ff_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0016f546_u32 as i32), coefficient: I1F31::from_bits(0x7feb2106_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00165d2b_u32 as i32), coefficient: I1F31::from_bits(0x7febab4d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0015ca0f_u32 as i32), coefficient: I1F31::from_bits(0x7fec310a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00153bba_u32 as i32), coefficient: I1F31::from_bits(0x7fecb26e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0014b1f8_u32 as i32), coefficient: I1F31::from_bits(0x7fed2faa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00142c97_u32 as i32), coefficient: I1F31::from_bits(0x7feda8eb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0013ab69_u32 as i32), coefficient: I1F31::from_bits(0x7fee1e5b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00132e41_u32 as i32), coefficient: I1F31::from_bits(0x7fee9022_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0012b4f5_u32 as i32), coefficient: I1F31::from_bits(0x7feefe67_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00123f5d_u32 as i32), coefficient: I1F31::from_bits(0x7fef694e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0011cd55_u32 as i32), coefficient: I1F31::from_bits(0x7fefd0f9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00115eb7_u32 as i32), coefficient: I1F31::from_bits(0x7ff03588_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0010f362_u32 as i32), coefficient: I1F31::from_bits(0x7ff0971b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00108b36_u32 as i32), coefficient: I1F31::from_bits(0x7ff0f5cf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00102614_u32 as i32), coefficient: I1F31::from_bits(0x7ff151bf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000fc3df_u32 as i32), coefficient: I1F31::from_bits(0x7ff1ab07_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000f647b_u32 as i32), coefficient: I1F31::from_bits(0x7ff201bf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000f07ce_u32 as i32), coefficient: I1F31::from_bits(0x7ff255ff_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000eadbf_u32 as i32), coefficient: I1F31::from_bits(0x7ff2a7de_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000e5635_u32 as i32), coefficient: I1F31::from_bits(0x7ff2f773_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000e0119_u32 as i32), coefficient: I1F31::from_bits(0x7ff344d2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000dae57_u32 as i32), coefficient: I1F31::from_bits(0x7ff3900e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000d5dd8_u32 as i32), coefficient: I1F31::from_bits(0x7ff3d93b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000d0f89_u32 as i32), coefficient: I1F31::from_bits(0x7ff4206c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000cc357_u32 as i32), coefficient: I1F31::from_bits(0x7ff465b0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000c7930_u32 as i32), coefficient: I1F31::from_bits(0x7ff4a91a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000c3102_u32 as i32), coefficient: I1F31::from_bits(0x7ff4eab9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000beabc_u32 as i32), coefficient: I1F31::from_bits(0x7ff52a9b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000ba64e_u32 as i32), coefficient: I1F31::from_bits(0x7ff568d0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000b63a9_u32 as i32), coefficient: I1F31::from_bits(0x7ff5a566_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000b22be_u32 as i32), coefficient: I1F31::from_bits(0x7ff5e06a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000ae380_u32 as i32), coefficient: I1F31::from_bits(0x7ff619e9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000aa5e0_u32 as i32), coefficient: I1F31::from_bits(0x7ff651ef_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000a69d1_u32 as i32), coefficient: I1F31::from_bits(0x7ff68888_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000a2f48_u32 as i32), coefficient: I1F31::from_bits(0x7ff6bdbf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0009f637_u32 as i32), coefficient: I1F31::from_bits(0x7ff6f19f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0009be94_u32 as i32), coefficient: I1F31::from_bits(0x7ff72434_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00098853_u32 as i32), coefficient: I1F31::from_bits(0x7ff75586_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0009536a_u32 as i32), coefficient: I1F31::from_bits(0x7ff785a0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00091fce_u32 as i32), coefficient: I1F31::from_bits(0x7ff7b48b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0008ed75_u32 as i32), coefficient: I1F31::from_bits(0x7ff7e24f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0008bc57_u32 as i32), coefficient: I1F31::from_bits(0x7ff80ef7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00088c69_u32 as i32), coefficient: I1F31::from_bits(0x7ff83a89_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00085da3_u32 as i32), coefficient: I1F31::from_bits(0x7ff8650e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00082ffd_u32 as i32), coefficient: I1F31::from_bits(0x7ff88e8e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0008036e_u32 as i32), coefficient: I1F31::from_bits(0x7ff8b711_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0007d7ee_u32 as i32), coefficient: I1F31::from_bits(0x7ff8de9c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0007ad75_u32 as i32), coefficient: I1F31::from_bits(0x7ff90538_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000783fd_u32 as i32), coefficient: I1F31::from_bits(0x7ff92aeb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00075b7e_u32 as i32), coefficient: I1F31::from_bits(0x7ff94fbc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000733f1_u32 as i32), coefficient: I1F31::from_bits(0x7ff973b0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00070d50_u32 as i32), coefficient: I1F31::from_bits(0x7ff996cf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0006e794_u32 as i32), coefficient: I1F31::from_bits(0x7ff9b91d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0006c2b6_u32 as i32), coefficient: I1F31::from_bits(0x7ff9daa0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00069eb2_u32 as i32), coefficient: I1F31::from_bits(0x7ff9fb5e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00067b81_u32 as i32), coefficient: I1F31::from_bits(0x7ffa1b5c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0006591d_u32 as i32), coefficient: I1F31::from_bits(0x7ffa3aa0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00063781_u32 as i32), coefficient: I1F31::from_bits(0x7ffa592e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000616a8_u32 as i32), coefficient: I1F31::from_bits(0x7ffa770a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0005f68d_u32 as i32), coefficient: I1F31::from_bits(0x7ffa943a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0005d72a_u32 as i32), coefficient: I1F31::from_bits(0x7ffab0c3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0005b87b_u32 as i32), coefficient: I1F31::from_bits(0x7ffacca7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00059a7c_u32 as i32), coefficient: I1F31::from_bits(0x7ffae7ed_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00057d27_u32 as i32), coefficient: I1F31::from_bits(0x7ffb0296_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00056079_u32 as i32), coefficient: I1F31::from_bits(0x7ffb1ca9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0005446e_u32 as i32), coefficient: I1F31::from_bits(0x7ffb3628_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00052900_u32 as i32), coefficient: I1F31::from_bits(0x7ffb4f17_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00050e2d_u32 as i32), coefficient: I1F31::from_bits(0x7ffb677a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0004f3f0_u32 as i32), coefficient: I1F31::from_bits(0x7ffb7f55_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0004da46_u32 as i32), coefficient: I1F31::from_bits(0x7ffb96a9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0004c12a_u32 as i32), coefficient: I1F31::from_bits(0x7ffbad7c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0004a89b_u32 as i32), coefficient: I1F31::from_bits(0x7ffbc3d0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00049093_u32 as i32), coefficient: I1F31::from_bits(0x7ffbd9a9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00047910_u32 as i32), coefficient: I1F31::from_bits(0x7ffbef08_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0004620f_u32 as i32), coefficient: I1F31::from_bits(0x7ffc03f2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00044b8c_u32 as i32), coefficient: I1F31::from_bits(0x7ffc1869_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00043585_u32 as i32), coefficient: I1F31::from_bits(0x7ffc2c70_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00041ff6_u32 as i32), coefficient: I1F31::from_bits(0x7ffc4009_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00040add_u32 as i32), coefficient: I1F31::from_bits(0x7ffc5337_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003f636_u32 as i32), coefficient: I1F31::from_bits(0x7ffc65fd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003e200_u32 as i32), coefficient: I1F31::from_bits(0x7ffc785d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003ce37_u32 as i32), coefficient: I1F31::from_bits(0x7ffc8a5a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003bad9_u32 as i32), coefficient: I1F31::from_bits(0x7ffc9bf5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003a7e3_u32 as i32), coefficient: I1F31::from_bits(0x7ffcad32_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00039553_u32 as i32), coefficient: I1F31::from_bits(0x7ffcbe11_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00038327_u32 as i32), coefficient: I1F31::from_bits(0x7ffcce96_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0003715d_u32 as i32), coefficient: I1F31::from_bits(0x7ffcdec3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00035ff1_u32 as i32), coefficient: I1F31::from_bits(0x7ffcee99_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00034ee2_u32 as i32), coefficient: I1F31::from_bits(0x7ffcfe1b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00033e2e_u32 as i32), coefficient: I1F31::from_bits(0x7ffd0d4b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00032dd3_u32 as i32), coefficient: I1F31::from_bits(0x7ffd1c29_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00031dce_u32 as i32), coefficient: I1F31::from_bits(0x7ffd2ab9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00030e1e_u32 as i32), coefficient: I1F31::from_bits(0x7ffd38fc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002fec1_u32 as i32), coefficient: I1F31::from_bits(0x7ffd46f3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002efb5_u32 as i32), coefficient: I1F31::from_bits(0x7ffd54a1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002e0f8_u32 as i32), coefficient: I1F31::from_bits(0x7ffd6207_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002d289_u32 as i32), coefficient: I1F31::from_bits(0x7ffd6f27_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002c465_u32 as i32), coefficient: I1F31::from_bits(0x7ffd7c02_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002b68b_u32 as i32), coefficient: I1F31::from_bits(0x7ffd8899_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002a8f9_u32 as i32), coefficient: I1F31::from_bits(0x7ffd94ef_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00029baf_u32 as i32), coefficient: I1F31::from_bits(0x7ffda104_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00028ea9_u32 as i32), coefficient: I1F31::from_bits(0x7ffdacdb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000281e7_u32 as i32), coefficient: I1F31::from_bits(0x7ffdb873_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00027568_u32 as i32), coefficient: I1F31::from_bits(0x7ffdc3d0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00026929_u32 as i32), coefficient: I1F31::from_bits(0x7ffdcef2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00025d2a_u32 as i32), coefficient: I1F31::from_bits(0x7ffdd9da_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00025168_u32 as i32), coefficient: I1F31::from_bits(0x7ffde48a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000245e3_u32 as i32), coefficient: I1F31::from_bits(0x7ffdef03_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00023a9a_u32 as i32), coefficient: I1F31::from_bits(0x7ffdf945_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00022f8b_u32 as i32), coefficient: I1F31::from_bits(0x7ffe0353_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000224b4_u32 as i32), coefficient: I1F31::from_bits(0x7ffe0d2e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00021a15_u32 as i32), coefficient: I1F31::from_bits(0x7ffe16d5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00020fad_u32 as i32), coefficient: I1F31::from_bits(0x7ffe204c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0002057a_u32 as i32), coefficient: I1F31::from_bits(0x7ffe2991_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001fb7b_u32 as i32), coefficient: I1F31::from_bits(0x7ffe32a8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001f1af_u32 as i32), coefficient: I1F31::from_bits(0x7ffe3b90_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001e815_u32 as i32), coefficient: I1F31::from_bits(0x7ffe444a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001deab_u32 as i32), coefficient: I1F31::from_bits(0x7ffe4cd8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001d572_u32 as i32), coefficient: I1F31::from_bits(0x7ffe553b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001cc68_u32 as i32), coefficient: I1F31::from_bits(0x7ffe5d73_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001c38b_u32 as i32), coefficient: I1F31::from_bits(0x7ffe6581_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001badc_u32 as i32), coefficient: I1F31::from_bits(0x7ffe6d67_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001b258_u32 as i32), coefficient: I1F31::from_bits(0x7ffe7524_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001aa00_u32 as i32), coefficient: I1F31::from_bits(0x7ffe7cbb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001a1d1_u32 as i32), coefficient: I1F31::from_bits(0x7ffe842b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000199cc_u32 as i32), coefficient: I1F31::from_bits(0x7ffe8b75_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000191ef_u32 as i32), coefficient: I1F31::from_bits(0x7ffe929b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00018a3a_u32 as i32), coefficient: I1F31::from_bits(0x7ffe999c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000182ac_u32 as i32), coefficient: I1F31::from_bits(0x7ffea07b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00017b44_u32 as i32), coefficient: I1F31::from_bits(0x7ffea737_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00017401_u32 as i32), coefficient: I1F31::from_bits(0x7ffeadd1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00016ce2_u32 as i32), coefficient: I1F31::from_bits(0x7ffeb449_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000165e8_u32 as i32), coefficient: I1F31::from_bits(0x7ffebaa2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00015f10_u32 as i32), coefficient: I1F31::from_bits(0x7ffec0da_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001585a_u32 as i32), coefficient: I1F31::from_bits(0x7ffec6f4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000151c6_u32 as i32), coefficient: I1F31::from_bits(0x7ffeccef_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00014b53_u32 as i32), coefficient: I1F31::from_bits(0x7ffed2cc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00014500_u32 as i32), coefficient: I1F31::from_bits(0x7ffed88c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00013ecc_u32 as i32), coefficient: I1F31::from_bits(0x7ffede2f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000138b8_u32 as i32), coefficient: I1F31::from_bits(0x7ffee3b6_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000132c1_u32 as i32), coefficient: I1F31::from_bits(0x7ffee922_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00012ce9_u32 as i32), coefficient: I1F31::from_bits(0x7ffeee72_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001272d_u32 as i32), coefficient: I1F31::from_bits(0x7ffef3a8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001218e_u32 as i32), coefficient: I1F31::from_bits(0x7ffef8c4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00011c0b_u32 as i32), coefficient: I1F31::from_bits(0x7ffefdc7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000116a4_u32 as i32), coefficient: I1F31::from_bits(0x7fff02b1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00011157_u32 as i32), coefficient: I1F31::from_bits(0x7fff0783_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00010c24_u32 as i32), coefficient: I1F31::from_bits(0x7fff0c3c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001070b_u32 as i32), coefficient: I1F31::from_bits(0x7fff10df_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0001020b_u32 as i32), coefficient: I1F31::from_bits(0x7fff156a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000fd24_u32 as i32), coefficient: I1F31::from_bits(0x7fff19df_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000f856_u32 as i32), coefficient: I1F31::from_bits(0x7fff1e3e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000f39f_u32 as i32), coefficient: I1F31::from_bits(0x7fff2287_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000eeff_u32 as i32), coefficient: I1F31::from_bits(0x7fff26bb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000ea76_u32 as i32), coefficient: I1F31::from_bits(0x7fff2ada_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000e604_u32 as i32), coefficient: I1F31::from_bits(0x7fff2ee5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000e1a7_u32 as i32), coefficient: I1F31::from_bits(0x7fff32dd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000dd60_u32 as i32), coefficient: I1F31::from_bits(0x7fff36c0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000d92e_u32 as i32), coefficient: I1F31::from_bits(0x7fff3a90_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000d510_u32 as i32), coefficient: I1F31::from_bits(0x7fff3e4e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000d107_u32 as i32), coefficient: I1F31::from_bits(0x7fff41f9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000cd12_u32 as i32), coefficient: I1F31::from_bits(0x7fff4593_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000c930_u32 as i32), coefficient: I1F31::from_bits(0x7fff491a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000c561_u32 as i32), coefficient: I1F31::from_bits(0x7fff4c90_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000c1a5_u32 as i32), coefficient: I1F31::from_bits(0x7fff4ff6_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000bdfb_u32 as i32), coefficient: I1F31::from_bits(0x7fff534a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000ba63_u32 as i32), coefficient: I1F31::from_bits(0x7fff568e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000b6dd_u32 as i32), coefficient: I1F31::from_bits(0x7fff59c3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000b368_u32 as i32), coefficient: I1F31::from_bits(0x7fff5ce7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000b004_u32 as i32), coefficient: I1F31::from_bits(0x7fff5ffc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000acb1_u32 as i32), coefficient: I1F31::from_bits(0x7fff6302_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000a96d_u32 as i32), coefficient: I1F31::from_bits(0x7fff65fa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000a63a_u32 as i32), coefficient: I1F31::from_bits(0x7fff68e2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000a317_u32 as i32), coefficient: I1F31::from_bits(0x7fff6bbd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000a002_u32 as i32), coefficient: I1F31::from_bits(0x7fff6e8a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00009cfd_u32 as i32), coefficient: I1F31::from_bits(0x7fff7148_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00009a07_u32 as i32), coefficient: I1F31::from_bits(0x7fff73fa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000971f_u32 as i32), coefficient: I1F31::from_bits(0x7fff769e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00009445_u32 as i32), coefficient: I1F31::from_bits(0x7fff7936_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00009179_u32 as i32), coefficient: I1F31::from_bits(0x7fff7bc1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00008eba_u32 as i32), coefficient: I1F31::from_bits(0x7fff7e3f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00008c0a_u32 as i32), coefficient: I1F31::from_bits(0x7fff80b1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00008966_u32 as i32), coefficient: I1F31::from_bits(0x7fff8318_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000086cf_u32 as i32), coefficient: I1F31::from_bits(0x7fff8573_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00008444_u32 as i32), coefficient: I1F31::from_bits(0x7fff87c2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000081c6_u32 as i32), coefficient: I1F31::from_bits(0x7fff8a06_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00007f54_u32 as i32), coefficient: I1F31::from_bits(0x7fff8c3f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00007cef_u32 as i32), coefficient: I1F31::from_bits(0x7fff8e6d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00007a94_u32 as i32), coefficient: I1F31::from_bits(0x7fff9091_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00007845_u32 as i32), coefficient: I1F31::from_bits(0x7fff92aa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00007602_u32 as i32), coefficient: I1F31::from_bits(0x7fff94b9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x000073c9_u32 as i32), coefficient: I1F31::from_bits(0x7fff96be_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000719b_u32 as i32), coefficient: I1F31::from_bits(0x7fff98b9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006f78_u32 as i32), coefficient: I1F31::from_bits(0x7fff9aaa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006d5f_u32 as i32), coefficient: I1F31::from_bits(0x7fff9c93_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006b50_u32 as i32), coefficient: I1F31::from_bits(0x7fff9e71_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000694b_u32 as i32), coefficient: I1F31::from_bits(0x7fffa047_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006750_u32 as i32), coefficient: I1F31::from_bits(0x7fffa214_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x0000655f_u32 as i32), coefficient: I1F31::from_bits(0x7fffa3d8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006377_u32 as i32), coefficient: I1F31::from_bits(0x7fffa594_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00006198_u32 as i32), coefficient: I1F31::from_bits(0x7fffa747_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00005fc2_u32 as i32), coefficient: I1F31::from_bits(0x7fffa8f2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00005df6_u32 as i32), coefficient: I1F31::from_bits(0x7fffaa95_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0x00005c31_u32 as i32), coefficient: I1F31::from_bits(0x7fffac30_u32 as i32) }
 ];
 
 pub static FALL_BASE_COEFFICIENT_TABLE: [BaseAndCoefficient; 256] = [
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffcbb823_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fdd256c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffceddd2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fdf3e8c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffd1b7c3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe1252d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffd44fff_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe2e000_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffd6aedc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe47493_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffd8db54_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe5e78e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffdadb4e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe73cde_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffdcb3ca_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe877dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffde6914_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fe99b63_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffdffeda_u32 as i32),
-        coefficient: I1F31::from_bits(0x7feaa9e7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe1784d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7feba589_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe2d835_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fec9023_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe420fc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fed6b53_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe554c4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fee3882_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe6756c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7feef8f3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe7849d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fefadbe_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe883d0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff057e0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffe97455_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff0f838_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffea5757_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff18f8f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffeb2de4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff21e98_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffebf8ee_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff2a5f4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffecb94f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff32634_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffed6fcb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff39fdd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffee1d17_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff41365_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffeec1d4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff48138_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffef5e97_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff4e9ba_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffeff3e5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff54d43_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff0823b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff5ac27_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff10a09_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff606b1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff18bb8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff65d25_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff207a6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff6afc4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff27e2c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff6fec8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff2ef9a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff74a67_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff35c3c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff792d3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff3c456_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff7d83a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff4282a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff81ac7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff487f3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff85aa2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff4e3e8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff897f0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff53c3c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff8d2d3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff59121_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff90b6b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff5e2c3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff941d7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff6314b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff97632_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff67ce2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff9a897_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff6c5ab_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ff9d91d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff70bca_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa07dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff74f5e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa34ea_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff79086_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa605a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff7cf5f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffa8a3f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff80c03_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffab2ac_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff8468b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffad9b2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff87f0f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffaff60_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff8b5a7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb23c4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff8ea66_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb46ef_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff91d62_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb68ec_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff94eac_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffb89c8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff97e58_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffba990_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff9ac76_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbc84f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfff9d916_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffbe60f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffa0448_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc02db_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffa2e1a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc1ebc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffa5699_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc39bc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffa7dd4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc53e3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffaa3d6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc6d39_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffac8ac_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc85c8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffaec60_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffc9d95_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffb0efd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffcb4a9_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffb308f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffccb0a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffb511d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffce0be_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffb70b3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffcf5cd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffb8f59_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd0a3b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffbad17_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd1e0f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffbc9f5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd314e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffbe5fc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd43fd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc0132_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd5621_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc1b9f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd67c0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc354b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd78dc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc4e3a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd897c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc6674_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffd99a3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc7dff_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffda955_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffc94e0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdb895_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffcab1d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdc769_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffcc0bc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdd5d3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffcd5c1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffde3d6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffcea31_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdf176_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffcfe12_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffdfeb6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd1167_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe0b9a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd2435_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe1823_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd3680_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe2455_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd484c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe3033_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd599e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe3bbf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd6a79_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe46fb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd7ae0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe51eb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd8ad7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe5c90_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffd9a62_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe66ec_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffda983_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe7102_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffdb83f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe7ad4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffdc697_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe8464_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffdd48e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe8db4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffde229_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe96c6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffdef68_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffe9f9b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffdfc50_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffea835_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe08e1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeb096_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe1520_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeb8c0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe210e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffec0b4_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe2cae_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffec874_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe3801_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffed001_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe430a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffed75c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe4dcc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffede88_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe5847_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffee585_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe627e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeec54_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe6c73_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffef2f7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe7628_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffef970_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe7f9e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffeffbe_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe88d7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff05e5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe91d5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff0be3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffe9a99_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff11bb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffea325_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff176e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffeab7b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff1cfd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffeb39c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff2268_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffebb89_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff27b1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffec344_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff2cd8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffecacd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff31de_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffed227_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff36c5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffed953_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff3b8d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffee052_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4036_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffee724_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff44c3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffeedcc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4933_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffef44a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff4d87_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffefa9f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff51c0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff00cd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff55de_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff06d4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff59e3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff0cb6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff5dcf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff1273_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff61a2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff180c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff655e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff1d83_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6902_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff22d8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff6c90_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff280b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7008_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff2d1f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff736a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff3213_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff76b8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff36e9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff79f1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff3ba1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff7d16_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff403c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8028_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff44bb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8327_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff491e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8614_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff4d66_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff88ee_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff5194_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8bb8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff55a8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff8e70_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff59a3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9117_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff5d86_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff93af_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff6152_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9636_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff6506_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff98af_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff68a3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9b18_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff6c2b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9d72_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff6f9d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fff9fbe_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff72fb_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa1fc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff7643_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa42d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff7978_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa650_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff7c9a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffa866_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff7fa8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffaa70_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff82a4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffac6e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff858e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffae5f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff8867_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb044_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff8b2e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb21f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff8de4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb3ee_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff908a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb5b2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff9321_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb76b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff95a7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffb91a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff981e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbabf_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff9a87_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbc5a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff9ce1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbdeb_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffff9f2d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffbf73_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffa16b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc0f2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffa39c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc268_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffa5bf_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc3d5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffa7d6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc539_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffa9e0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc695_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffabde_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc7e9_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffadd0_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffc936_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffafb7_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffca7a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffb192_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcbb7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffb362_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffccec_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffb527_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffce1a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffb6e2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffcf41_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffb892_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd061_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffba38_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd17b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffbbd4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd28e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffbd67_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd39a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffbef1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd4a0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc071_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd5a1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc1e8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd69b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc357_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd78f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc4bd_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd87e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc61b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffd967_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc770_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffda4b_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffc8be_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdb29_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffca04_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdc03_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffcb42_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdcd7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffcc79_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdda6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffcda9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffde71_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffced2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdf37_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffcff4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffdff8_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd10f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe0b5_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd224_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe16d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd332_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe221_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd43a_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe2d1_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd53c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe37d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd637_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe425_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd72d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe4c9_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd81e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe569_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd909_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe606_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffd9ee_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe69f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdace_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe734_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdba9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe7c6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdc7f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe855_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdd50_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe8e0_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffde1c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe968_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdee3_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffe9ed_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffdfa6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffea6f_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe064_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeaee_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe11e_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeb69_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe1d4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffebe3_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe285_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffec59_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe333_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeccc_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe3dc_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffed3d_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe481_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffedac_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe523_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffee17_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe5c1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffee81_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe65b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffeee7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe6f2_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffef4c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe785_u32 as i32),
-        coefficient: I1F31::from_bits(0x7fffefae_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe815_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff00e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe8a1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff06c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe92b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff0c7_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffe9b1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff121_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffea34_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff178_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffeab4_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff1cd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffeb31_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff221_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffebab_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff272_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffec23_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff2c2_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffec97_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff310_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffed09_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff35c_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffed79_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff3a6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffede5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff3ee_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffee50_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff435_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffeeb8_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff47a_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffef1d_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff4be_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffef80_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff500_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xffffefe1_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff541_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff040_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff580_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff09c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff5bd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff0f6_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff5fa_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff14f_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff634_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff1a5_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff66e_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff1f9_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff6a6_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff24b_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff6dd_u32 as i32),
-    },
-    BaseAndCoefficient {
-        base: I1F31::from_bits(0xfffff29c_u32 as i32),
-        coefficient: I1F31::from_bits(0x7ffff713_u32 as i32),
-    },
+    BaseAndCoefficient{ base: I1F31::from_bits(0xffe79505_u32 as i32), coefficient: I1F31::from_bits(0x7f85e91b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffe90cd9_u32 as i32), coefficient: I1F31::from_bits(0x7f8d403b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffea6165_u32 as i32), coefficient: I1F31::from_bits(0x7f93e6f8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffeb9754_u32 as i32), coefficient: I1F31::from_bits(0x7f99f4a4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffecb287_u32 as i32), coefficient: I1F31::from_bits(0x7f9f7ca4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffedb63e_u32 as i32), coefficient: I1F31::from_bits(0x7fa48f37_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffeea537_u32 as i32), coefficient: I1F31::from_bits(0x7fa93a14_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffef81c7_u32 as i32), coefficient: I1F31::from_bits(0x7fad88e5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff04dee_u32 as i32), coefficient: I1F31::from_bits(0x7fb185a4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff10b62_u32 as i32), coefficient: I1F31::from_bits(0x7fb538e9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff1bba0_u32 as i32), coefficient: I1F31::from_bits(0x7fb8aa21_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff25ff4_u32 as i32), coefficient: I1F31::from_bits(0x7fbbdfc3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff2f97e_u32 as i32), coefficient: I1F31::from_bits(0x7fbedf74_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff3893b_u32 as i32), coefficient: I1F31::from_bits(0x7fc1ae29_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff4100d_u32 as i32), coefficient: I1F31::from_bits(0x7fc45041_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff48eb8_u32 as i32), coefficient: I1F31::from_bits(0x7fc6c999_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff505ed_u32 as i32), coefficient: I1F31::from_bits(0x7fc91d9f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff57647_u32 as i32), coefficient: I1F31::from_bits(0x7fcb4f62_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff5e053_u32 as i32), coefficient: I1F31::from_bits(0x7fcd619e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff6448e_u32 as i32), coefficient: I1F31::from_bits(0x7fcf56c7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff6a36a_u32 as i32), coefficient: I1F31::from_bits(0x7fd13110_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff6fd4b_u32 as i32), coefficient: I1F31::from_bits(0x7fd2f277_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff7528e_u32 as i32), coefficient: I1F31::from_bits(0x7fd49cc8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff7a387_u32 as i32), coefficient: I1F31::from_bits(0x7fd631a3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff7f081_u32 as i32), coefficient: I1F31::from_bits(0x7fd7b284_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff839c1_u32 as i32), coefficient: I1F31::from_bits(0x7fd920c3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff87f85_u32 as i32), coefficient: I1F31::from_bits(0x7fda7d9b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff8c209_u32 as i32), coefficient: I1F31::from_bits(0x7fdbca2c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff90180_u32 as i32), coefficient: I1F31::from_bits(0x7fdd077e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff93e1a_u32 as i32), coefficient: I1F31::from_bits(0x7fde3683_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff97805_u32 as i32), coefficient: I1F31::from_bits(0x7fdf5819_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff9af69_u32 as i32), coefficient: I1F31::from_bits(0x7fe06d0e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfff9e46d_u32 as i32), coefficient: I1F31::from_bits(0x7fe1761f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffa1732_u32 as i32), coefficient: I1F31::from_bits(0x7fe273fa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffa47da_u32 as i32), coefficient: I1F31::from_bits(0x7fe36742_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffa7682_u32 as i32), coefficient: I1F31::from_bits(0x7fe4508c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffaa347_u32 as i32), coefficient: I1F31::from_bits(0x7fe53065_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffface42_u32 as i32), coefficient: I1F31::from_bits(0x7fe6074c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffaf78c_u32 as i32), coefficient: I1F31::from_bits(0x7fe6d5bc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffb1f3a_u32 as i32), coefficient: I1F31::from_bits(0x7fe79c24_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffb4563_u32 as i32), coefficient: I1F31::from_bits(0x7fe85aed_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffb6a18_u32 as i32), coefficient: I1F31::from_bits(0x7fe9127a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffb8d6e_u32 as i32), coefficient: I1F31::from_bits(0x7fe9c325_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffbaf74_u32 as i32), coefficient: I1F31::from_bits(0x7fea6d44_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffbd03b_u32 as i32), coefficient: I1F31::from_bits(0x7feb1128_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffbefd2_u32 as i32), coefficient: I1F31::from_bits(0x7febaf1c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc0e48_u32 as i32), coefficient: I1F31::from_bits(0x7fec4768_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc2ba9_u32 as i32), coefficient: I1F31::from_bits(0x7fecda4d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc4802_u32 as i32), coefficient: I1F31::from_bits(0x7fed680a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc635f_u32 as i32), coefficient: I1F31::from_bits(0x7fedf0db_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc7dcb_u32 as i32), coefficient: I1F31::from_bits(0x7fee74f7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffc9750_u32 as i32), coefficient: I1F31::from_bits(0x7feef492_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffcaff9_u32 as i32), coefficient: I1F31::from_bits(0x7fef6fdf_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffcc7cf_u32 as i32), coefficient: I1F31::from_bits(0x7fefe70c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffcdedb_u32 as i32), coefficient: I1F31::from_bits(0x7ff05a45_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffcf524_u32 as i32), coefficient: I1F31::from_bits(0x7ff0c9b4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd0ab4_u32 as i32), coefficient: I1F31::from_bits(0x7ff13582_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd1f91_u32 as i32), coefficient: I1F31::from_bits(0x7ff19dd4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd33c3_u32 as i32), coefficient: I1F31::from_bits(0x7ff202cd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd4750_u32 as i32), coefficient: I1F31::from_bits(0x7ff2648f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd5a3f_u32 as i32), coefficient: I1F31::from_bits(0x7ff2c33c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd6c97_u32 as i32), coefficient: I1F31::from_bits(0x7ff31ef1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd7e5c_u32 as i32), coefficient: I1F31::from_bits(0x7ff377cb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffd8f95_u32 as i32), coefficient: I1F31::from_bits(0x7ff3cde7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffda046_u32 as i32), coefficient: I1F31::from_bits(0x7ff4215e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdb075_u32 as i32), coefficient: I1F31::from_bits(0x7ff4724b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdc027_u32 as i32), coefficient: I1F31::from_bits(0x7ff4c0c4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdcf60_u32 as i32), coefficient: I1F31::from_bits(0x7ff50ce2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdde25_u32 as i32), coefficient: I1F31::from_bits(0x7ff556b9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdec79_u32 as i32), coefficient: I1F31::from_bits(0x7ff59e5e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffdfa61_u32 as i32), coefficient: I1F31::from_bits(0x7ff5e3e7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe07e1_u32 as i32), coefficient: I1F31::from_bits(0x7ff62764_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe14fc_u32 as i32), coefficient: I1F31::from_bits(0x7ff668ea_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe21b5_u32 as i32), coefficient: I1F31::from_bits(0x7ff6a889_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe2e10_u32 as i32), coefficient: I1F31::from_bits(0x7ff6e652_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe3a11_u32 as i32), coefficient: I1F31::from_bits(0x7ff72255_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe45ba_u32 as i32), coefficient: I1F31::from_bits(0x7ff75ca1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe510e_u32 as i32), coefficient: I1F31::from_bits(0x7ff79545_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe5c10_u32 as i32), coefficient: I1F31::from_bits(0x7ff7cc4f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe66c3_u32 as i32), coefficient: I1F31::from_bits(0x7ff801cd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe7129_u32 as i32), coefficient: I1F31::from_bits(0x7ff835cc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe7b45_u32 as i32), coefficient: I1F31::from_bits(0x7ff86858_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe8519_u32 as i32), coefficient: I1F31::from_bits(0x7ff8997c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe8ea7_u32 as i32), coefficient: I1F31::from_bits(0x7ff8c945_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffe97f3_u32 as i32), coefficient: I1F31::from_bits(0x7ff8f7be_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffea0fd_u32 as i32), coefficient: I1F31::from_bits(0x7ff924f1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffea9c8_u32 as i32), coefficient: I1F31::from_bits(0x7ff950e9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffeb256_u32 as i32), coefficient: I1F31::from_bits(0x7ff97bae_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffebaa9_u32 as i32), coefficient: I1F31::from_bits(0x7ff9a54c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffec2c2_u32 as i32), coefficient: I1F31::from_bits(0x7ff9cdca_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffecaa4_u32 as i32), coefficient: I1F31::from_bits(0x7ff9f532_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffed24f_u32 as i32), coefficient: I1F31::from_bits(0x7ffa1b8c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffed9c7_u32 as i32), coefficient: I1F31::from_bits(0x7ffa40e1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffee10b_u32 as i32), coefficient: I1F31::from_bits(0x7ffa6537_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffee81e_u32 as i32), coefficient: I1F31::from_bits(0x7ffa8898_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffeef02_u32 as i32), coefficient: I1F31::from_bits(0x7ffaab09_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffef5b7_u32 as i32), coefficient: I1F31::from_bits(0x7ffacc93_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffefc3f_u32 as i32), coefficient: I1F31::from_bits(0x7ffaed3b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff029b_u32 as i32), coefficient: I1F31::from_bits(0x7ffb0d09_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff08cd_u32 as i32), coefficient: I1F31::from_bits(0x7ffb2c03_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff0ed6_u32 as i32), coefficient: I1F31::from_bits(0x7ffb4a2f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff14b7_u32 as i32), coefficient: I1F31::from_bits(0x7ffb6793_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff1a71_u32 as i32), coefficient: I1F31::from_bits(0x7ffb8434_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff2005_u32 as i32), coefficient: I1F31::from_bits(0x7ffba019_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff2574_u32 as i32), coefficient: I1F31::from_bits(0x7ffbbb46_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff2ac0_u32 as i32), coefficient: I1F31::from_bits(0x7ffbd5c1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff2fe9_u32 as i32), coefficient: I1F31::from_bits(0x7ffbef8f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff34f1_u32 as i32), coefficient: I1F31::from_bits(0x7ffc08b5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff39d8_u32 as i32), coefficient: I1F31::from_bits(0x7ffc2137_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff3e9f_u32 as i32), coefficient: I1F31::from_bits(0x7ffc3919_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff4347_u32 as i32), coefficient: I1F31::from_bits(0x7ffc5062_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff47d1_u32 as i32), coefficient: I1F31::from_bits(0x7ffc6713_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff4c3d_u32 as i32), coefficient: I1F31::from_bits(0x7ffc7d32_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff508d_u32 as i32), coefficient: I1F31::from_bits(0x7ffc92c3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff54c2_u32 as i32), coefficient: I1F31::from_bits(0x7ffca7ca_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff58db_u32 as i32), coefficient: I1F31::from_bits(0x7ffcbc49_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff5cdb_u32 as i32), coefficient: I1F31::from_bits(0x7ffcd046_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff60c1_u32 as i32), coefficient: I1F31::from_bits(0x7ffce3c3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff648e_u32 as i32), coefficient: I1F31::from_bits(0x7ffcf6c4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff6843_u32 as i32), coefficient: I1F31::from_bits(0x7ffd094d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff6be0_u32 as i32), coefficient: I1F31::from_bits(0x7ffd1b5f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff6f66_u32 as i32), coefficient: I1F31::from_bits(0x7ffd2d00_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff72d6_u32 as i32), coefficient: I1F31::from_bits(0x7ffd3e30_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff7631_u32 as i32), coefficient: I1F31::from_bits(0x7ffd4ef5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff7976_u32 as i32), coefficient: I1F31::from_bits(0x7ffd5f50_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff7ca7_u32 as i32), coefficient: I1F31::from_bits(0x7ffd6f43_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff7fc4_u32 as i32), coefficient: I1F31::from_bits(0x7ffd7ed3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff82cd_u32 as i32), coefficient: I1F31::from_bits(0x7ffd8e01_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff85c3_u32 as i32), coefficient: I1F31::from_bits(0x7ffd9cd0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff88a7_u32 as i32), coefficient: I1F31::from_bits(0x7ffdab43_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff8b79_u32 as i32), coefficient: I1F31::from_bits(0x7ffdb95b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff8e39_u32 as i32), coefficient: I1F31::from_bits(0x7ffdc71c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff90e8_u32 as i32), coefficient: I1F31::from_bits(0x7ffdd487_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9386_u32 as i32), coefficient: I1F31::from_bits(0x7ffde19f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9614_u32 as i32), coefficient: I1F31::from_bits(0x7ffdee65_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9892_u32 as i32), coefficient: I1F31::from_bits(0x7ffdfadc_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9b01_u32 as i32), coefficient: I1F31::from_bits(0x7ffe0706_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9d61_u32 as i32), coefficient: I1F31::from_bits(0x7ffe12e5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffff9fb2_u32 as i32), coefficient: I1F31::from_bits(0x7ffe1e7b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffa1f5_u32 as i32), coefficient: I1F31::from_bits(0x7ffe29c9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffa42a_u32 as i32), coefficient: I1F31::from_bits(0x7ffe34d1_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffa651_u32 as i32), coefficient: I1F31::from_bits(0x7ffe3f96_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffa86b_u32 as i32), coefficient: I1F31::from_bits(0x7ffe4a19_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffaa78_u32 as i32), coefficient: I1F31::from_bits(0x7ffe545a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffac79_u32 as i32), coefficient: I1F31::from_bits(0x7ffe5e5e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffae6d_u32 as i32), coefficient: I1F31::from_bits(0x7ffe6823_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb056_u32 as i32), coefficient: I1F31::from_bits(0x7ffe71ad_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb233_u32 as i32), coefficient: I1F31::from_bits(0x7ffe7afd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb404_u32 as i32), coefficient: I1F31::from_bits(0x7ffe8413_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb5ca_u32 as i32), coefficient: I1F31::from_bits(0x7ffe8cf3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb786_u32 as i32), coefficient: I1F31::from_bits(0x7ffe959c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffb936_u32 as i32), coefficient: I1F31::from_bits(0x7ffe9e10_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffbadd_u32 as i32), coefficient: I1F31::from_bits(0x7ffea651_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffbc7a_u32 as i32), coefficient: I1F31::from_bits(0x7ffeae60_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffbe0c_u32 as i32), coefficient: I1F31::from_bits(0x7ffeb63e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffbf96_u32 as i32), coefficient: I1F31::from_bits(0x7ffebdec_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc116_u32 as i32), coefficient: I1F31::from_bits(0x7ffec56c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc28c_u32 as i32), coefficient: I1F31::from_bits(0x7ffeccbe_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc3fa_u32 as i32), coefficient: I1F31::from_bits(0x7ffed3e4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc560_u32 as i32), coefficient: I1F31::from_bits(0x7ffedade_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc6bd_u32 as i32), coefficient: I1F31::from_bits(0x7ffee1af_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc811_u32 as i32), coefficient: I1F31::from_bits(0x7ffee856_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffc95e_u32 as i32), coefficient: I1F31::from_bits(0x7ffeeed5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffcaa3_u32 as i32), coefficient: I1F31::from_bits(0x7ffef52d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffcbe0_u32 as i32), coefficient: I1F31::from_bits(0x7ffefb5e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffcd15_u32 as i32), coefficient: I1F31::from_bits(0x7fff016a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffce44_u32 as i32), coefficient: I1F31::from_bits(0x7fff0752_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffcf6b_u32 as i32), coefficient: I1F31::from_bits(0x7fff0d17_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd08b_u32 as i32), coefficient: I1F31::from_bits(0x7fff12b8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd1a5_u32 as i32), coefficient: I1F31::from_bits(0x7fff1838_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd2b8_u32 as i32), coefficient: I1F31::from_bits(0x7fff1d97_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd3c4_u32 as i32), coefficient: I1F31::from_bits(0x7fff22d5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd4ca_u32 as i32), coefficient: I1F31::from_bits(0x7fff27f4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd5cb_u32 as i32), coefficient: I1F31::from_bits(0x7fff2cf5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd6c5_u32 as i32), coefficient: I1F31::from_bits(0x7fff31d7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd7b9_u32 as i32), coefficient: I1F31::from_bits(0x7fff369c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd8a7_u32 as i32), coefficient: I1F31::from_bits(0x7fff3b45_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffd990_u32 as i32), coefficient: I1F31::from_bits(0x7fff3fd2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffda74_u32 as i32), coefficient: I1F31::from_bits(0x7fff4443_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffdb52_u32 as i32), coefficient: I1F31::from_bits(0x7fff489a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffdc2b_u32 as i32), coefficient: I1F31::from_bits(0x7fff4cd7_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffdcff_u32 as i32), coefficient: I1F31::from_bits(0x7fff50fb_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffddce_u32 as i32), coefficient: I1F31::from_bits(0x7fff5506_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffde98_u32 as i32), coefficient: I1F31::from_bits(0x7fff58f8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffdf5e_u32 as i32), coefficient: I1F31::from_bits(0x7fff5cd4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe01e_u32 as i32), coefficient: I1F31::from_bits(0x7fff6098_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe0db_u32 as i32), coefficient: I1F31::from_bits(0x7fff6446_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe193_u32 as i32), coefficient: I1F31::from_bits(0x7fff67de_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe246_u32 as i32), coefficient: I1F31::from_bits(0x7fff6b60_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe2f6_u32 as i32), coefficient: I1F31::from_bits(0x7fff6ece_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe3a1_u32 as i32), coefficient: I1F31::from_bits(0x7fff7227_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe449_u32 as i32), coefficient: I1F31::from_bits(0x7fff756c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe4ec_u32 as i32), coefficient: I1F31::from_bits(0x7fff789e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe58c_u32 as i32), coefficient: I1F31::from_bits(0x7fff7bbd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe628_u32 as i32), coefficient: I1F31::from_bits(0x7fff7ec9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe6c1_u32 as i32), coefficient: I1F31::from_bits(0x7fff81c4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe756_u32 as i32), coefficient: I1F31::from_bits(0x7fff84ac_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe7e7_u32 as i32), coefficient: I1F31::from_bits(0x7fff8783_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe875_u32 as i32), coefficient: I1F31::from_bits(0x7fff8a4a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe900_u32 as i32), coefficient: I1F31::from_bits(0x7fff8d00_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffe987_u32 as i32), coefficient: I1F31::from_bits(0x7fff8fa5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffea0c_u32 as i32), coefficient: I1F31::from_bits(0x7fff923c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffea8d_u32 as i32), coefficient: I1F31::from_bits(0x7fff94c2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffeb0c_u32 as i32), coefficient: I1F31::from_bits(0x7fff973a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffeb87_u32 as i32), coefficient: I1F31::from_bits(0x7fff99a4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffec00_u32 as i32), coefficient: I1F31::from_bits(0x7fff9bfe_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffec75_u32 as i32), coefficient: I1F31::from_bits(0x7fff9e4b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffece9_u32 as i32), coefficient: I1F31::from_bits(0x7fffa08b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffed59_u32 as i32), coefficient: I1F31::from_bits(0x7fffa2bd_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffedc7_u32 as i32), coefficient: I1F31::from_bits(0x7fffa4e2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffee32_u32 as i32), coefficient: I1F31::from_bits(0x7fffa6fa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffee9b_u32 as i32), coefficient: I1F31::from_bits(0x7fffa906_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffef01_u32 as i32), coefficient: I1F31::from_bits(0x7fffab06_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffef65_u32 as i32), coefficient: I1F31::from_bits(0x7fffacfa_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xffffefc7_u32 as i32), coefficient: I1F31::from_bits(0x7fffaee3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff026_u32 as i32), coefficient: I1F31::from_bits(0x7fffb0c0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff084_u32 as i32), coefficient: I1F31::from_bits(0x7fffb292_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff0df_u32 as i32), coefficient: I1F31::from_bits(0x7fffb45a_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff138_u32 as i32), coefficient: I1F31::from_bits(0x7fffb617_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff18f_u32 as i32), coefficient: I1F31::from_bits(0x7fffb7c9_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff1e4_u32 as i32), coefficient: I1F31::from_bits(0x7fffb972_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff237_u32 as i32), coefficient: I1F31::from_bits(0x7fffbb11_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff288_u32 as i32), coefficient: I1F31::from_bits(0x7fffbca6_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff2d7_u32 as i32), coefficient: I1F31::from_bits(0x7fffbe32_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff324_u32 as i32), coefficient: I1F31::from_bits(0x7fffbfb5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff370_u32 as i32), coefficient: I1F31::from_bits(0x7fffc12f_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff3ba_u32 as i32), coefficient: I1F31::from_bits(0x7fffc2a0_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff402_u32 as i32), coefficient: I1F31::from_bits(0x7fffc409_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff448_u32 as i32), coefficient: I1F31::from_bits(0x7fffc569_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff48d_u32 as i32), coefficient: I1F31::from_bits(0x7fffc6c2_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff4d0_u32 as i32), coefficient: I1F31::from_bits(0x7fffc812_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff512_u32 as i32), coefficient: I1F31::from_bits(0x7fffc95b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff552_u32 as i32), coefficient: I1F31::from_bits(0x7fffca9c_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff591_u32 as i32), coefficient: I1F31::from_bits(0x7fffcbd5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff5ce_u32 as i32), coefficient: I1F31::from_bits(0x7fffcd08_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff60a_u32 as i32), coefficient: I1F31::from_bits(0x7fffce33_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff645_u32 as i32), coefficient: I1F31::from_bits(0x7fffcf58_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff67e_u32 as i32), coefficient: I1F31::from_bits(0x7fffd075_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff6b6_u32 as i32), coefficient: I1F31::from_bits(0x7fffd18d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff6ec_u32 as i32), coefficient: I1F31::from_bits(0x7fffd29d_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff722_u32 as i32), coefficient: I1F31::from_bits(0x7fffd3a8_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff756_u32 as i32), coefficient: I1F31::from_bits(0x7fffd4ac_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff789_u32 as i32), coefficient: I1F31::from_bits(0x7fffd5ab_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff7ba_u32 as i32), coefficient: I1F31::from_bits(0x7fffd6a3_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff7eb_u32 as i32), coefficient: I1F31::from_bits(0x7fffd796_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff81a_u32 as i32), coefficient: I1F31::from_bits(0x7fffd883_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff849_u32 as i32), coefficient: I1F31::from_bits(0x7fffd96b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff876_u32 as i32), coefficient: I1F31::from_bits(0x7fffda4e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff8a2_u32 as i32), coefficient: I1F31::from_bits(0x7fffdb2b_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff8cd_u32 as i32), coefficient: I1F31::from_bits(0x7fffdc03_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff8f8_u32 as i32), coefficient: I1F31::from_bits(0x7fffdcd6_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff921_u32 as i32), coefficient: I1F31::from_bits(0x7fffdda5_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff949_u32 as i32), coefficient: I1F31::from_bits(0x7fffde6e_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff971_u32 as i32), coefficient: I1F31::from_bits(0x7fffdf33_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff997_u32 as i32), coefficient: I1F31::from_bits(0x7fffdff4_u32 as i32) },
+BaseAndCoefficient{ base: I1F31::from_bits(0xfffff9bd_u32 as i32), coefficient: I1F31::from_bits(0x7fffe0b0_u32 as i32) }
 ];

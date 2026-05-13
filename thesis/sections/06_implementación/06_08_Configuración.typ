@@ -13,7 +13,7 @@ en la @cod_config_toml:
 
 #figure(
   raw(read("/code/Config.toml"), block: true, lang: "toml"),
-  caption: [`Config.toml` por defecto],
+  caption: [Fragmento del archivo de configuración `Config.toml`],
   placement: auto,
 )<cod_config_toml>
 
@@ -34,14 +34,26 @@ tanto, se da la opción de no incluir el código en el programa compilado.
 
 Rust permite usar _feature flags_ para controlar la inclusión o exclusión de secciones de código, bibliotecas, etc. Se
 puede hacer que dependan de si cierta feature flag está activa, de si no está activa, o de si cierta combinación está
-activa. Usando feature flags, las siguientes características son configurables:
+activa, como se puede ver en el @cod_ejemplo_feature_flags. Usando feature flags, las siguientes características son
+configurables:
 
 - El chip a usar: qué hardware abstraction layer y qué pines usar.
 - La entrada de MIDI: por un pin usando el formato DIN, por USB, o desactivada.
 - La inclusión del ecualizador.
 - La capacidad de configurar el sintetizador en ejecución (el ataque, la onda, etc.).
 
-/* Añadir ejemplo mínimo de feature flags */
+#figure(
+  ```rust
+  #[cfg(feature = "cheat")]
+  fn roll_dice() -> u8 { 6 }
+
+  #[cfg(not(feature = "cheat"))]
+  fn roll_dice() -> u8 { rand_range(1..=6) }
+  ```,
+  caption: [Ejemplo básico del uso de feature flags en Rust mediante atributos #[cfg] para seleccionar distintas
+    implementaciones de una función en tiempo de compilación.],
+  placement: auto,
+)<cod_ejemplo_feature_flags>
 
 El script `run-with-flags.sh` lee los campos relevantes de `Config.toml` y activa las feature flags correspondientes,
 permitiendo que se configuren fácilmente. Este toma como argumento el comando a ejecutar con las flags, de manera que

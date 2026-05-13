@@ -8,7 +8,7 @@
 La manera más fácil de usar el sintetizador es por una conexión USB. Sparklet permite usar USB para la salida de audio y
 la entrada de MIDI, permitiendo que opere con una única conexión a cualquier ordenador moderno.
 
-Sparklet usa `embassy_usb` para gestionar la conexión, que abstrae la mayoría de la complejidad. `embassy_usb` provee la
+Sparklet usa `embassy_usb` para gestionar la conexión, que abstrae la mayoría de la complejidad. `embassy_usb` proporciona la
 implementación de una interfaz para recibir MIDI y una interfaz para ser una entrada de audio (como un micrófono), por
 lo que sencillamente se añaden a la descripción del dispositivo las interfaces usadas @ref_web_usb_audio.
 

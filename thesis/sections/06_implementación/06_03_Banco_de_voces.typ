@@ -19,15 +19,18 @@ tocar una voz, se pone su `ADSR` respectivo en el estado `Release`.
 
 Un sintetizador, para resultar útil a un músico, debe responder de forma predecible e intuitivamente a sus acciones.
 Cuando un músico toca una nota, espera oírla, aún si supera el límite de voces; el sintetizador por lo tanto ha de
-liberar una voz para tocarla (_voice stealing_) @ref_book_theory_music. La voz no puede parar su nota actual
-inmediatamente, pues se oiría un clic, pero ha de liberarse lo antes posible, ya que el músico espera oír la nota que
-tocó. La lógica que determina cuál voz liberar se denomina el algoritmo de asignación de voces. Por este motivo, el
-envolvente ADSR tiene un modo `QuickRelease`, para soltar una nota inmediatamente incluso con un decaimiento alto.
+liberar una voz para tocarla, lo que se denomina robo de voces o _voice stealing_ @ref_book_theory_music. La voz no
+puede parar su nota actual inmediatamente, pues se oiría un clic, pero ha de liberarse lo antes posible, ya que el
+músico espera oír la nota que tocó. La lógica que determina cuál voz liberar se denomina el algoritmo de asignación de
+voces. Por este motivo, el envolvente ADSR tiene un modo `QuickRelease`, para soltar una nota inmediatamente incluso con
+un decaimiento alto.
 
 #cite(<ref_book_theory_music>, form: "prose") propone las bases de un algoritmo simple, pero no es suficiente para
 resolver todas las situaciones límite que han de ser manejadas correctamente para que el sintetizador resulte intuitivo
 a un músico. Realizar una implementación elegante y eficiente que maneje correctamente todas estas circunstancias fue
 una de las dificultades principales del desarrollo de Sparklet. Tómense los siguientes casos:
+
+/* TODO: Quizá hacer diagramas de qué pasa en estas situaciones */
 
 + Un músico toca una pieza con un límite de polifonía bajo. Arpegia rápidamente un acorde: do, mi, sol, mi, do; de forma
   que un decaimiento alto haría que cuando toque por segunda vez una nota, la primera voz que la contiene aún no haya
@@ -56,12 +59,19 @@ una de las dificultades principales del desarrollo de Sparklet. Tómense los sig
 
 === Solución implementada
 
+#figure(
+  image("/figures/Banco de voces.pdf", width: 60%),
+  caption: [Representación en diagrama del algoritmo de robo de voces implementado.],
+  placement: auto,
+)<fig_voice_bank>
+
 Tomando estos casos límite en cuenta, se implementó el siguiente algoritmo, que los gestiona todos de forma eficiente.
-El código de Rust que lo implementa se puede ver en el @cod_voice_steal_algorithm.
+Un diagrama del algoritmo se puede ver en la @fig_voice_bank. Además, se provee una descripción en detalle en la
+siguiente sección.
 
 El primer problema se puede resolver tomando inspiración en el funcionamiento de un piano. Cuando se usa el pedal para
 que las cuerdas no se amortigüen, volver a pulsar una tecla no silencia la nota antes de que el martillo vuelva a
-tocarla. Para modelar este comportamiento, `Voice` provee el método `retrigger`, en el que la voz vuelve al estado
+tocarla. Para modelar este comportamiento, `Voice` proporciona el método `retrigger`, en el que la voz vuelve al estado
 `Attack` sin modificar su nivel actual `current`, volviendo a darle intensidad. Este comportamiento se ve ilustrado en
 la /* TODO */. Haciendo que tocar una nota siempre haga `retrigger` a la voz que la tiene si ya está siendo tocada, se
 contribuye a resolver también el segundo problema, pues se garantiza que sólo una voz reproduce cada nota. Si se da el
@@ -77,10 +87,10 @@ arreglando el quinto.
 === Detalles del algoritmo
 <sec_detalles_algoritmo_voice_bank>
 
-Ya que este algoritmo es uno de los aspectos más únicos de Sparklet, cabe entrar en detalle de cómo funciona. Cada vez
-que se genera un bloque de audio, lo primero que se hace es que `VoiceBank` procese los eventos MIDI pendientes. En
-lugar de aplicarlos directamente, usa la cola intermediaria descrita anteriormente. Por cada evento, en orden
-cronológico:
+Ya que este algoritmo es uno de los aspectos más únicos de Sparklet, cabe entrar en detalle de cómo funciona. El código
+que lo implementa se puede ver en el @cod_voice_steal_algorithm. Cada vez que se genera un bloque de audio, lo primero
+que se hace es que `VoiceBank` procese los eventos MIDI pendientes. En lugar de aplicarlos directamente, usa la cola
+intermediaria descrita anteriormente. Por cada evento, en orden cronológico:
 
 + Si es de soltar una nota (`NoteOff`):
   + Se mueven todas las voces asociadas a esa nota al estado `Release`.
@@ -93,9 +103,8 @@ esto ocurre, se calcula el déficit entre el número de notas pendientes y las v
 y se activa el modo `QuickRelease` en tantas voces como sea necesario para compensar el déficit. De esta manera, hay
 tantas voces en estado `QuickRelease` como notas pendientes en la cola. En un evento de procesamiento futuro, estas
 voces habrán pasado al estado `Idle`, por lo que estarán libres. Hasta entonces, la cola de notas a tocar mantiene las
-notas más recientes que no han sido soltadas.
-
-La heurística usada para elegir cuál voz pasar a estado `QuickRelease` es la siguiente:
+notas más recientes que no han sido soltadas. La heurística usada para elegir cuál voz pasar a estado `QuickRelease` es
+la siguiente:
 
 + La voz con menor amplitud cuyo ADSR esté en estado `Release`. Esto da prioridad a las notas donde el cambio se notará
   menos (las que tienen volumen bajo y ya estaban siendo soltadas).
@@ -110,5 +119,6 @@ Si no se encuentra ninguna, no se realiza ninguna operación, ya que significa q
     block: true,
     lang: "rust",
   )],
-  caption: [El algoritmo de procesado de eventos MIDI, extraído del método `Generator::render_samples`.],
+  caption: [El algoritmo de robo de voces, extraído del método `Generator::render_samples`.],
+  placement: auto,
 )<cod_voice_steal_algorithm>

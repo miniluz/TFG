@@ -69,7 +69,7 @@ SPARK es una opción apropiada para conseguir el @rnf_reliability, ya que permit
 que se tendría que implementar mucha lógica desde cero. La fricción de esta opción no permitiría realizar el proyecto a
 tiempo.
 
-Rust aporta garantías de fiabilidad suficientes y provee un ecosistema suficiente para facilitar la realización del
+Rust aporta garantías de fiabilidad suficientes y proporciona un ecosistema suficiente para facilitar la realización del
 proyecto. He podido encontrar bibliotecas para las necesidades del proyecto compatibles con el desarrollo empotrado
 (gestión de operaciones de coma fija, de MIDI, de USB, ejecución de pruebas, etc.), además de herramientas útiles (para
 leer los mensajes del chip, evaluar el uso de memoria del binario, etc.).
@@ -123,8 +123,8 @@ manualmente, haciendo que funciones complejas sean menos legibles. Este método 
 @cod_maquina_estado_manual. En Rust, estas máquinas de estado pueden ser creadas usando las funciones asíncronas, usando
 una sintaxis que parece secuencial con `async` y `await`, de manera similar al desarrollo web. Este método se puede ver
 en el @cod_maquina_estado_async. Estas funciones son transformadas en máquinas de estados automáticamente, que
-implementa la interfaz `Future`. Embassy provee un ejecutor cooperativo ligero para plataformas empotradas basada en los
-`Future` de Rust.
+implementa la interfaz `Future`. Embassy proporciona un ejecutor cooperativo ligero para plataformas empotradas basada
+en los `Future` de Rust.
 #figure(
   grid(
     columns: 1,
@@ -150,7 +150,9 @@ implementa la interfaz `Future`. Embassy provee un ejecutor cooperativo ligero p
             }
         }
         ```,
-        caption: "Una tarea cooperativa que alterna entre el estado A y B implementada como una máquina de estados manualmente",
+        caption: [Una tarea cooperativa que alterna entre el estado A y B, implementada a mano como una máquina de
+          estados.
+        ],
       )<cod_maquina_estado_manual>
     ],
     [
@@ -164,7 +166,8 @@ implementa la interfaz `Future`. Embassy provee un ejecutor cooperativo ligero p
           }
         }
         ```,
-        caption: [Una tarea cooperativa que alterna entre el estado A y B implementada con la sintaxis `async`],
+        caption: [Una tarea cooperativa que alterna entre el estado A y B, implementada con la sintaxis `async` y
+          convertida en una máquina de estados por el compilador.],
       )
       <cod_maquina_estado_async>
     ],
@@ -192,8 +195,9 @@ Fuera del ecosistema de Embassy, se usan varias bibliotecas. A continuación se 
 `defmt` es una biblioteca de _logging_ que permite enviar mensajes de la placa de desarrollo a la computadora sin
 almacenar el texto en la memoria del dispositivo @ref_web_defmt. Transforma los mensajes automáticamente, asignando al
 microcontrolador enviar una representación compacta del mensaje (generalmente con un identificador del tipo de mensaje y
-sus argumentos), y al ordenador darle formato. El texto de los mensajes se almacena en las secciones de depuración del
-binario, que no se envían al microcontrolador. Un ejemplo de su uso se puede ver en el @cod_ejemplo_defmt.
+sus argumentos), y al ordenador huésped darle formato. El texto de los mensajes se almacena en las secciones de
+depuración del binario, que no se envían al microcontrolador. Un ejemplo de su uso se puede ver en el
+@cod_ejemplo_defmt.
 
 #figure(
   ```rust
@@ -202,25 +206,27 @@ binario, que no se envían al microcontrolador. Un ejemplo de su uso se puede ve
   info!("Midi note received: {}", note);
   // El texto no se envía al microchip. El mensaje únicamente contiene un identificador del mensaje y el valor de `note`
   ```,
-  caption: [Ejemplo básico del uso de la biblioteca `defmt`],
+  caption: [Ejemplo del uso de `defmt` para registrar eventos en sistemas embebidos, donde el formateo del mensaje se
+    realiza en el huésped en lugar del microcontrolador.],
 )<cod_ejemplo_defmt>
 
-`fixed` provee tipos para operar con números de coma fija en Rust sin un coste de rendimiento @ref_web_fixed. `bytemuck`
-a su vez permite hacer conversiones de tipo que no conllevan modificar la representación en bits de los datos, como
-convertir un `Q15` a un `i16` o convertir un vector de `Q15` al vector de `u8` que forman sus bytes @ref_web_bytemuck.
+`fixed` proporciona tipos para operar con números de coma fija en Rust sin un coste de rendimiento @ref_web_fixed.
+`bytemuck` a su vez permite hacer conversiones de tipo que no conllevan modificar la representación en bits de los
+datos, como convertir un `Q15` a un `i16` o convertir un vector de `Q15` al vector de `u8` que forman sus bytes
+@ref_web_bytemuck.
 
 
 === Utilidades
 <sec_otras_herramientas>
 
-Se usa Nix para proveer los programas necesarios para el proyecto de forma reproducible @ref_web_nix_main. Se usa para
-formar el entorno de desarrollo y el entorno de usado por GitHub Actions para ejecutar las pruebas automáticas. Este
-provee todos los programas usadas en el desarrollo, incluyendo Rust, Octave, Typst y todas las utilidades, y fija sus
-versiones. Garantiza que el entorno de desarrollo es el mismo que el de ejecución de pruebas, para cumplir el
+Se usa Nix para proporcionar los programas necesarios para el proyecto de forma reproducible @ref_web_nix_main. Se usa
+para formar el entorno de desarrollo y el entorno de usado por GitHub Actions para ejecutar las pruebas automáticas.
+Este proporciona todos los programas usadas en el desarrollo, incluyendo Rust, Octave, Typst y todas las utilidades, y
+fija sus versiones. Garantiza que el entorno de desarrollo es el mismo que el de ejecución de pruebas, para cumplir el
 @rnf_tests.
 
 Se usa _just_ como gestor de comandos, una alternativa a usar una `Makefile` más usada por la comunidad de Rust. Este
-provee una interfaz fácil (`just test`) para todas las secuencias de comandos comunes usadas en el desarrollo. Para
+proporciona una interfaz fácil (`just test`) para todas las secuencias de comandos comunes usadas en el desarrollo. Para
 unificar el uso de las distintas herramientas de formato (`typstyle`, `cargo-fmt`) y _linting_ (`clippy`, `cspell`) se
 usa `prek`.
 

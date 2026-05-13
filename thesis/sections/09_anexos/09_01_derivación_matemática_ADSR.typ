@@ -25,6 +25,7 @@ $
 
 Cuando el condensador cambia de un valor inicial $y_0$ a un valor objetivo $T$, sigue la @eq_decay_to_T:
 
+
 $
   y(t) = T + (y_0 - T) times e^inline((-t)/tau)
 $
@@ -128,8 +129,7 @@ $
 $
 <eq_t_r>
 
-
-Si se consigue el $tau$ necesario para decaer de $y_0$ a $T_0$ en $n$ muestras, se pueden calcular $C$ y $B$. Despejar
+Si se calcula el $tau$ necesario para decaer de $y_0$ a $T_0$ en $n$ muestras, se pueden calcular $C$ y $B$. Despejar
 $tau$ resulta en el valor indicado en la @eq_tau_t_r:
 
 #context query(<eq_decay_iterative>).first()

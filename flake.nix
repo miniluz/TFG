@@ -74,6 +74,12 @@
                 typst
                 drawio
                 entr
+                (python3.withPackages (
+                  pythonPackages: with pythonPackages; [
+                    numpy
+                    matplotlib
+                  ]
+                ))
 
                 vmpk
                 qpwgraph
