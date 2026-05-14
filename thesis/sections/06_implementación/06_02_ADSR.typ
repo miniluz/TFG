@@ -9,7 +9,7 @@
 
 Cuando un oscilador se activa y desactiva repentinamente, no genera un sonido agradable. Cuando se toca una nota,
 empieza repentinamente al máximo volumen, y cuando se deja de tocar, para instantáneamente. Estos cambios bruscos se
-escuchan como clics, que no son compatibles con el @rnf_audio_quality.
+escuchan como clics, que no son compatibles con el @rnf_calidad_de_audio.
 
 El envolvente de ataque, decaimiento, sostenimiento y relajación (_attack, decay, sustain, release_ o ADSR) suaviza esta
 transición. Se origina en los sintetizadores analógicos, y se ha convertido en el estándar para controlar la envolvente

@@ -38,7 +38,7 @@ notas.
 
 #include "../../tables/tabla_errores_cents.typ"
 
-Para que el error $e_"cents"$ sea imperceptible, como pide el @rnf_audio_quality, tiene que ser menor a $6 "cents"$
+Para que el error $e_"cents"$ sea imperceptible, como pide el @rnf_calidad_de_audio, tiene que ser menor a $6 "cents"$
 @ref_thesis_minimum_cents. Si queremos un error $f_e$ imperceptible para la frecuencia $f$ de la cuerda más grave de un
 bajo de 5 cuerdas, de unos $30 "Hz"$, el error tiene que ser de
 $f_e = (2^(1/1.200))^(e_"cents") times f - f approx 0.10 "Hz"$. Dado que $f_s / 2^"bits" = f_e$, hacen falta
@@ -48,7 +48,7 @@ de 32 bits, si se usan más de 16 bits lo mejor es usar 32 (en formato UQ8.24).
 Los 8 bits de la parte entera, $i$, se usan directamente para indexar la tabla $T$. De los 24 bits de la parte
 fraccionaria, se toman los primeros 15 y se interpretan como un Q15, $r$. Estos se usan para interpolar la muestra $i$
 con la siguiente, $i + 1 mod 256$. Interpolar evita el ruido que genera redondear del índice @ref_book_music_tutorial, y
-es necesario para cumplir con el @rnf_audio_quality, y es necesario para cumplir con el @rnf_audio_quality. Mientras
+es necesario para cumplir con el @rnf_calidad_de_audio, y es necesario para cumplir con el @rnf_calidad_de_audio. Mientras
 mayor es $r$, más cerca se está de la siguiente muestra, por lo que se usa como el peso de la siguiente muestra. Por lo
 tanto, la salida se calcula con la @eq_salida_interpolada @ref_book_theory_music.
 
@@ -61,7 +61,7 @@ $
   @ref_web_const_eval. Sin embargo, no fue posible, ya que la mayoría de operaciones con floats no se pueden realizar en
   `const` al no dar los mismos resultados en cualquier CPU @ref_web_powf_not_const.]
 
-Sparklet incluye 4 tablas para los cuatro tipos de ondas que indica el @rf_waveforms. Cada una tiene 256 muestras de 16
+Sparklet incluye 4 tablas para los cuatro tipos de ondas que indica el @rf_ondas. Cada una tiene 256 muestras de 16
 bits cada una (en formato Q15), por lo que ocupan 512 bytes cada una y 2 KiB en total. Estas tablas se generan en la con
 utilidades que se ejecutan en la computadora de desarrollo con la arquitectura `x86_64` antes del desarrollo. Se
 encuentran en la carpeta `sparklet/table_generators/src/bin`.#fn Calculan el valor de cada muestra en la tabla usando

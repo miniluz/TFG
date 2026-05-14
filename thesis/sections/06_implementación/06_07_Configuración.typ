@@ -9,7 +9,7 @@
 === Durante la compilación
 <sec_configuración_compilación>
 
-Sparklet ha de cumplir el @rnf_rendimiento y el @rf_multi_device simultáneamente. Una dificultad es que algunas
+Sparklet ha de cumplir el @rnf_rendimiento y el @rf_multi_dispositivos simultáneamente. Una dificultad es que algunas
 características, como el ecualizador o la lectura de MIDI por USB, pueden ser demasiado pesadas para el CPU o la memoria
 de dispositivo menos capaces. Desactivar estas funcionalidades en ejecución con un `if` no es suficiente, porque su
 código sigue ocupando memoria. Por ejemplo, para dar soporte a MIDI por USB, se incluye un controlador de USB completo
@@ -66,7 +66,7 @@ se incluye en el código en tiempo de compilación con la macro `include!()`.
 === Durante la ejecución
 
 Sparklet se puede configurar en la ejecución con dos botones y tres codificadores rotatorios, como indica el
-@rf_runtime_configuration. Para permitir modificar más de tres parámetros con los tres codificadores, se pagina la
+@rf_configuración_ejecución. Para permitir modificar más de tres parámetros con los tres codificadores, se pagina la
 configuración: los codificadores modifican los valores de la página actual, mientras que los botones controlan la
 página. El módulo responsable de esta gestión es `ConfigManager`, que mantiene el estado de las páginas, los parámetros
 y la página seleccionada, y procesa eventos de configuración.

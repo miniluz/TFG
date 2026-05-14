@@ -27,4 +27,4 @@
 
 #include "06_implementación/06_10_USB.typ"
 
-#include "06_implementación/06_11_CMSIS.typ"
+#include "06_implementación/06_11_Operaciones_DSP.typ"

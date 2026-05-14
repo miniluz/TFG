@@ -32,7 +32,7 @@ Sparklet soporta la entrada MIDI tanto por un puerto DIN, usando UART, como por 
 
 La fiabilidad del módulo de `midly` es fundamental, pues es el único módulo expuesto a datos externos con código de
 gestión escrito a mano. Se puede encontrar con mensajes erróneos, con ruido, o en el peor caso maliciosos, y los ha de
-manejar correctamente para cumplir el @rnf_reliability. Por lo tanto, este fue el módulo más probado. Su resistencia a
+manejar correctamente para cumplir el @rnf_fiabilidad. Por lo tanto, este fue el módulo más probado. Su resistencia a
 errores y mensajes largos fue validada: es capaz de procesar mensajes tras haber recibido mil bytes de datos aleatorios
 
 // TODO: Hablar de MIDI con UART

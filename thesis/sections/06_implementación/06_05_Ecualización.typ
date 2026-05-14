@@ -5,7 +5,7 @@
 
 == Ecualización
 
-Para la ecualización que pide le @rf_eq, se separa la señal en componentes correspondientes a ciertos rangos de
+Para la ecualización que pide le @rf_ecualizador, se separa la señal en componentes correspondientes a ciertos rangos de
 frecuencia que se escalan independientemente y vuelven a combinar. #footnote[Usando la tabla
   `DB_LINEAR_AMLITUDE_TABLE`.] Para atenuar un rango de frecuencias en particular o para aumentar las frecuencias
 agudas, se puede bajar o subir el volumen a los componentes correspondientes.

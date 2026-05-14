@@ -6,7 +6,7 @@
 == Banco de voces
 <sec_banco_de_voces>
 
-Sparklet es capaz de reproducir más de una nota a la vez de acuerdo al @rf_polyphony, lo que se conoce como polifonía
+Sparklet es capaz de reproducir más de una nota a la vez de acuerdo al @rf_polifonía, lo que se conoce como polifonía
 @ref_book_theory_music. La cantidad de notas que puede reproducir a la vez se llama en límite de polifonía $|V|$. Por
 ejemplo, si puede reproducir cuatro notas simultáneamente, se dice que tiene un límite de polifonía de cuatro, o que
 tiene cuatro voces.
@@ -42,7 +42,7 @@ una de las dificultades principales del desarrollo de Sparklet. Tómense los sig
   en el cable. Otra implementación podría asignar una segunda voz a esa nota y liberar sólo una si después se recibe un
   evento de soltar la nota. En este caso, sería imposible soltar la otra nota: incluso si el músico vuelve a tocar y
   soltar la misma tecla, se asignará y liberará otra voz. Restablecer el comportamiento normal del sintetizador
-  necesitaría de su reinicio, lo que incumpliría el @rnf_reliability.
+  necesitaría de su reinicio, lo que incumpliría el @rnf_fiabilidad.
 
 + Entre dos procesamientos de eventos MIDI, un músico toca más notas del límite. Por ejemplo, hay un límite de 2 notas,
   ambas ocupadas, y el músico ha tocado 4 notas desde la última vez que se procesaron. Se han de soltar las notas que

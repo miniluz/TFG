@@ -20,19 +20,19 @@
   El sintetizador ha de ser configurable en compilación para conectarse a MIDI por un puerto DIN.]
 #req("rf_audio_usb", "F")[Audio USB][
   El sintetizador ha de ser configurable en compilación para conectarse al audio por USB.]
-#req("rf_waveforms", "F")[Generación de ondas][
+#req("rf_ondas", "F")[Generación de ondas][
   El sintetizador ha de poder generar ondas sinusoidales, cuadradas, de diente de sierra y triangulares.]
 #req("rf_adsr", "F")[ADSR][
   El sintetizador ha de modular la amplitud de la onda con un envolvente ADSR configurable.]
-#req("rf_eq", "F")[Ecualización][
+#req("rf_ecualizador", "F")[Ecualización][
   El sintetizador ha de ser configurable en compilación para poder ecualizar la señal.]
-#req("rf_polyphony", "F")[Polifonía][
+#req("rf_polifonía", "F")[Polifonía][
   El sintetizador ha de tener una cantidad de voces configurable en compilación.]
-#req("rf_multi_device", "F")[Multiples dispositivos][
+#req("rf_multi_dispositivos", "F")[Multiples dispositivos][
   El sintetizador ha de poder ser instalado en al menos dos dispositivos empotrados distintos.]
-#req("rf_add_devices", "F")[Añadir dispositivos][
+#req("rf_añadir_dispositivos", "F")[Añadir dispositivos][
   Debe estar documentado cómo configurar el sintetizador para un nuevo dispositivo empotrado.]
-#req("rf_runtime_configuration", "F")[Configuración en ejecución][
+#req("rf_configuración_ejecución", "F")[Configuración en ejecución][
   El sintetizador ha de ser configurable en ejecución con elementos físicos conectados a la placa.]
 
 === Requisitos no funcionales
@@ -40,11 +40,11 @@
 
 #req("rnf_rendimiento", "NF")[Rendimiento][
   El sintetizador ha de acabar de producir cada bloque de audio antes de que el siguiente se solicite.]
-#req("rnf_reliability", "NF")[Fiabilidad][
+#req("rnf_fiabilidad", "NF")[Fiabilidad][
   El sintetizador ha de operar continuamente sin necesitar un reinicio.]
-#req("rnf_audio_quality", "NF")[Calidad de audio][
+#req("rnf_calidad_de_audio", "NF")[Calidad de audio][
   El sintetizador ha de producir audio libre de distorsiones perceptibles.]
-#req("rnf_tests", "NF")[Pruebas][
+#req("rnf_pruebas", "NF")[Pruebas][
   El sintetizador ha de tener pruebas que validen su funcionalidad ejecutadas automáticamente durante el desarrollo de
   forma visible.
 ]
@@ -62,9 +62,9 @@ C es una de los lenguajes más populares en el desarrollo empotrado. El @rnf_ren
 CMSIS-DSP, una biblioteca de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C,
 C++ o Zig permitiría integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero
 que tenga suficiente experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del
-hardware, para cumplir el @rnf_reliability. Un argumento similar aplica a C++ y a Zig.
+hardware, para cumplir el @rnf_fiabilidad. Un argumento similar aplica a C++ y a Zig.
 
-SPARK es una opción apropiada para conseguir el @rnf_reliability, ya que permite verificar formalmente los programas
+SPARK es una opción apropiada para conseguir el @rnf_fiabilidad, ya que permite verificar formalmente los programas
 @ref_web_ada_formal_proof. Sin embargo, tiene un ecosistema pequeño, en particular en lo que respecta al audio, por lo
 que se tendría que implementar mucha lógica desde cero. La fricción de esta opción no permitiría realizar el proyecto a
 tiempo.
@@ -81,14 +81,14 @@ parte de tu programa y depender de bibliotecas que lo usan, minimizando el riesg
 revisadas. Las librerías de `HAL` (_hardware abstraction layer_) en el ecosistema de Rust están construidas con una API
 diseñada para validar en compilación que la configuración del hardware es correcta. Si se diseña una arquitectura en la
 que no puedan ocurrir bloqueos mutuos (_deadlocks_), se puede tener seguridad de que el programa nunca se tendrá que
-reiniciar, cumpliendo el @rnf_reliability.
+reiniciar, cumpliendo el @rnf_fiabilidad.
 
 Rust también permite realizar compilación cruzada @ref_web_rust_cross, permitiendo que el mismo código sea compilado
 tanto a `x86_64`, la arquitectura del ordenador, como a `thumbv7em` (_ARM Cortex M7_), la arquitectura del
 microcontrolador. El proyecto aprovecha esto moviendo todo el código posible a _crates_ (paquetes) que son
 independientes del hardware. Esto permite desarrollar sin necesidad de tener el microcontrolador a mano, además de
 automatizar las pruebas en workflows de GitHub Actions para que sus resultados sean visibles, para cumplir el
-@rnf_tests.
+@rnf_pruebas.
 
 Finalmente, Rust es el lenguaje con el que tengo más experiencia de los evaluados. Por todo esto, he elegido usarlo.
 
@@ -179,7 +179,7 @@ en los `Future` de Rust.
 Debido a la popularidad de Embassy, su ecosistema es bastante maduro. Ofrece _hardware abstraction layers_, APIs de Rust
 que abstraen las características del hardware (p. ej. entrada, salida, _pull-ups_). Usan el sistema de tipos de Rust
 para garantizar que los estados inválidos del hardware generan fallos durante la compilación (en lugar de durante la
-ejecución), ayudando a conseguir el @rnf_reliability. Por ejemplo, es imposible activar las interrupciones en los pines
+ejecución), ayudando a conseguir el @rnf_fiabilidad. Por ejemplo, es imposible activar las interrupciones en los pines
 `PA5` y `PB5` simultáneamente, ya que crear una entrada con interrupciones consume un `struct` `EXTI5` del que
 únicamente se puede obtener uno (con código que no es `unsafe`). Si se intenta, genera un error de compilación.
 
@@ -223,7 +223,7 @@ Se usa Nix para proporcionar los programas necesarios para el proyecto de forma 
 para formar el entorno de desarrollo y el entorno de usado por GitHub Actions para ejecutar las pruebas automáticas.
 Este proporciona todos los programas usadas en el desarrollo, incluyendo Rust, Octave, Typst y todas las utilidades, y
 fija sus versiones. Garantiza que el entorno de desarrollo es el mismo que el de ejecución de pruebas, para cumplir el
-@rnf_tests.
+@rnf_pruebas.
 
 Se usa _just_ como gestor de comandos, una alternativa a usar una `Makefile` más usada por la comunidad de Rust. Este
 proporciona una interfaz fácil (`just test`) para todas las secuencias de comandos comunes usadas en el desarrollo. Para
