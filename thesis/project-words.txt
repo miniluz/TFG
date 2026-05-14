@@ -46,3 +46,16 @@ Loeffler
 mastersthesis
 Vaidyanathan
 cetz
+elabel
+baselinediff
+baselinefix
+bluss
+dylab
+eqbbox
+mbbox
+rowbaseline
+ryuryu
+Sverdrup
+textbaseline
+Ulrik
+ylab

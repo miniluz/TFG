@@ -5,10 +5,17 @@
 
 == Ecualización
 
-Para la ecualización que pide le @rf_ecualizador, se separa la señal en componentes correspondientes a ciertos rangos de
-frecuencia que se escalan independientemente y vuelven a combinar. #footnote[Usando la tabla
-  `DB_LINEAR_AMLITUDE_TABLE`.] Para atenuar un rango de frecuencias en particular o para aumentar las frecuencias
-agudas, se puede bajar o subir el volumen a los componentes correspondientes.
+Sparklet implementa un ecualizador multibanda para satisfacer el @rf_ecualizador. Se separa la señal en componentes que
+corresponden a ciertos rangos de frecuencia, la ganancia de estos componentes se ajusta independientemente, y se vuelven
+a combinar, como se puede ver en la @fig_eq_diagrama. #footnote[Usando la tabla `DB_LINEAR_AMLITUDE_TABLE`.] Para
+atenuar un rango de frecuencias en particular o para aumentar las frecuencias agudas, se puede bajar o subir la ganancia
+a los componentes correspondientes.
+
+#figure(
+  image("/figures/Ecualizador.pdf", width: 90%),
+  caption: [Proceso de división, ajuste y recombinación de bandas en un ecualizador multibanda.],
+  placement: auto,
+)<fig_eq_diagrama>
 
 #let citation = cite(<ref_book_filter_banks>, form: "prose")
 
@@ -32,7 +39,7 @@ almacenando los coeficientes en formato Q15.
 
 El objetivo del banco es permitir controlar el tono del sonido en términos generales, permitiendo al músico controlar
 los componentes graves, medios y altos del sonido. Al usar filtros de Butterworth de primer orden, cada filtro tiene una
-pendiente de $-6 "dB"$, lo que resulta en que disminuir el volumen de una banda no resulte brusco. Cada banda se
+pendiente de $-6 "dB"$, lo que resulta en que disminuir la ganancia de una banda no resulte brusco. Cada banda se
 organiza aproximadamente en una escala de octavas, con solapamiento entre filtros para suavizar la transición entre
 bandas.
 

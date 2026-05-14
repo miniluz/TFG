@@ -9,21 +9,18 @@ El ejecutor (`runner`) es responsable de inicializar el hardware, definir los ca
 comunicarse, y crear las tareas que llaman el resto de componentes. Es el primer módulo mencionado hasta el momento que
 sólo se puede ejecutar en el sistema empotrado. En concreto, hace lo siguiente:
 
-+ Inicialización del hardware El módulo `hardware` es responsable de controlar el hardware, es decir los inputs y
-  outputs GPIO u EXTI necesarios. Aislarlo en un módulo facilita actualizar los detalles si se cambia el chip usado.
-  Inicializa el USB, si es necesario, y determina los pines que serán usados para los botones y codificadores rotativos
-  de la configuración. Finalmente, introduce toda la configuración en el struct `Hardware`, y lo devuelve.
++ Inicialización del hardware El módulo `hardware` es responsable de controlar el hardware, es decir las entradas y
+  salidas GPIO, EXTI, etc. necesarias. Aislarlo en un módulo facilita actualizar los detalles si se cambia el chip
+  usado. Inicializa el USB, si es necesario, y determina los pines que serán usados para los botones y codificadores
+  rotativos de la configuración. Finalmente, introduce toda la configuración en el struct `Hardware`, y lo devuelve.
 
 + Inicialización del ejecutor de Embassy.
 
 + Inicialización del USB, si está activado.
 
-+ Creación, sin inicializar, de la tarea MIDI, ya sea recibido por un conector DIN por UART o por USB. Esta tarea
-  sencillamente lee los datos que se envían por la conexión serial y los envía a un `MidiListener` que contiene en su
-  estado.
++ Creación, sin inicializar, de la tarea MIDI, ya sea usando un conector DIN o USB.
 
-+ Creación de la tarea de salida audio por USB. Esta espera a que el USB la sondee y devuelve los datos. También
-  controla las señales de silenciamiento y control de volumen.
++ Creación de la tarea de salida audio por USB.
 
 + Creación de la tarea de la gestión de la configuración.
 

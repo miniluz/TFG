@@ -21,14 +21,22 @@ envía al `VoiceBank` por el canal de eventos, que los procesa como se explica e
   mensajes que soporta Sparklet ocupan como mínimo 3 bytes, solo puede producir $31.250 div 24 approx 1302$ mensajes por
   segundo. MIDI por USB puede usar velocidades de transmición superiores, pero la cola en la práctica nunca se llena.]
 
+Sparklet soporta la entrada MIDI tanto por un puerto DIN, usando UART, como por USB, según el @rf_midi_din y el
+@rf_midi_usb. En ambos casos, se consiguen los bytes de los mensajes MIDI y se envían a `MidiListener`. La conexión de
+`MidiListener` con otros módulos se puede ver representada en la @fig_midi_listener.
+
+#figure(
+  image("/figures/MIDI.pdf", width: 80%),
+  caption: [`MidiListener` recibe bytes de la entrada, sea por DIN o USB, y pasa los eventos al `VoiceBank` por una cola
+    con descarte],
+  placement: auto,
+)<fig_midi_listener>
 
 `Sparklet` únicamente soporta los eventos MIDI `NoteOn` y `NoteOff`. El resto de eventos son descartados por
 `MidiListener` antes de enviarlos por el canal. Ambos eventos caben en 3 bytes @ref_web_midi, pero se asigna a `midly`
 un _buffer_ de 4 bytes al no tener coste adicional por alineación de memoria. Los mensajes más largos son ignorados al
 no caber en el buffer, lo que es conveniente pues MIDI acepta mensajes de longitud arbitraria /* TODO cita */.
 
-Sparklet soporta la entrada MIDI tanto por un puerto DIN, usando UART, como por USB, según el @rf_midi_din y el
-@rf_midi_usb. En ambos casos, se consiguen los bytes de los mensajes MIDI y se envían a `MidiListener`.
 
 La fiabilidad del módulo de `midly` es fundamental, pues es el único módulo expuesto a datos externos con código de
 gestión escrito a mano. Se puede encontrar con mensajes erróneos, con ruido, o en el peor caso maliciosos, y los ha de
