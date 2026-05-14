@@ -6,14 +6,15 @@
 == Banco de voces
 <sec_banco_de_voces>
 
-Un sintetizador generalmente es capaz de reproducir más de una nota a la vez, lo que se conoce como polifonía
-@ref_book_theory_music. Generalmente tienen un límite de polifonía $|V|$. Por ejemplo, si puede reproducir cuatro notas
-simultáneamente, se dice que tiene un límite de polifonía de cuatro, o que tiene cuatro voces. El componente de Sparklet
-que mantiene el estado de las voces y las gestiona se llama el banco de voces, denominado `VoiceBank`.
+Sparklet es capaz de reproducir más de una nota a la vez de acuerdo al @rf_polyphony, lo que se conoce como polifonía
+@ref_book_theory_music. La cantidad de notas que puede reproducir a la vez se llama en límite de polifonía $|V|$. Por
+ejemplo, si puede reproducir cuatro notas simultáneamente, se dice que tiene un límite de polifonía de cuatro, o que
+tiene cuatro voces.
 
-El comportamiento del banco de voces es simple si nunca se tocan más de $|V|$ notas simultáneamente: cada vez que se
-toca una nota, se busca una voz `Voice` libre (con ADSR en estado `Idle`) y se toca en ella, y cada vez que se deja de
-tocar una voz, se pone su `ADSR` respectivo en el estado `Release`.
+El componente de Sparklet que mantiene el estado de las voces y las gestiona se llama el banco de voces, denominado
+`VoiceBank`. El comportamiento del banco de voces es simple si nunca se tocan más de $|V|$ notas simultáneamente: cada
+vez que se toca una nota, se busca una voz `Voice` libre (con ADSR en estado `Idle`) y se asigna a esa a ella, y cada
+vez que se deja de tocar una nota, se pone el `ADSR` de su voz en el estado `Release`.
 
 === Casos límite de la superación del límite de polifonía
 
@@ -40,7 +41,8 @@ una de las dificultades principales del desarrollo de Sparklet. Tómense los sig
 + Se han recibido dos eventos de tocar la misma nota sin un evento de soltarla en medio, por ejemplo debido a un error
   en el cable. Otra implementación podría asignar una segunda voz a esa nota y liberar sólo una si después se recibe un
   evento de soltar la nota. En este caso, sería imposible soltar la otra nota: incluso si el músico vuelve a tocar y
-  soltar la misma tecla, se asignará y liberará otra voz.
+  soltar la misma tecla, se asignará y liberará otra voz. Restablecer el comportamiento normal del sintetizador
+  necesitaría de su reinicio, lo que incumpliría el @rnf_reliability.
 
 + Entre dos procesamientos de eventos MIDI, un músico toca más notas del límite. Por ejemplo, hay un límite de 2 notas,
   ambas ocupadas, y el músico ha tocado 4 notas desde la última vez que se procesaron. Se han de soltar las notas que
@@ -58,6 +60,7 @@ una de las dificultades principales del desarrollo de Sparklet. Tómense los sig
   caso anterior, tocar la primera nota, luego tener que soltarla, y finalmente tocar la tercera, retrasándola.
 
 === Solución implementada
+<sec_procesado_midi>
 
 #figure(
   image("/figures/Banco de voces.pdf", width: 60%),
@@ -85,7 +88,6 @@ límite, arreglando el tercer y cuarto problema, y eliminan las notas que se sue
 arreglando el quinto.
 
 === Detalles del algoritmo
-<sec_detalles_algoritmo_voice_bank>
 
 Ya que este algoritmo es uno de los aspectos más únicos de Sparklet, cabe entrar en detalle de cómo funciona. El código
 que lo implementa se puede ver en el @cod_voice_steal_algorithm. Cada vez que se genera un bloque de audio, lo primero

@@ -5,9 +5,9 @@
 
 == Ejecutor
 
-El ejecutor (`runner`) es el primer módulo mencionado hasta el momento que sólo se puede ejecutar en el sistema
-empotrado. Su responsabilidad es inicializar el hardware, definir los canales que usan para comunicarse, y crear las
-tareas que llaman al resto de componentes. En la práctica, hace lo siguiente:
+El ejecutor (`runner`) es responsable de inicializar el hardware, definir los canales que usan los otros módulos para
+comunicarse, y crear las tareas que llaman el resto de componentes. Es el primer módulo mencionado hasta el momento que
+sólo se puede ejecutar en el sistema empotrado. En concreto, hace lo siguiente:
 
 + Inicialización del hardware El módulo `hardware` es responsable de controlar el hardware, es decir los inputs y
   outputs GPIO u EXTI necesarios. Aislarlo en un módulo facilita actualizar los detalles si se cambia el chip usado.

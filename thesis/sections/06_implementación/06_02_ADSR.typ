@@ -9,7 +9,7 @@
 
 Cuando un oscilador se activa y desactiva repentinamente, no genera un sonido agradable. Cuando se toca una nota,
 empieza repentinamente al máximo volumen, y cuando se deja de tocar, para instantáneamente. Estos cambios bruscos se
-escuchan como clics, y no tienen un carácter musical.
+escuchan como clics, que no son compatibles con el @rnf_audio_quality.
 
 El envolvente de ataque, decaimiento, sostenimiento y relajación (_attack, decay, sustain, release_ o ADSR) suaviza esta
 transición. Se origina en los sintetizadores analógicos, y se ha convertido en el estándar para controlar la envolvente
@@ -64,17 +64,17 @@ principio se pierde poca energía y al final se pierde con demasiada velocidad.
 
 #figure(
   image("/figures/adsr_vol_lineal.png", width: 69%),
-  caption: [Amplitud equivalente para una transición lineal del volumen],
+  caption: [Amplitud equivalente para una transición lineal del volumen.],
   placement: auto,
 )<fig_vol_lineal>
 #figure(
   image("/figures/adsr_amp_lineal.png", width: 69%),
-  caption: [Volumen equivalente para una transición lineal de la amplitud],
+  caption: [Volumen equivalente para una transición lineal de la amplitud.],
   placement: auto,
 )<fig_amp_lineal>
 #figure(
   image("/figures/adsr_condensador.png", width: 69%),
-  caption: [La transición conseguida por el modelo matemático #linebreak() del condensador, con $r_t = 0,1$],
+  caption: [La transición conseguida por el modelo matemático #linebreak() del condensador, con $r_t = 0,1$.],
   placement: auto,
 )<fig_condensador>
 
@@ -87,15 +87,16 @@ parámetro adicional _target ratio_ $r$ que permite interpolar entre un decaimie
 para permitir dar la forma deseada al envolvente. Se puede ver en la @fig_condensador la respuesta obtenida, que es
 agresiva en el ataque y pierde energía más rápidamente en el decaimiento.
 
-Un condensador sigue el decaimiento exponencial. Para poder modelar este comportamiento de forma eficiente con números
-de coma fija, que no pueden hacer cálculos exponenciales, se transforman las ecuaciones del decaimiento a una forma
-recursiva. La derivación en detalle se encuentra en un anexo bajo la @sec_derivación_ADSR. El resumen es el siguiente:
-la amplitud $y_n$ de la curva ADSR en la muestra $n$ se calcula en base a la muestra anterior $y_(n-1)$ de forma
-recursiva. Este cálculo consiste en multiplicarla por un coeficiente $C$ y sumarle una base $B$, como se indica en la
-@eq_decay_b_c. La base y el coeficiente se calculan en base al valor inicial $y_0$, el valor objetivo $T_0$, y la
-cantidad de muestras que toma la transformación $n$. A partir del target ratio $r$ ya mencionado se calcula un objetivo
-corregido $T$, como se muestra en @eq_base_coefficient_t_r. Además, pueden ser almacenados en un Q15, ya que su valor
-absoluto nunca es mayor a 1 en los casos relevantes, como se muestra en @eq_b_c_range.
+Un condensador sigue el decaimiento exponencial. Para poder modelar este comportamiento con números de coma fija, que no
+pueden hacer cálculos exponenciales, se transforman las ecuaciones del decaimiento a una forma recursiva. La forma
+recursiva también es eficiente, como pide el @rnf_rendimiento. La derivación en detalle se encuentra en un anexo bajo la
+@sec_derivación_ADSR. El resumen es el siguiente: la amplitud $y_n$ de la curva ADSR en la muestra $n$ se calcula en
+base a la muestra anterior $y_(n-1)$ de forma recursiva. Este cálculo consiste en multiplicarla por un coeficiente $C$ y
+sumarle una base $B$, como se indica en la @eq_decay_b_c. La base y el coeficiente se calculan en base al valor inicial
+$y_0$, el valor objetivo $T_0$, y la cantidad de muestras que toma la transformación $n$. A partir del target ratio $r$
+ya mencionado se calcula un objetivo corregido $T$, como se muestra en @eq_base_coefficient_t_r. Además, pueden ser
+almacenados en un Q15, ya que su valor absoluto nunca es mayor a 1 en los casos relevantes, como se muestra en
+@eq_b_c_range.
 
 $
   y_n = B + y_(n-1) times C

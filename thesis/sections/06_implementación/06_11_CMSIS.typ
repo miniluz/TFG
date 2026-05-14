@@ -5,10 +5,11 @@
 
 == CMSIS
 
-Para lidiar con CMSIS, se usa la biblioteca `cmsis_dsp` de Rust, que proporciona _bindings_ para la biblioteca CMSIS; es
-decir, por cada función de la biblioteca en C se proporciona una función en Rust que hace la misma operación. Se hizo un
+Para comunicar el Sparklet con la biblioteca CMSIS-DSP, que provee operaciones DSP eficientes en la arquitectura ARM, se
+usa la biblioteca `cmsis_dsp` de Rust. Proporciona _bindings_ para CMSIS-DSP; es decir, por cada función de la
+biblioteca en C se proporciona una función en Rust que la llama, manteniendo las invariantes que Rust espera. Se hizo un
 _fork_ de la biblioteca para poder implementar bindings a otras funciones necesarias, como la función
-`biquad_cascade_df1_q15` que usa el banco de filtros.
+`biquad_cascade_df1_q15`, que usa el ecualizador.
 
 Como se mencionó en la @sec_inst_dsp, Sparklet usa una interfaz llamada `CmsisOperations` con dos implementaciones, una
 basada en Rust (que puede ejecutarse en cualquier plataforma compatible, incluyendo `x86_64`) y una basada en

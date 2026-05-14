@@ -5,10 +5,10 @@
 
 == Ecualización
 
-Para la ecualización, se separa la señal en componentes correspondientes a ciertos rangos de frecuencia que se escalan
-independientemente y vuelven a añadir. #footnote[Usando la tabla `DB_LINEAR_AMLITUDE_TABLE`.] Para atenuar un rango de
-frecuencias en particular o para aumentar las frecuencias agudas, se puede bajar o subir el volumen a los componentes
-correspondientes.
+Para la ecualización que pide le @rf_eq, se separa la señal en componentes correspondientes a ciertos rangos de
+frecuencia que se escalan independientemente y vuelven a combinar. #footnote[Usando la tabla
+  `DB_LINEAR_AMLITUDE_TABLE`.] Para atenuar un rango de frecuencias en particular o para aumentar las frecuencias
+agudas, se puede bajar o subir el volumen a los componentes correspondientes.
 
 #let citation = cite(<ref_book_filter_banks>, form: "prose")
 
@@ -17,10 +17,11 @@ Para conseguir esto, se podría usar un árbol de filtros perfectamente reconstr
 embargo, implementarlos sin usar operaciones de coma flotante de forma eficiente no es viable, ya que requiere de
 filtros FIR de orden grande.
 
-Sparklet usa 6 filtros de Butterworth aplicados en paralelo para dividir la señal en bandas con solapamiento, de forma
-no perfectamente reconstructiva. El primero es de paso bajo, los intermedios son de paso banda y el último de paso alto,
-para repartir entre ellos todo el rango de frecuencias, como se puede ver en la @fig_eq_response. Se usan filtros IIR de
-Butterworth en DF1 @ref_book_theory_music @ref_book_understanding_dsp, almacenando los coeficientes en formato Q15.
+Para conseguir el @rnf_rendimiento, Sparklet usa 6 filtros de Butterworth aplicados en paralelo para dividir la señal en
+bandas con solapamiento, de forma no perfectamente reconstructiva. El primero es de paso bajo, los intermedios son de
+paso banda y el último de paso alto, para repartir entre ellos todo el rango de frecuencias, como se puede ver en la
+@fig_eq_response. Se usan filtros IIR de Butterworth en DF1 @ref_book_theory_music @ref_book_understanding_dsp,
+almacenando los coeficientes en formato Q15.
 
 #figure(
   image("/figures/octave_filter_response_q15.png", width: 90%),

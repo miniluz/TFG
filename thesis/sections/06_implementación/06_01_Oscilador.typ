@@ -10,9 +10,9 @@
 
 Los osciladores son donde comienza la síntesis. Estos reciben una frecuencia y generan una señal de audio a dicha
 frecuencia. Hay diversos tipos de osciladores, pero uno de los más usados en entornos empotrados es el de tabla de onda
-(_wavetable_), debido a su eficiencia. Esta es la razón por la que Sparklet lo usa. La onda deseada se almacena en una
-tabla de longitud arbitraria $L$ como se ve en la /* TODO */, y se reproduce a la frecuencia deseada
-@ref_book_music_tutorial @ref_book_theory_music.
+(_wavetable_), debido a su eficiencia. Esta es la razón por la que Sparklet lo usa, según el @rnf_rendimiento. La onda
+deseada se almacena en una tabla de longitud arbitraria $L$ como se ve en la /* TODO */, y se reproduce a la frecuencia
+deseada @ref_book_music_tutorial @ref_book_theory_music.
 
 // TODO: Ilustración de una wavetable.
 
@@ -38,17 +38,19 @@ notas.
 
 #include "../../tables/tabla_errores_cents.typ"
 
-Para que el error $e_"cents"$ sea imperceptible, tiene que ser menor a $6 "cents"$ @ref_thesis_minimum_cents. Si
-queremos un error $f_e$ imperceptible para la frecuencia $f$ de la cuerda más grave de un bajo de 5 cuerdas, de unos
-$30 "Hz"$, el error tiene que ser de $f_e = (2^(1/1.200))^(e_"cents") times f - f approx 0.10 "Hz"$. Dado que
-$f_s / 2^"bits" = f_e$, hacen falta $log_2(f_s / f_e) = log_2((48.000 "Hz") / (0.10 "Hz")) = 19$ bits de precisión. Pero
-ya que la familia ARM Cortext M es de 32 bits, si se usan más de 16 bits lo mejor es usar 32 (en formato UQ8.24).
+Para que el error $e_"cents"$ sea imperceptible, como pide el @rnf_audio_quality, tiene que ser menor a $6 "cents"$
+@ref_thesis_minimum_cents. Si queremos un error $f_e$ imperceptible para la frecuencia $f$ de la cuerda más grave de un
+bajo de 5 cuerdas, de unos $30 "Hz"$, el error tiene que ser de
+$f_e = (2^(1/1.200))^(e_"cents") times f - f approx 0.10 "Hz"$. Dado que $f_s / 2^"bits" = f_e$, hacen falta
+$log_2(f_s / f_e) = log_2((48.000 "Hz") / (0.10 "Hz")) = 19$ bits de precisión. Pero ya que la familia ARM Cortext M es
+de 32 bits, si se usan más de 16 bits lo mejor es usar 32 (en formato UQ8.24).
 
 Los 8 bits de la parte entera, $i$, se usan directamente para indexar la tabla $T$. De los 24 bits de la parte
 fraccionaria, se toman los primeros 15 y se interpretan como un Q15, $r$. Estos se usan para interpolar la muestra $i$
-con la siguiente, $i + 1 mod 256$. Interpolar evita el ruido que genera redondear del índice @ref_book_music_tutorial.
-Mientras mayor es $r$, más cerca se está de la siguiente muestra, por lo que se usa como el peso de la siguiente
-muestra. Por lo tanto, la salida se calcula con la @eq_salida_interpolada @ref_book_theory_music.
+con la siguiente, $i + 1 mod 256$. Interpolar evita el ruido que genera redondear del índice @ref_book_music_tutorial, y
+es necesario para cumplir con el @rnf_audio_quality, y es necesario para cumplir con el @rnf_audio_quality. Mientras
+mayor es $r$, más cerca se está de la siguiente muestra, por lo que se usa como el peso de la siguiente muestra. Por lo
+tanto, la salida se calcula con la @eq_salida_interpolada @ref_book_theory_music.
 
 $
   T[i] times (1 - r) + T[i+1 mod 256] times r

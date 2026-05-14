@@ -38,7 +38,7 @@
 === Requisitos no funcionales
 <sec_rnf>
 
-#req("rnf_speed", "NF")[Velocidad][
+#req("rnf_rendimiento", "NF")[Rendimiento][
   El sintetizador ha de acabar de producir cada bloque de audio antes de que el siguiente se solicite.]
 #req("rnf_reliability", "NF")[Fiabilidad][
   El sintetizador ha de operar continuamente sin necesitar un reinicio.]
@@ -58,11 +58,11 @@
 En cuanto a la selección del lenguaje, se evaluaron C, C++, Zig, SPARK y Rust, por ser lenguajes populares para el
 desarrollo empotrado.
 
-C es una de los lenguajes más populares en el desarrollo empotrado. El @rnf_speed urge la integración de CMSIS-DSP, una
-biblioteca de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C, C++ o Zig
-permitiría integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero que tenga
-suficiente experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del hardware,
-para cumplir el @rnf_reliability. Un argumento similar aplica a C++ y a Zig.
+C es una de los lenguajes más populares en el desarrollo empotrado. El @rnf_rendimiento urge la integración de
+CMSIS-DSP, una biblioteca de C para realizar operaciones DSP aprovechando las operaciones del CPU operaciones. Usar C,
+C++ o Zig permitiría integrarse con la librería sin problemas. Sin embargo, aunque he usado C en el pasado, no considero
+que tenga suficiente experiencia para garantizar que no hayan problemas de memoria o un uso incorrecto accidental del
+hardware, para cumplir el @rnf_reliability. Un argumento similar aplica a C++ y a Zig.
 
 SPARK es una opción apropiada para conseguir el @rnf_reliability, ya que permite verificar formalmente los programas
 @ref_web_ada_formal_proof. Sin embargo, tiene un ecosistema pequeño, en particular en lo que respecta al audio, por lo
